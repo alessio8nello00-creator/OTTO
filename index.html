@@ -1,0 +1,1649 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Gestiotto">
+<meta name="theme-color" content="#7a4d31">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest">
+<title>Gestiotto</title>
+<style>
+/* ===== Palette autunnale: calma, calda, marrone ===== */
+:root{
+  --bg:#f5efe6; --card:#fffaf2; --ink:#3d2e22; --muted:#8c7660; --line:#eadfce;
+  --brand:#8a5a3b; --brand-2:#6f4429; --brand-soft:#f0e3d2; --amber:#d9984f;
+  --casa:#5f7f9e; --casa-soft:#e3eaf1; --giada:#c4687f; --giada-soft:#f6e3e8; --none-soft:#efe6da;
+  --warn:#b5652c; --warn-soft:#f8e6d6; --ok:#6b8a5a;
+  --r:18px; --safe-b:env(safe-area-inset-bottom); --safe-t:env(safe-area-inset-top);
+  --serif:ui-serif,"New York",Georgia,serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#1d1712; --card:#2a211a; --ink:#f1e7db; --muted:#a8927b; --line:#3d3128;
+    --brand:#b07a52; --brand-2:#4a2f1e; --brand-soft:#3a2b20; --casa:#7f9fbd; --casa-soft:#25303b;
+    --giada:#d4869a; --giada-soft:#3d2830; --none-soft:#2f261e; --warn-soft:#3d2a1c; --ok:#93b07f; }
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+header{position:sticky;top:0;z-index:5;padding:calc(var(--safe-t) + 10px) 16px 12px;background:linear-gradient(180deg,var(--brand),var(--brand-2));color:#fbf3e8}
+header .row{display:flex;align-items:center;gap:12px}
+header .logo{width:40px;height:40px;flex:none;border-radius:11px;box-shadow:0 0 0 1.5px rgba(255,255,255,.25)}
+header .titles{flex:1;min-width:0}
+header h1{margin:0;font:600 22px/1.15 var(--serif);letter-spacing:-.2px}
+header small{opacity:.8;font-size:13px}
+.iconbtn{width:38px;height:38px;border-radius:12px;background:rgba(255,255,255,.14);color:#fbf3e8;display:grid;place-items:center;font-size:18px}
+main{padding:14px 16px calc(150px + var(--safe-b));max-width:640px;margin:0 auto}
+.view{display:none}.view.on{display:block}
+.card{background:var(--card);border-radius:var(--r);padding:14px;margin-bottom:12px;border:1px solid var(--line)}
+.card h2{margin:0 0 10px;font:600 13px/1.2 -apple-system,system-ui,sans-serif;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card h2 .r{text-transform:none;letter-spacing:0;font-weight:600;color:var(--brand)}
+.hero{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border-radius:14px;padding:12px;background:var(--none-soft);border:1.5px solid var(--line);margin-bottom:12px}
+.hero.casa{background:var(--casa-soft);border-color:var(--casa)}
+.hero.giada{background:var(--giada-soft);border-color:var(--giada)}
+.hero .big{font:600 18px/1.25 var(--serif)}
+.hero .emoji{font-size:28px}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.day{border-radius:12px;padding:8px 0;text-align:center;background:var(--none-soft);font-size:12px;color:var(--muted);position:relative}
+.day b{display:block;font-size:17px;color:var(--ink)}
+.day.casa{background:var(--casa);color:#eef3f8}.day.casa b{color:#fff}
+.day.giada{background:var(--giada);color:#fbecef}.day.giada b{color:#fff}
+.day.today{outline:2px solid var(--brand);outline-offset:1px}
+.day .dot,.cal .c .dot{position:absolute;bottom:3px;left:50%;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:currentColor}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin-top:8px;flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+.item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.item:last-child{border-bottom:0}
+.item .grow,.grow{flex:1;min-width:0}
+.sub{font-size:13px;color:var(--muted)}
+.time{font-weight:700;min-width:48px;color:var(--brand)}
+.chk{width:26px;height:26px;border-radius:50%;border:2px solid var(--muted);flex:none;display:grid;place-items:center;color:#fff;font-size:14px}
+.done .chk{background:var(--brand);border-color:var(--brand)}
+.done .grow{text-decoration:line-through;color:var(--muted)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:10px;scrollbar-width:none}
+.chip{flex:none;padding:8px 14px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-size:14px;white-space:nowrap}
+.chip.on{background:var(--brand);color:#fbf3e8;border-color:var(--brand)}
+.chip .n{opacity:.7;margin-left:4px}
+.listrow{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--line);width:100%;text-align:left}
+.listrow:last-child{border-bottom:0}
+.badge{background:var(--brand);color:#fbf3e8;border-radius:999px;padding:2px 9px;font-size:13px;font-weight:600}
+.badge.zero{background:var(--none-soft);color:var(--muted)}
+.badge.warn{background:var(--warn)}
+.addrow{display:flex;gap:8px;align-items:center}
+input[type=text],input[type=time],input[type=date],input[type=password],input[type=number],input[type=url],select,textarea{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);outline:none;font-size:16px;-webkit-appearance:none;appearance:none;min-width:0}
+input:focus,textarea:focus,select:focus{border-color:var(--brand)}
+label.lbl{display:block;font-size:13px;color:var(--muted);margin:2px 0 -4px}
+.btn{padding:11px 16px;border-radius:12px;background:var(--brand);color:#fbf3e8;font-weight:600;white-space:nowrap}
+.btn.ghost{background:var(--brand-soft);color:var(--ink)}
+.btn.full{width:100%;display:block;margin-top:8px}
+.btn.small{padding:6px 10px;font-size:13px}
+.btn:disabled{opacity:.5}
+.muted{color:var(--muted);font-size:14px}
+.empty{color:var(--muted);font-size:14px;padding:6px 0;font-style:italic}
+.seg{display:grid;grid-template-columns:1fr 1fr 1fr;background:var(--bg);border-radius:12px;padding:3px;gap:3px}
+.seg button{padding:9px 4px;border-radius:10px;font-size:14px;font-weight:600;color:var(--muted)}
+.seg button.on.casa{background:var(--casa);color:#fff}.seg button.on.giada{background:var(--giada);color:#fff}.seg button.on.none{background:var(--card);color:var(--ink)}
+.cal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.cal-head b{font:600 18px var(--serif);text-transform:capitalize}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal .wd{text-align:center;font-size:11px;color:var(--muted);padding-bottom:2px}
+.cal .c{aspect-ratio:1;border-radius:10px;display:grid;place-items:center;font-size:14px;position:relative;background:var(--none-soft)}
+.cal .c.casa{background:var(--casa);color:#fff}.cal .c.giada{background:var(--giada);color:#fff}
+.cal .c.sel{outline:2.5px solid var(--brand);outline-offset:1px}
+.cal .c.today{font-weight:800;text-decoration:underline}
+.cal .c.blank{background:none}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.grid2>*{min-width:0}.grid2 .btn{white-space:normal;font-size:15px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.grid3>*{min-width:0}
+.stack>*+*{margin-top:8px}
+nav{position:fixed;bottom:0;left:0;right:0;z-index:6;background:var(--card);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding:6px 0 calc(6px + var(--safe-b))}
+nav button{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;color:var(--muted);padding:4px 0}
+nav button span{font-size:21px;line-height:1}
+nav button.on{color:var(--brand);font-weight:600}
+.alert{display:flex;gap:10px;align-items:center;background:var(--warn-soft);border:1px solid var(--amber);border-radius:14px;padding:10px 12px;margin-bottom:8px}
+.alert b{font-family:var(--serif)}
+.tips{margin:0;padding-left:18px}.tips li{margin:4px 0;font-size:15px}
+.dots{display:flex;gap:6px}.dots i{width:14px;height:14px;border-radius:50%;background:var(--none-soft);border:1.5px solid var(--line)}.dots i.on{background:var(--ok);border-color:var(--ok)}
+#chatlog{display:flex;flex-direction:column;gap:8px;padding-bottom:8px}
+.msg{max-width:85%;padding:10px 13px;border-radius:18px;white-space:pre-wrap;word-wrap:break-word;font-size:15px}
+.msg.u{align-self:flex-end;background:var(--brand);color:#fbf3e8;border-bottom-right-radius:6px}
+.msg.a{align-self:flex-start;background:var(--card);border:1px solid var(--line);border-bottom-left-radius:6px}
+.msg.t{align-self:center;background:none;color:var(--muted);font-size:12px;padding:2px}
+.chatbar{position:fixed;left:0;right:0;bottom:calc(58px + var(--safe-b));padding:8px 12px;background:var(--bg);display:none;gap:8px;z-index:6}
+body.chat .chatbar{display:flex}
+.chatbar textarea{resize:none;height:44px;max-height:120px}
+#micBtn.rec{background:var(--warn);color:#fff}
+.suggest{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.suggest button{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:7px 12px;font-size:13px;text-align:left}
+.shopmode .item{padding:16px 0;font-size:20px}.shopmode .chk{width:34px;height:34px}
+dialog{border:0;border-radius:22px;padding:18px;background:var(--card);color:var(--ink);width:min(94vw,470px);max-height:88vh;overflow:auto}
+dialog::backdrop{background:rgba(40,25,15,.5)}
+dialog h3{margin:0 0 10px;font:600 20px var(--serif)}
+.check{border-radius:14px;padding:10px 12px;background:var(--bg);font-size:14px}
+.check .bad{color:var(--warn);font-weight:600}
+.check .ok{color:var(--muted)}
+.days{display:flex;gap:5px}
+.days button{flex:1;padding:8px 0;border-radius:10px;background:var(--bg);border:1px solid var(--line);font-size:13px;font-weight:600}
+.days button.on{background:var(--brand);color:#fbf3e8;border-color:var(--brand)}
+.toggle{display:flex;align-items:center;gap:8px;font-size:14px}
+.toggle input{width:20px;height:20px;accent-color:var(--brand);flex:none}
+.rule.off{opacity:.5}
+.toast{position:fixed;left:50%;top:calc(var(--safe-t) + 74px);transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;z-index:20;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90vw}
+.toast.on{opacity:1}
+.fab{position:fixed;right:16px;bottom:calc(76px + var(--safe-b));z-index:6;background:var(--brand);color:#fbf3e8;border-radius:999px;padding:13px 18px;font-weight:700;box-shadow:0 6px 18px rgba(60,35,20,.3)}
+body.chat .fab,body.vita .fab{display:none}
+.motto{text-align:center;color:var(--muted);font:italic 14px var(--serif);margin:18px 0 0}
+.status{font-size:13px;color:var(--muted);margin-top:6px}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap}
+.th{position:relative;width:78px;height:78px;border-radius:12px;overflow:hidden;background:var(--brand-soft);display:grid;place-items:center;font-size:11px;text-align:center;padding:4px;border:1px solid var(--line)}
+.th img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.th .x{position:absolute;top:3px;right:3px;width:22px;height:22px;border-radius:50%;background:rgba(40,25,15,.7);color:#fff;font-size:12px;z-index:1}
+.has-note{color:var(--brand)}
+#vwImg{max-width:100%;border-radius:12px;display:block}
+</style>
+</head>
+<body>
+<header>
+  <div class="row">
+    <svg class="logo" viewBox="0 0 512 512" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a26c45"/><stop offset="1" stop-color="#6b4127"/></linearGradient></defs><rect width="512" height="512" rx="112" fill="url(#lg)"/><rect x="156" y="66" width="200" height="380" rx="46" fill="none" stroke="#f6ead8" stroke-width="18"/><line x1="236" y1="100" x2="276" y2="100" stroke="#f6ead8" stroke-width="10" stroke-linecap="round" opacity=".7"/><circle cx="256" cy="204" r="44" fill="none" stroke="#f6ead8" stroke-width="22"/><circle cx="256" cy="318" r="56" fill="none" stroke="#f6ead8" stroke-width="22"/></svg>
+    <div class="titles"><h1 id="hTitle">Ciao Otto</h1><small id="hSub"></small></div>
+    <button class="iconbtn" id="btnSettings" aria-label="Impostazioni">⚙︎</button>
+  </div>
+</header>
+
+<main>
+  <!-- ============ OGGI ============ -->
+  <section class="view on" id="v-oggi">
+    <div class="card"><h2><span>Oggi</span><span class="r" id="todayCount"></span></h2><div id="todayAppts"></div><div id="tomorrowLine" class="sub" style="margin-top:6px"></div></div>
+    <button class="alert syncBanner" style="width:100%;text-align:left"><div style="font-size:22px">⟳</div><div class="grow"><b>Completa la sincronizzazione</b><div class="muted">Hai avviato “Otto Sync”: tocca qui per incollare il risultato</div></div><span class="btn ghost small" data-sync-x>Chiudi</span></button>
+    <div id="alerts"></div>
+    <div class="card" id="tipsCard"><h2>Da sapere</h2><ul class="tips" id="tips"></ul></div>
+    <div class="card" id="sugCardOggi"><h2>Suggerimenti</h2><div id="suggOggi"></div></div>
+    <div class="card" id="bagCard"><h2><span id="bagTitle">Borsa per Giada</span><span class="r" id="bagCount"></span></h2><div id="bag"></div></div>
+    <div class="card">
+      <button class="hero" id="hero"></button>
+      <div class="week" id="week"></div>
+      <div class="legend"><span><i style="background:var(--casa)"></i>Casa mia</span><span><i style="background:var(--giada)"></i>Da Giada</span><span>tocca per cambiare</span></div>
+    </div>
+    <div class="card"><h2><span>Palestra · settimana</span><span class="r" id="gymCount"></span></h2>
+      <div class="addrow"><div class="dots grow" id="gymDots"></div><button class="btn ghost small" data-note="gym||Scheda palestra">📋 Scheda</button><button class="btn small" id="gymToday"></button></div></div>
+    <div id="countersToday"></div>
+    <div class="card" id="plantsCard"><h2>Piante da annaffiare</h2><div id="plantsDue"></div></div>
+    <div class="card"><h2>Liste</h2><div id="todayLists"></div></div>
+    <p class="motto" id="motto"></p>
+  </section>
+
+  <!-- ============ AGENDA ============ -->
+  <section class="view" id="v-agenda">
+    <div class="card">
+      <div class="cal-head"><button class="btn ghost small" id="calPrev">‹</button><b id="calTitle"></b><button class="btn ghost small" id="calNext">›</button></div>
+      <div class="cal" id="cal"></div>
+    </div>
+    <div class="card">
+      <h2 id="selTitle"></h2>
+      <div class="seg" id="nightSeg">
+        <button data-w="casa" class="casa">🏠 Casa mia</button>
+        <button data-w="giada" class="giada">💗 Da Giada</button>
+        <button data-w="none" class="none">—</button>
+      </div>
+      <div id="dayAppts" style="margin-top:10px"></div>
+      <button class="btn full" id="apNew">＋ Nuovo appuntamento</button>
+    </div>
+  </section>
+
+  <!-- ============ LISTE ============ -->
+  <section class="view" id="v-liste">
+    <button class="alert syncBanner" style="width:100%;text-align:left"><div style="font-size:22px">⟳</div><div class="grow"><b>Completa la sincronizzazione</b><div class="muted">Hai avviato “Otto Sync”: tocca qui per incollare il risultato</div></div><span class="btn ghost small" data-sync-x>Chiudi</span></button>
+    <div class="chips" id="listChips"></div>
+    <div class="card" id="listCard">
+      <div class="addrow"><input type="text" id="itemInput" placeholder="Aggiungi…" enterkeyhint="done"><button class="btn" id="itemAdd">+</button></div>
+      <div id="items" style="margin-top:6px"></div>
+      <div class="grid2" style="margin-top:10px">
+        <button class="btn ghost" id="shopMode">🛒 Sono nel negozio</button>
+        <button class="btn ghost" id="clearDone">Togli fatti</button>
+      </div>
+      <div class="grid2" style="margin-top:8px"><button class="btn ghost" id="listTips">✦ Cosa manca?</button><button class="btn ghost" id="shareWa">WhatsApp</button></div>
+      <div id="listTipsOut"></div>
+    </div>
+    <div class="card">
+      <h2 id="rulesTitle">Automazioni</h2>
+      <div id="rules"></div>
+      <button class="btn ghost full" id="ruleNew">＋ Nuova automazione</button>
+    </div>
+    <div class="card">
+      <h2>Promemoria iPhone</h2>
+      <p class="muted" style="margin-top:0" id="syncInfo"></p>
+      <button class="btn full" id="syncAll">⟳ Sincronizza con Promemoria</button>
+      <button class="btn ghost full" id="syncPull">Incolla a mano</button>
+    </div>
+  </section>
+
+  <!-- ============ VITA ============ -->
+  <section class="view" id="v-vita">
+    <div class="card" id="sugCard"><h2>Suggerimenti</h2><div id="sugg"></div></div>
+    <div class="card"><h2>Promemoria su misura</h2>
+      <p class="muted" style="margin-top:0">Creali dalla chat: “ogni primo del mese alle 9 ricordami l'affitto”.</p>
+      <div id="reminders"></div></div>
+    <div class="card"><h2>Contatori</h2>
+      <p class="muted" style="margin-top:0">Abitudini da contare a settimana: “crea un contatore Lettura, 5 volte a settimana”.</p>
+      <div id="counters"></div></div>
+    <div class="card"><h2>Cosa Claude sa di te</h2>
+      <p class="muted" style="margin-top:0">Dì in chat “ricorda che…”. Claude lo userà sempre.</p>
+      <div id="memory"></div></div>
+    <div class="card"><h2><span>Scadenze</span></h2>
+      <div id="deadlines"></div>
+      <div class="stack" style="margin-top:10px">
+        <input type="text" id="dlTitle" list="dlSuggest" placeholder="Es. Bollo scooter">
+        <datalist id="dlSuggest"><option>Bollo scooter</option><option>Assicurazione scooter</option><option>Revisione scooter</option><option>Tagliando scooter</option><option>Carta d'identità</option><option>Patente</option><option>Passaporto</option></datalist>
+        <div class="grid2"><input type="date" id="dlDate">
+          <select id="dlRec"><option value="none">Una volta</option><option value="yearly">Ogni anno</option><option value="biennial">Ogni 2 anni</option></select></div>
+        <select id="dlRemind"><option value="30,7,1">Avvisami 30, 7 e 1 giorno prima</option><option value="60,30,7">Avvisami 60, 30 e 7 giorni prima</option><option value="14,3">Avvisami 14 e 3 giorni prima</option><option value="7,1">Avvisami 7 e 1 giorno prima</option></select>
+        <button class="btn full" id="dlAdd">＋ Aggiungi scadenza</button>
+      </div>
+    </div>
+
+    <div class="card"><h2>Compleanni e ricorrenze</h2>
+      <div id="bdays"></div>
+      <div class="stack" style="margin-top:10px">
+        <div class="grid2"><input type="text" id="bdName" placeholder="Chi / cosa"><input type="date" id="bdDate"></div>
+        <select id="bdGift"><option value="21">Regalo in lista 3 settimane prima</option><option value="14">Regalo in lista 2 settimane prima</option><option value="30">Regalo in lista 1 mese prima</option><option value="0">Nessun regalo, solo avviso</option></select>
+        <button class="btn full" id="bdAdd">＋ Aggiungi</button>
+      </div>
+    </div>
+
+    <div class="card"><h2><span>Palestra</span><span class="r" id="gymCount2"></span></h2>
+      <div class="addrow"><span class="muted grow">Obiettivo settimanale</span>
+        <select id="gymGoal" style="width:110px"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option></select></div>
+      <div id="gymHist" class="sub" style="margin-top:8px"></div>
+      <button class="btn ghost full" data-note="gym||Scheda palestra">📋 Scheda palestra (note e foto)</button>
+    </div>
+
+    <div class="card"><h2>Piante (casa mia)</h2>
+      <div id="plants"></div>
+      <div class="addrow" style="margin-top:10px"><input type="text" id="plName" placeholder="Pianta"><select id="plEvery" style="width:140px"><option value="2">ogni 2 gg</option><option value="3">ogni 3 gg</option><option value="4">ogni 4 gg</option><option value="7" selected>ogni settimana</option><option value="14">ogni 2 sett.</option></select><button class="btn" id="plAdd">+</button></div>
+    </div>
+
+    <div class="card"><h2>Borsa per Giada</h2>
+      <p class="muted" style="margin-top:0">Compare il giorno in cui dormi da lei (e la sera prima).</p>
+      <div id="bagItems"></div>
+      <div class="addrow" style="margin-top:10px"><input type="text" id="bgName" placeholder="Cosa portare"><select id="bgCond" style="width:150px"><option value="">sempre</option><option value="work">se domani lavoro</option><option value="gym">se devo fare palestra</option></select><button class="btn" id="bgAdd">+</button></div>
+    </div>
+
+    <div class="card"><h2>Routine</h2>
+      <label class="lbl">Giorni d'ufficio</label><div class="days" id="workDays" style="margin-top:8px"></div>
+      <div class="grid2" style="margin-top:8px"><div><label class="lbl">Entrata</label><input type="time" id="workStart"></div><div><label class="lbl">Uscita</label><input type="time" id="workEnd"></div></div>
+      <div class="grid3" style="margin-top:8px"><div><label class="lbl">Recap mattina</label><input type="time" id="rcMorning"></div><div><label class="lbl">Recap sera</label><input type="time" id="rcEvening"></div><div><label class="lbl">Domenica</label><input type="time" id="rcSunday"></div></div>
+      <button class="btn full" id="routineSave">Salva routine</button>
+    </div>
+
+    <div class="card"><h2>Notifiche sul telefono</h2>
+      <p class="muted" style="margin-top:0">Recap, appuntamenti, scadenze, automazioni: arrivano anche ad app chiusa tramite il tuo server (vedi guida).</p>
+      <div class="stack">
+        <input type="url" id="pushUrl" placeholder="https://gestiotto.TUONOME.workers.dev">
+        <input type="password" id="pushPw" placeholder="Password del server">
+        <div class="grid2"><button class="btn" id="pushOn">Attiva</button><button class="btn ghost" id="pushTest">Prova</button></div>
+        <div class="status" id="pushStatus"></div>
+        <div class="status" id="iphoneStatus"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CHAT ============ -->
+  <section class="view" id="v-chat">
+    <div class="suggest" id="suggest">
+      <button>Cosa devo comprare?</button>
+      <button>Da venerdì a domenica dormo da Giada</button>
+      <button>Fissa il dentista giovedì alle 15</button>
+      <button>Voglio fare la carbonara: metti in lista gli ingredienti</button>
+      <button>Il bollo dello scooter scade il 31 gennaio</button>
+      <button>Ho fatto palestra oggi</button>
+      <button>Cosa ho questa settimana?</button>
+    </div>
+    <div id="chatlog"></div>
+  </section>
+</main>
+
+<div class="chatbar"><button class="btn ghost" id="micBtn" aria-label="Parla">🎙︎</button><textarea id="chatIn" placeholder="Scrivi o parla…" rows="1"></textarea><button class="btn" id="chatSend">➤</button></div>
+<button class="fab" id="fab">✦ Chiedi a Claude</button>
+
+<nav id="nav">
+  <button data-v="oggi" class="on"><span>☀︎</span>Oggi</button>
+  <button data-v="agenda"><span>▦</span>Agenda</button>
+  <button data-v="liste"><span>☑︎</span>Liste</button>
+  <button data-v="vita"><span>◎</span>Vita</button>
+  <button data-v="chat"><span>✦</span>Claude</button>
+</nav>
+
+<!-- Conferma appuntamento -->
+<dialog id="dlgAppt">
+  <h3 id="apHead">Controlla l'appuntamento</h3>
+  <div class="stack">
+    <label class="lbl">Cosa</label><input type="text" id="apTitle">
+    <div class="grid2">
+      <div><label class="lbl">Giorno</label><input type="date" id="apDate"></div>
+      <div><label class="lbl">Ora</label><input type="time" id="apTime"></div>
+    </div>
+    <label class="lbl">Dove</label><input type="text" id="apPlace" placeholder="facoltativo">
+    <div class="grid2">
+      <div><label class="lbl">Si ripete?</label>
+        <select id="apRec"><option value="none">No, una volta</option><option value="daily">Ogni giorno</option><option value="weekly">Ogni settimana</option><option value="biweekly">Ogni 2 settimane</option><option value="monthly">Ogni mese</option><option value="yearly">Ogni anno</option></select></div>
+      <div><label class="lbl">Avvisami</label>
+        <select id="apAlert"><option value="-1">Mai</option><option value="0">All'ora esatta</option><option value="10">10 min prima</option><option value="30">30 min prima</option><option value="60">1 ora prima</option><option value="120">2 ore prima</option><option value="1440">1 giorno prima</option><option value="2880">2 giorni prima</option><option value="10080">1 settimana prima</option></select></div>
+    </div>
+    <label class="lbl">Note</label><textarea id="apNotes" rows="2" placeholder="facoltativo"></textarea>
+    <div class="check" id="apCheck"></div>
+    <label class="toggle"><input type="checkbox" id="apCal"> Aggiungi anche al Calendario iPhone</label>
+    <button class="btn full" id="apOk">✓ Conferma</button>
+    <button class="btn ghost full" id="apNo">Annulla</button>
+  </div>
+</dialog>
+
+<!-- Automazione lista -->
+<dialog id="dlgRule">
+  <h3>Nuova automazione</h3>
+  <div class="stack">
+    <label class="lbl">Lista</label><select id="ruList"></select>
+    <label class="lbl">Quali giorni</label>
+    <div class="days" id="ruDays"></div>
+    <label class="lbl">A che ora</label><input type="time" id="ruTime" value="18:00">
+    <label class="lbl">Messaggio</label><input type="text" id="ruMsg">
+    <label class="toggle"><input type="checkbox" id="ruPending" checked> Solo se nella lista c'è ancora qualcosa</label>
+    <button class="btn full" id="ruOk">Salva automazione</button>
+    <button class="btn ghost full" onclick="dlgRule.close()">Annulla</button>
+  </div>
+</dialog>
+
+<dialog id="dlgSettings">
+  <h3>Impostazioni</h3>
+  <div class="stack">
+    <label class="lbl">Come ti chiamo</label><input type="text" id="setName">
+    <label class="lbl">Chiave API Anthropic (resta solo su questo telefono)</label><input type="password" id="setKey" placeholder="sk-ant-…" autocomplete="off">
+    <label class="lbl">Modello</label><input type="text" id="setModel">
+    <label class="toggle"><input type="checkbox" id="setVoice"> Leggi sempre ad alta voce le risposte di Claude</label>
+    <button class="btn full" id="setSave">Salva</button>
+    <div class="grid2"><button class="btn ghost" id="bkExport">Esporta backup</button><button class="btn ghost" id="bkImport">Importa backup</button></div>
+    <button class="btn ghost full" id="bkServer">Ripristina dal server</button>
+    <input type="file" id="bkFile" accept="application/json,.json" hidden>
+    <button class="btn ghost full" id="chatReset">Cancella conversazione con Claude</button>
+    <button class="btn ghost full" onclick="dlgSettings.close()">Chiudi</button>
+  </div>
+</dialog>
+
+<dialog id="dlgImport">
+  <h3>Importa da Promemoria</h3>
+  <p class="muted">Se l'incolla automatico non funziona, incolla qui il testo copiato da “Otto Sync”.</p>
+  <div class="stack">
+    <textarea id="impText" rows="4" placeholder="…oppure incolla qui a mano (una riga: Lista|Voce)"></textarea>
+    <button class="btn ghost full" id="impDo">Importa testo</button>
+    <button class="btn ghost full" onclick="dlgImport.close()">Chiudi</button>
+  </div>
+</dialog>
+
+<dialog id="dlgNotes">
+  <h3 id="ntTitle">Note</h3>
+  <div class="stack">
+    <textarea id="ntText" rows="9" placeholder="Scrivi qui…"></textarea>
+    <div class="thumbs" id="ntFiles"></div>
+    <label class="btn ghost full" style="text-align:center">＋ Foto o PDF<input type="file" id="ntFile" accept="image/*,application/pdf" multiple hidden></label>
+    <button class="btn full" id="ntSave">Salva</button>
+    <button class="btn ghost full" id="ntClose">Chiudi</button>
+  </div>
+</dialog>
+<dialog id="dlgView"><img id="vwImg" alt=""><button class="btn ghost full" onclick="dlgView.close()">Chiudi</button></dialog>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =====================================================================
+   DATI
+   ===================================================================== */
+const KEY = 'otto.v1';
+const defaults = () => ({
+  appts: [],      // {id,title,date,time,place,notes,rec,alert}
+  items: [],      // {id,title,list,done,synced}
+  lists: ['Supermercato', 'Farmacia', 'Casa', 'Regali', 'Idee e desideri', 'Viaggi', 'Visite e medicine', 'Diario'],
+  nights: {},     // {'YYYY-MM-DD':'casa'|'giada'}
+  rules: [],      // {id,list,days,time,msg,onlyPending,on,dismissed}
+  dismissed: {},
+  gym: { goal: 4, log: [], notes: '', files: [] },               // log: ['YYYY-MM-DD']
+  plants: [],     // {id,name,every,last}
+  deadlines: [],  // {id,title,date,rec,remind:[giorni]}
+  birthdays: [],  // {id,name,date:'YYYY-MM-DD',gift:giorni,added:{anno:true}}
+  bag: { items: [
+    { id: 'b1', t: 'Vestiti per il giorno dopo', cond: '' },
+    { id: 'b2', t: 'Beauty e spazzolino', cond: '' },
+    { id: 'b3', t: 'Borsa palestra', cond: 'gym' },
+    { id: 'b4', t: 'PC lavoro', cond: 'work' }], checked: {} },
+  reminders: [], // promemoria su misura {id,title,body,rep,days,dom,date,time,on,notes}
+  counters: [],  // contatori su misura {id,name,goal,log:[date]}
+  memory: [],    // cose che Claude deve ricordare {id,text}
+  hiddenTips: {}, // suggerimenti nascosti
+  remQueue: [],  // voci da togliere da Promemoria ('Lista|Voce')
+  ext: { cal: [], calAt: '' }, // eventi letti dal Calendario iPhone (sola lettura)
+  syncPending: false,
+  settings: { name: 'Otto', apiKey: '', model: 'claude-sonnet-4-5', voice: false,
+    routine: { workDays: [1, 2, 3, 4, 5], workStart: '08:30', workEnd: '17:30', morning: '08:00', evening: '21:00', sunday: '19:00' },
+    push: { url: '', password: '', on: false } },
+  chat: []
+});
+let S;
+function hydrate(raw) {
+  const d = defaults(), s = Object.assign(d, raw || {});
+  s.settings = Object.assign(defaults().settings, s.settings);
+  s.settings.routine = Object.assign(defaults().settings.routine, s.settings.routine);
+  s.settings.push = Object.assign(defaults().settings.push, s.settings.push);
+  s.gym = Object.assign(defaults().gym, s.gym);
+  s.bag = Object.assign(defaults().bag, s.bag);
+  s.ext = Object.assign(defaults().ext, s.ext);
+  if (!s.settings.name || s.settings.name === 'Ale') s.settings.name = 'Otto';
+  return s;
+}
+try { S = hydrate(JSON.parse(localStorage.getItem(KEY) || 'null')); } catch { S = hydrate(null); }
+let syncT;
+const save = () => {
+  try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { toast('Impossibile salvare: ' + e.message); }
+  clearTimeout(syncT); syncT = setTimeout(syncServer, 4000);
+};
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const NAME = () => S.settings.name || 'Otto';
+const R = () => S.settings.routine;
+
+/* =====================================================================
+   DATE
+   ===================================================================== */
+const pad = n => String(n).padStart(2, '0');
+const ymd = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const parse = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const shift = (s, n) => ymd(addDays(parse(s), n));
+const today = () => ymd(new Date());
+const daysBetween = (a, b) => Math.round((parse(b) - parse(a)) / 864e5);
+const WD = ['dom', 'lun', 'mar', 'mer', 'gio', 'ven', 'sab'];
+const WDL = ['domenica', 'lunedì', 'martedì', 'mercoledì', 'giovedì', 'venerdì', 'sabato'];
+const MON = ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'];
+const longDate = s => { const d = parse(s); return `${WDL[d.getDay()]} ${d.getDate()} ${MON[d.getMonth()]}`; };
+const shortDate = s => { const d = parse(s); return `${WD[d.getDay()]} ${d.getDate()} ${MON[d.getMonth()].slice(0, 3)}`; };
+const toMin = t => { if (!t) return null; const [h, m] = t.split(':').map(Number); return h * 60 + m; };
+const at = (dateStr, time) => parse(dateStr).getTime() + toMin(time) * 6e4;
+const weekStart = s => { const d = parse(s); return shift(s, -((d.getDay() + 6) % 7)); };
+const REC = { none: '', daily: 'ogni giorno', weekly: 'ogni settimana', biweekly: 'ogni 2 settimane', monthly: 'ogni mese', yearly: 'ogni anno' };
+const ALERT = { '-1': 'nessun avviso', 0: "avviso all'ora esatta", 10: 'avviso 10 min prima', 30: 'avviso 30 min prima', 60: 'avviso 1 ora prima', 120: 'avviso 2 ore prima', 1440: 'avviso 1 giorno prima', 2880: 'avviso 2 giorni prima', 10080: 'avviso 1 settimana prima' };
+const inDays = n => n === 0 ? 'oggi' : n === 1 ? 'domani' : `tra ${n} giorni`;
+
+/* =====================================================================
+   UTIL
+   ===================================================================== */
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+let toastT; function toast(m) { const t = $('toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 2600); }
+const where = d => S.nights[d] || 'none';
+const WHERE_TXT = { casa: 'casa tua', giada: 'da Giada', none: 'da segnare' };
+const cycle = w => w === 'none' ? 'casa' : w === 'casa' ? 'giada' : 'none';
+function setNight(d, w) { if (w === 'none') delete S.nights[d]; else S.nights[d] = w; }
+const pending = list => S.items.filter(i => !i.done && (!list || i.list === list));
+function ensureList(name) {
+  const found = S.lists.find(l => l.toLowerCase() === name.trim().toLowerCase());
+  if (found) return found;
+  S.lists.push(name.trim()); return name.trim();
+}
+const isWorkday = d => R().workDays.includes(parse(d).getDay());
+function inWorkHours(d, t) { if (!t || !isWorkday(d)) return false; const m = toMin(t); return m >= toMin(R().workStart) && m < toMin(R().workEnd); }
+
+/* Appuntamenti ricorrenti */
+function occurs(a, d) {
+  if (d < a.date) return false;
+  const s = parse(a.date), x = parse(d);
+  switch (a.rec || 'none') {
+    case 'none': return d === a.date;
+    case 'daily': return true;
+    case 'weekly': return s.getDay() === x.getDay();
+    case 'biweekly': return daysBetween(a.date, d) % 14 === 0;
+    case 'monthly': return s.getDate() === x.getDate();
+    case 'yearly': return s.getDate() === x.getDate() && s.getMonth() === x.getMonth();
+  }
+  return false;
+}
+const sameEv = (a, e) => a.title.trim().toLowerCase() === e.title.trim().toLowerCase() && (a.time || '') === (e.time || '');
+const apptsOn = d => {
+  const own = S.appts.filter(a => occurs(a, d));
+  const ext = S.ext.cal.filter(e => e.date === d && !own.some(a => sameEv(a, e)))
+    .map(e => ({ ...e, id: 'ext-' + e.date + (e.time || '') + e.title, ext: true, rec: 'none', alert: -1 }));
+  return [...own, ...ext].map(a => ({ ...a, date: d })).sort((a, b) => (a.time || '99').localeCompare(b.time || '99'));
+};
+function upcoming(days, from = today()) { const out = []; for (let i = 0; i <= days; i++) out.push(...apptsOn(shift(from, i))); return out; }
+const apptLine = a => `${a.time || 'tutto il giorno'} ${a.title}${a.place ? ' (' + a.place + ')' : ''}`;
+
+/* Palestra */
+function gymWeek(d = today()) { const ws = weekStart(d), we = shift(ws, 6); return S.gym.log.filter(x => x >= ws && x <= we).length; }
+/* Scadenze: prossima occorrenza */
+function nextDeadline(dl) {
+  let d = dl.date; const step = dl.rec === 'yearly' ? 1 : dl.rec === 'biennial' ? 2 : 0;
+  if (!step) return d;
+  while (d < today()) { const x = parse(d); x.setFullYear(x.getFullYear() + step); d = ymd(x); }
+  return d;
+}
+function nextBirthday(b) {
+  const [, m, dd] = b.date.split('-'); const y = new Date().getFullYear();
+  let d = `${y}-${m}-${dd}`; if (d < today()) d = `${y + 1}-${m}-${dd}`;
+  return d;
+}
+/* Piante */
+const plantNext = p => shift(p.last, p.every);
+const plantsDueBy = d => S.plants.filter(p => plantNext(p) <= d);
+/* Borsa: cosa serve per la notte del giorno d */
+function bagFor(d) {
+  const next = shift(d, 1);
+  return S.bag.items.filter(i => !i.cond || (i.cond === 'work' && isWorkday(next)) || (i.cond === 'gym' && gymWeek(next) < S.gym.goal));
+}
+
+/* Promemoria su misura: cade nel giorno d? */
+function remOn(r, d) {
+  if (r.on === false) return false;
+  const x = parse(d);
+  switch (r.rep) {
+    case 'once': return d === r.date;
+    case 'daily': return true;
+    case 'weekly': return (r.days || []).includes(x.getDay());
+    case 'monthly': { const last = new Date(x.getFullYear(), x.getMonth() + 1, 0).getDate(); return x.getDate() === Math.min(r.dom || 1, last); }
+    case 'yearly': return !!r.date && r.date.slice(5) === d.slice(5);
+  }
+  return false;
+}
+const REP_TXT = r => ({ once: r.date ? 'il ' + shortDate(r.date) : 'una volta', daily: 'ogni giorno', weekly: daysText(r.days || []).replace('Ogni', 'ogni'), monthly: `ogni mese il ${r.dom}`, yearly: r.date ? `ogni anno il ${parse(r.date).getDate()} ${MON[parse(r.date).getMonth()]}` : 'ogni anno' }[r.rep] || '');
+const counterWeek = (c, d = today()) => { const ws = weekStart(d), we = shift(ws, 6); return c.log.filter(x => x >= ws && x <= we).length; };
+
+/* =====================================================================
+   CONSIGLI (tono neutro, preciso) — usati in "Oggi" e nei recap
+   ===================================================================== */
+function tips(d = today(), inApp = false) {
+  const t = [], tom = shift(d, 1), hour = new Date().getHours();
+  if (inApp) { /* la borsa ha già la sua scheda */ }
+  else if (where(d) === 'giada') t.push(`Stanotte da Giada: porta ${bagFor(d).map(i => i.t.toLowerCase()).join(', ')}.`);
+  else if (!inApp && where(tom) === 'giada' && hour >= 17) t.push(`Domani notte da Giada: prepara stasera ${bagFor(tom).map(i => i.t.toLowerCase()).join(', ')}.`);
+  apptsOn(tom).filter(a => inWorkHours(tom, a.time)).forEach(a => t.push(`Domani alle ${a.time} c'è “${a.title}” durante l'orario d'ufficio.`));
+  S.deadlines.forEach(dl => { const n = daysBetween(d, nextDeadline(dl)); if (n >= 0 && n <= 30) t.push(`${dl.title}: scade ${inDays(n)} (${shortDate(nextDeadline(dl))}).`); });
+  S.birthdays.forEach(b => { const n = daysBetween(d, nextBirthday(b)); if (n >= 0 && n <= Math.max(7, b.gift || 0)) t.push(n === 0 ? `Oggi: ${b.name}.` : `${b.name}: ${inDays(n)} (${shortDate(nextBirthday(b))}).`); });
+  const dow = parse(d).getDay(), left = dow === 0 ? 0 : 7 - dow, g = gymWeek(d);
+  if (g < S.gym.goal && dow >= 4 || dow === 0 && g < S.gym.goal) t.push(`Palestra: ${g}/${S.gym.goal} questa settimana, ${left ? 'restano ' + left + ' giorni' : 'ultimo giorno'}.`);
+  const unset = []; for (let i = 0; i < 7; i++) if (where(shift(d, i)) === 'none') unset.push(shift(d, i));
+  if (unset.length >= 3) t.push(`${unset.length} notti dei prossimi 7 giorni sono da segnare.`);
+  const due = plantsDueBy(d);
+  if (due.length) t.push(`Da annaffiare: ${due.map(p => p.name).join(', ')}${where(d) === 'giada' ? ' (quando torni a casa)' : ''}.`);
+  return t;
+}
+
+/* =====================================================================
+   SUGGERIMENTI: cose che probabilmente mancano (si possono nascondere)
+   ===================================================================== */
+function suggestions() {
+  const s = [], has = re => S.deadlines.some(d => re.test(d.title));
+  const add = (key, text) => { if (!S.hiddenTips[key]) s.push({ key, text }); };
+  if (has(/scooter|moto/i)) {
+    if (!has(/bollo/i)) add('sc-bollo', 'Scooter: manca la scadenza del bollo.');
+    if (!has(/assicuraz/i)) add('sc-ass', "Scooter: manca la scadenza dell'assicurazione.");
+    if (!has(/revisione/i)) add('sc-rev', 'Scooter: manca la scadenza della revisione.');
+  }
+  if (has(/auto(?!r)/i)) {
+    if (!has(/bollo/i)) add('au-bollo', 'Auto: manca la scadenza del bollo.');
+    if (!has(/assicuraz/i)) add('au-ass', "Auto: manca la scadenza dell'assicurazione.");
+  }
+  if (!has(/carta d.identit|identit/i)) add('doc-ci', "Documenti: manca la scadenza della carta d'identità.");
+  if (!has(/patente/i)) add('doc-pat', 'Documenti: manca la scadenza della patente.');
+  if (!S.birthdays.some(b => /giada/i.test(b.name))) add('bd-giada', 'Compleanni: manca il compleanno di Giada.');
+  if (S.birthdays.some(b => /giada/i.test(b.name)) && !S.birthdays.some(b => /anniversar/i.test(b.name))) add('bd-ann', 'Ricorrenze: manca l\'anniversario con Giada.');
+  if (!S.gym.notes && !(S.gym.files || []).length) add('gym-scheda', 'Palestra: scheda non inserita (📋 Scheda).');
+  S.appts.filter(a => a.rec && a.rec !== 'none' && a.alert < 0).forEach(a => add('ap-al-' + a.id, `${a.title}: appuntamento ricorrente senza avviso.`));
+  S.deadlines.filter(d => d.rec === 'none' && /bollo|assicuraz|revisione/i.test(d.title)).forEach(d => add('dl-rec-' + d.id, `${d.title}: impostata “una volta”, di solito si ripete.`));
+  if (S.lists.includes('Viaggi') && pending('Viaggi').length && !pending('Viaggi').some(i => /document|carta|passaport/i.test(i.title))) add('vg-doc', 'Viaggi: documenti non in lista.');
+  if (!S.settings.push.on) add('push', 'Notifiche ad app chiusa non attive (Vita › Notifiche).');
+  if (!S.settings.apiKey) add('key', 'Chat non attiva: manca la chiave API (⚙︎).');
+  return s;
+}
+const suggHtml = list => list.map(x => `<div class="item"><div class="grow">${esc(x.text)}</div><button class="btn ghost small" data-hide-tip="${x.key}">Nascondi</button></div>`).join('');
+document.addEventListener('click', e => { const b = e.target.closest('[data-hide-tip]'); if (b) { S.hiddenTips[b.dataset.hideTip] = true; save(); render(); } });
+
+/* Regalo in lista automaticamente prima del compleanno */
+function housekeeping() {
+  const y = String(new Date().getFullYear()); let changed = false;
+  S.birthdays.forEach(b => {
+    if (!b.gift) return; const nb = nextBirthday(b), n = daysBetween(today(), nb), key = nb.slice(0, 4);
+    b.added = b.added || {};
+    if (n <= b.gift && !b.added[key]) { const l = ensureList('Regali'); S.items.push({ id: uid(), title: `Regalo per ${b.name} (${shortDate(nb)})`, list: l, done: false, synced: false }); b.added[key] = true; changed = true; }
+  });
+  if (changed) save();
+}
+
+/* =====================================================================
+   NAV
+   ===================================================================== */
+let view = 'oggi';
+function go(v) {
+  view = v;
+  document.querySelectorAll('.view').forEach(x => x.classList.toggle('on', x.id === 'v-' + v));
+  document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+  document.body.classList.toggle('chat', v === 'chat');
+  document.body.classList.toggle('vita', v === 'vita');
+  render();
+  if (v === 'chat') setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 50);
+  else window.scrollTo(0, 0);
+}
+$('nav').onclick = e => { const b = e.target.closest('button'); if (b) go(b.dataset.v); };
+$('fab').onclick = () => go('chat');
+
+/* =====================================================================
+   RENDER
+   ===================================================================== */
+const MOTTI = ['∞ un 8 sdraiato: tutto scorre.', 'Tutto gestito, Otto.', 'Otto cose alla volta.', 'Ogni cosa al suo posto.', 'Oggi è sotto controllo.'];
+function render() {
+  const t = today();
+  document.querySelectorAll('.syncBanner').forEach(b => b.style.display = S.syncPending && Date.now() - (+S.syncPending || 0) < 2 * 3600e3 ? '' : 'none');
+  $('hTitle').textContent = 'Ciao ' + NAME();
+  $('hSub').textContent = longDate(t);
+  $('motto').textContent = MOTTI[parse(t).getDate() % MOTTI.length];
+  renderOggi(); renderAgenda(); renderListe(); renderVita(); renderChat();
+}
+
+const hasNote = e => !!(e && (e.notes || (e.files && e.files.length)));
+const noteBtn = (kind, e, title) => `<button class="btn ghost small ${hasNote(e) ? 'has-note' : ''}" data-note="${kind}|${e.id || ''}|${esc(title)}">${hasNote(e) ? '📝' : '✎︎'}</button>`;
+function apptRow(a, opts = {}) {
+  if (a.ext) return `<div class="item"><div class="time">${esc(a.time || '—')}</div><div class="grow">${esc(a.title)}<div class="sub">${esc([opts.showDate ? longDate(a.date) : '', a.place, 'Calendario iPhone'].filter(Boolean).join(' · '))}</div></div></div>`;
+  const extra = [opts.showDate ? longDate(a.date) : '', a.place, REC[a.rec] ? '↻ ' + REC[a.rec] : '', inWorkHours(a.date, a.time) ? 'orario ufficio' : ''].filter(Boolean).join(' · ');
+  return `<div class="item"><div class="time">${esc(a.time || '—')}</div>
+    <div class="grow">${esc(a.title)}<div class="sub">${esc(extra)}</div></div>
+    ${opts.actions ? `${noteBtn('appt', S.appts.find(x => x.id === a.id), a.title)}<button class="btn ghost small" data-edit-ap="${a.id}">Modifica</button><button class="btn ghost small" data-del-ap="${a.id}">✕</button>` : (hasNote(S.appts.find(x => x.id === a.id)) ? `<button class="btn ghost small has-note" data-note="appt|${a.id}|${esc(a.title)}">📝</button>` : '')}</div>`;
+}
+
+/* --- Avvisi in app --- */
+function lastFire(rule, now = new Date()) {
+  for (let i = 0; i < 8; i++) {
+    const d = addDays(now, -i);
+    if (!rule.days.includes(d.getDay())) continue;
+    const [h, m] = rule.time.split(':').map(Number);
+    const x = new Date(d.getFullYear(), d.getMonth(), d.getDate(), h, m);
+    if (x <= now) return x;
+  }
+  return null;
+}
+function activeAlerts() {
+  const now = new Date(), out = [];
+  upcoming(8).forEach(a => {
+    if (a.alert == null || a.alert < 0) return;
+    const start = a.time ? new Date(at(a.date, a.time)) : parse(a.date);
+    const from = new Date(start - a.alert * 6e4), key = a.id + '@' + a.date;
+    if (now >= from && now <= new Date(+start + 36e5) && !S.dismissed[key])
+      out.push({ key, icon: '⏰', title: a.title, text: `${a.date === today() ? 'Oggi' : longDate(a.date)}${a.time ? ' alle ' + a.time : ''}${a.place ? ' · ' + a.place : ''}` });
+  });
+  S.reminders.forEach(r => { const d = today(); if (!remOn(r, d) || Date.now() < at(d, r.time)) return; const key = 'rem:' + r.id + '@' + d;
+    if (!S.dismissed[key]) out.push({ key, icon: '🔔', title: r.title, text: r.body || r.time }); });
+  S.rules.filter(r => r.on).forEach(r => {
+    const f = lastFire(r); if (!f) return;
+    if (r.dismissed && new Date(r.dismissed) >= f) return;
+    const n = pending(r.list).length;
+    if (r.onlyPending && !n) return;
+    out.push({ key: 'rule:' + r.id, icon: '🍂', title: r.msg, text: n ? `${n} voci in ${r.list}` : r.list });
+  });
+  return out;
+}
+function dismissAlert(key) {
+  if (key.startsWith('rule:')) { const r = S.rules.find(r => r.id === key.slice(5)); if (r) r.dismissed = new Date().toISOString(); }
+  else S.dismissed[key] = 1;
+  save(); render();
+}
+$('alerts').onclick = e => { const b = e.target.closest('[data-dismiss]'); if (b) dismissAlert(b.dataset.dismiss); };
+
+function renderOggi() {
+  const t = today(), tom = shift(t, 1), w = where(t);
+  // 1. Appuntamenti di oggi
+  const ta = apptsOn(t);
+  $('todayCount').textContent = ta.length ? ta.length + (ta.length === 1 ? ' appuntamento' : ' appuntamenti') : '';
+  $('todayAppts').innerHTML = ta.length ? ta.map(a => apptRow(a)).join('') : '<div class="empty">Nessun appuntamento oggi.</div>';
+  const tm = apptsOn(tom);
+  $('tomorrowLine').textContent = tm.length ? 'Domani: ' + tm.map(a => (a.time ? a.time + ' ' : '') + a.title).join(' · ') : 'Domani: niente in agenda.';
+  // 2. Avvisi
+  const al = activeAlerts();
+  $('alerts').innerHTML = al.map(a => `<div class="alert"><div style="font-size:22px">${a.icon}</div><div class="grow"><b>${esc(a.title)}</b><div class="muted">${esc(a.text)}</div></div><button class="btn ghost small" data-dismiss="${esc(a.key)}">Fatto</button></div>`).join('');
+  // 3. Consigli
+  const tp = tips(t, true);
+  $('tipsCard').style.display = tp.length ? '' : 'none';
+  $('tips').innerHTML = tp.map(x => `<li>${esc(x)}</li>`).join('');
+  // 3b. Suggerimenti (al massimo 2 in Oggi)
+  const sg = suggestions();
+  $('sugCardOggi').style.display = sg.length ? '' : 'none';
+  $('suggOggi').innerHTML = suggHtml(sg.slice(0, 2));
+  // 4. Borsa per Giada
+  const bagDay = w === 'giada' ? t : (where(tom) === 'giada' && new Date().getHours() >= 17 ? tom : null);
+  $('bagCard').style.display = bagDay ? '' : 'none';
+  if (bagDay) {
+    const items = bagFor(bagDay), ch = S.bag.checked[bagDay] || [];
+    $('bagTitle').textContent = bagDay === t ? 'Borsa per Giada · stanotte' : 'Borsa per Giada · domani';
+    $('bagCount').textContent = `${items.filter(i => ch.includes(i.id)).length}/${items.length}`;
+    $('bag').innerHTML = items.map(i => `<div class="item ${ch.includes(i.id) ? 'done' : ''}" data-bag="${i.id}" data-bagday="${bagDay}"><button class="chk">${ch.includes(i.id) ? '✓' : ''}</button><div class="grow">${esc(i.t)}</div></div>`).join('');
+  }
+  // 5. Dove dormo + settimana
+  const txt = { casa: ['🏠', 'Stanotte a casa tua'], giada: ['💗', 'Stanotte da Giada'], none: ['🌙', 'Dove dormi stanotte? Tocca per scegliere'] }[w];
+  $('hero').className = 'hero ' + w;
+  $('hero').innerHTML = `<div class="emoji">${txt[0]}</div><div class="big">${txt[1]}</div>`;
+  let h = '';
+  for (let i = 0; i < 7; i++) {
+    const d = shift(t, i), dd = parse(d);
+    h += `<button class="day ${where(d)} ${i === 0 ? 'today' : ''}" data-day="${d}">${WD[dd.getDay()]}<b>${dd.getDate()}</b>${apptsOn(d).length ? '<span class="dot"></span>' : ''}</button>`;
+  }
+  $('week').innerHTML = h;
+  // 6. Palestra
+  const g = gymWeek(), did = S.gym.log.includes(t);
+  $('gymCount').textContent = `${g}/${S.gym.goal}`;
+  $('gymDots').innerHTML = Array.from({ length: Math.max(S.gym.goal, g) }, (_, i) => `<i class="${i < g ? 'on' : ''}"></i>`).join('');
+  $('gymToday').textContent = did ? 'Fatta oggi ✓' : '＋ Fatta oggi';
+  $('gymToday').className = 'btn small ' + (did ? 'ghost' : '');
+  // 6b. Contatori
+  $('countersToday').innerHTML = S.counters.map(c => { const n = counterWeek(c), did = c.log.includes(t);
+    return `<div class="card"><h2><span>${esc(c.name)} · settimana</span><span class="r">${n}/${c.goal}</span></h2><div class="addrow"><div class="dots grow">${Array.from({ length: Math.max(c.goal, n) }, (_, i) => `<i class="${i < n ? 'on' : ''}"></i>`).join('')}</div><button class="btn small ${did ? 'ghost' : ''}" data-count="${c.id}">${did ? 'Fatto oggi ✓' : '＋ Fatto oggi'}</button></div></div>`; }).join('');
+  // 7. Piante
+  const due = plantsDueBy(t);
+  $('plantsCard').style.display = due.length ? '' : 'none';
+  $('plantsDue').innerHTML = due.map(p => `<div class="item"><div class="grow">${esc(p.name)}<div class="sub">${w === 'giada' ? 'quando torni a casa' : 'ogni ' + p.every + ' giorni'}</div></div><button class="btn small" data-water="${p.id}">Annaffiata</button></div>`).join('');
+  // 8. Liste (solo quelle con voci)
+  const ls = S.lists.filter(l => pending(l).length);
+  $('todayLists').innerHTML = ls.length ? ls.map(l => `<button class="listrow" data-open-list="${esc(l)}"><span>${esc(l)}</span><span class="badge">${pending(l).length}</span></button>`).join('') : '<div class="empty">Liste vuote.</div>';
+}
+$('hero').onclick = () => { const t = today(); setNight(t, cycle(where(t))); save(); render(); };
+$('week').onclick = e => { const b = e.target.closest('[data-day]'); if (!b) return; setNight(b.dataset.day, cycle(where(b.dataset.day))); save(); render(); };
+$('todayLists').onclick = e => { const b = e.target.closest('[data-open-list]'); if (b) { curList = b.dataset.openList; go('liste'); } };
+$('bag').onclick = e => {
+  const r = e.target.closest('[data-bag]'); if (!r) return;
+  const d = r.dataset.bagday, ch = S.bag.checked[d] = S.bag.checked[d] || [];
+  const i = ch.indexOf(r.dataset.bag); i >= 0 ? ch.splice(i, 1) : ch.push(r.dataset.bag);
+  for (const k in S.bag.checked) if (k < shift(today(), -3)) delete S.bag.checked[k];
+  save(); render();
+};
+function toggleGym(d = today()) { const i = S.gym.log.indexOf(d); i >= 0 ? S.gym.log.splice(i, 1) : S.gym.log.push(d); S.gym.log.sort(); save(); render(); }
+$('gymToday').onclick = () => toggleGym();
+document.addEventListener('click', e => { const b = e.target.closest('[data-count]'); if (!b) return; const c = S.counters.find(c => c.id === b.dataset.count); if (!c) return; const d = today(), i = c.log.indexOf(d); i >= 0 ? c.log.splice(i, 1) : c.log.push(d); save(); render(); });
+document.addEventListener('click', e => { const w = e.target.closest('[data-water]'); if (w) { const p = S.plants.find(p => p.id === w.dataset.water); if (p) { p.last = today(); save(); render(); toast(`${p.name}: annaffiata`); } } });
+
+/* =====================================================================
+   AGENDA
+   ===================================================================== */
+let calMonth = new Date(); calMonth.setDate(1);
+let selDay = today();
+function renderAgenda() {
+  $('calTitle').textContent = MON[calMonth.getMonth()] + ' ' + calMonth.getFullYear();
+  let h = ['lun', 'mar', 'mer', 'gio', 'ven', 'sab', 'dom'].map(x => `<div class="wd">${x}</div>`).join('');
+  const offset = (calMonth.getDay() + 6) % 7;
+  for (let i = 0; i < offset; i++) h += '<div class="c blank"></div>';
+  const days = new Date(calMonth.getFullYear(), calMonth.getMonth() + 1, 0).getDate();
+  for (let n = 1; n <= days; n++) {
+    const d = ymd(new Date(calMonth.getFullYear(), calMonth.getMonth(), n));
+    h += `<button class="c ${where(d)} ${d === selDay ? 'sel' : ''} ${d === today() ? 'today' : ''}" data-cal="${d}">${n}${apptsOn(d).length ? '<span class="dot"></span>' : ''}</button>`;
+  }
+  $('cal').innerHTML = h;
+  $('selTitle').textContent = longDate(selDay);
+  document.querySelectorAll('#nightSeg button').forEach(b => b.classList.toggle('on', b.dataset.w === where(selDay)));
+  const list = apptsOn(selDay);
+  $('dayAppts').innerHTML = list.length ? list.map(a => apptRow(a, { actions: true })).join('') : '<div class="empty">Nessun appuntamento.</div>';
+}
+$('calPrev').onclick = () => { calMonth.setMonth(calMonth.getMonth() - 1); renderAgenda(); };
+$('calNext').onclick = () => { calMonth.setMonth(calMonth.getMonth() + 1); renderAgenda(); };
+$('cal').onclick = e => { const b = e.target.closest('[data-cal]'); if (b) { selDay = b.dataset.cal; renderAgenda(); } };
+$('nightSeg').onclick = e => { const b = e.target.closest('button'); if (b) { setNight(selDay, b.dataset.w); save(); render(); } };
+$('apNew').onclick = async () => { const a = await confirmAppt({ title: '', date: selDay, time: '', place: '', rec: 'none', alert: 60 }); if (a) toast('Appuntamento fissato'); };
+document.addEventListener('click', async e => {
+  const del = e.target.closest('[data-del-ap]');
+  if (del) { const a = S.appts.find(a => a.id === del.dataset.delAp); if (a && confirm(a.rec && a.rec !== 'none' ? `Eliminare “${a.title}” e tutte le ripetizioni?` : `Eliminare “${a.title}”?`)) { S.appts = S.appts.filter(x => x.id !== a.id); save(); render(); } }
+  const ed = e.target.closest('[data-edit-ap]');
+  if (ed) { const a = S.appts.find(a => a.id === ed.dataset.editAp); if (a) await confirmAppt({ ...a }, true); }
+});
+
+/* ===== Schermata di conferma appuntamento ===== */
+let apResolve = null, apDraft = null, apEditing = false;
+function confirmAppt(draft, editing = false) {
+  apDraft = draft; apEditing = editing;
+  $('apHead').textContent = editing ? 'Modifica appuntamento' : 'Controlla prima di fissare';
+  $('apTitle').value = draft.title || ''; $('apDate').value = draft.date || today(); $('apTime').value = draft.time || '';
+  $('apPlace').value = draft.place || ''; $('apNotes').value = draft.notes || ''; $('apRec').value = draft.rec || 'none'; $('apAlert').value = String(draft.alert ?? 60);
+  $('apCal').checked = false;
+  apCheck(); $('dlgAppt').showModal();
+  return new Promise(res => apResolve = res);
+}
+function apCheck() {
+  const d = $('apDate').value, t = $('apTime').value;
+  if (!d) { $('apCheck').innerHTML = ''; return; }
+  const w = where(d), wTxt = { casa: '🏠 quella notte sei a casa tua', giada: '💗 quella notte sei da Giada', none: '🌙 notte non ancora segnata' }[w];
+  const others = apptsOn(d).filter(a => !(apEditing && a.id === apDraft.id));
+  const m = toMin(t), lines = [];
+  others.forEach(a => {
+    const close = m != null && a.time && Math.abs(toMin(a.time) - m) < 120;
+    lines.push(`<div class="${close ? 'bad' : 'ok'}">${close ? '⚠︎ Vicino a' : '· Già c\'è'}: ${esc(a.time || 'tutto il giorno')} ${esc(a.title)}</div>`);
+  });
+  if (inWorkHours(d, t)) lines.push(`<div class="bad">⚠︎ Durante l'orario d'ufficio (${R().workStart}–${R().workEnd})</div>`);
+  if (new Date(d + 'T' + (t || '23:59')) < new Date()) lines.push('<div class="bad">⚠︎ Questa data è già passata</div>');
+  S.deadlines.forEach(dl => { if (nextDeadline(dl) === d) lines.push(`<div class="ok">· Quel giorno scade: ${esc(dl.title)}</div>`); });
+  $('apCheck').innerHTML = `<div><b>${esc(longDate(d))}${t ? ' alle ' + esc(t) : ''}</b></div><div class="ok">${wTxt}</div>${lines.join('') || '<div class="ok">· Nessun altro impegno quel giorno ✓</div>'}`;
+}
+['apDate', 'apTime'].forEach(id => $(id).addEventListener('input', apCheck));
+$('apNo').onclick = () => { $('dlgAppt').close(); apResolve?.(null); apResolve = null; };
+$('dlgAppt').addEventListener('cancel', () => { apResolve?.(null); apResolve = null; });
+$('apOk').onclick = () => {
+  const a = { ...apDraft, title: $('apTitle').value.trim(), date: $('apDate').value, time: $('apTime').value, place: $('apPlace').value.trim(), notes: $('apNotes').value.trim(), rec: $('apRec').value, alert: Number($('apAlert').value) };
+  if (!a.title || !a.date) return toast('Servono almeno cosa e giorno');
+  if (apEditing) { const i = S.appts.findIndex(x => x.id === a.id); if (i >= 0) S.appts[i] = a; }
+  else { a.id = uid(); S.appts.push(a); }
+  save();
+  if ($('apCal').checked) addToCalendar(a);
+  $('dlgAppt').close(); render(); apResolve?.(a); apResolve = null;
+};
+function addToCalendar(a) {
+  const d = a.date.replace(/-/g, ''), stamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  let when;
+  if (a.time) { const s = new Date(at(a.date, a.time)), e = new Date(+s + 36e5);
+    const f = x => `${ymd(x).replace(/-/g, '')}T${pad(x.getHours())}${pad(x.getMinutes())}00`;
+    when = `DTSTART:${f(s)}\r\nDTEND:${f(e)}`; }
+  else when = `DTSTART;VALUE=DATE:${d}\r\nDTEND;VALUE=DATE:${shift(a.date, 1).replace(/-/g, '')}`;
+  const rr = { daily: 'FREQ=DAILY', weekly: 'FREQ=WEEKLY', biweekly: 'FREQ=WEEKLY;INTERVAL=2', monthly: 'FREQ=MONTHLY', yearly: 'FREQ=YEARLY' }[a.rec];
+  const alarm = a.alert >= 0 ? `\r\nBEGIN:VALARM\r\nACTION:DISPLAY\r\nDESCRIPTION:${a.title}\r\nTRIGGER:-PT${a.alert}M\r\nEND:VALARM` : '';
+  const ics = `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Gestiotto//IT\r\nBEGIN:VEVENT\r\nUID:${a.id}@gestiotto\r\nDTSTAMP:${stamp}\r\n${when}${rr ? '\r\nRRULE:' + rr : ''}\r\nSUMMARY:${a.title}\r\nLOCATION:${a.place || ''}${alarm}\r\nEND:VEVENT\r\nEND:VCALENDAR`;
+  const link = document.createElement('a');
+  link.href = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(ics);
+  link.download = 'appuntamento.ics'; document.body.appendChild(link); link.click(); link.remove();
+}
+
+/* =====================================================================
+   LISTE
+   ===================================================================== */
+let curList = S.lists[0], shopMode = false;
+function renderListe() {
+  if (!S.lists.includes(curList)) curList = S.lists[0];
+  $('listChips').innerHTML = S.lists.map(l => `<button class="chip ${l === curList ? 'on' : ''}" data-list="${esc(l)}">${esc(l)}<span class="n">${pending(l).length || ''}</span></button>`).join('') + '<button class="chip" id="newList">＋ Lista</button>';
+  if (view === 'liste') { const on = $('listChips').querySelector('.chip.on'); if (on) $('listChips').scrollLeft = on.offsetLeft - 16; }
+  const its = S.items.filter(i => i.list === curList).sort((a, b) => a.done - b.done);
+  $('items').innerHTML = its.length ? its.map(i => `<div class="item ${i.done ? 'done' : ''}" data-item="${i.id}"><button class="chk">${i.done ? '✓' : ''}</button><div class="grow">${esc(i.title)}</div>${i.synced ? '<span class="muted" title="Anche in Promemoria">☁︎</span>' : ''}${shopMode ? '' : noteBtn('item', i, i.title)}<button class="btn ghost small" data-del-item="${i.id}">✕</button></div>`).join('') : '<div class="empty">Lista vuota.</div>';
+  $('listCard').classList.toggle('shopmode', shopMode);
+  $('shopMode').textContent = shopMode ? '✓ Fine' : '🛒 Sono nel negozio';
+  const n = S.items.filter(i => !i.synced && !i.done).length;
+  const sp = syncPayload(); const nNew = sp.add.length, nDone = sp.done.length + S.remQueue.length;
+  $('syncInfo').textContent = nNew || nDone ? `Da inviare: ${nNew} nuove, ${nDone} completate/tolte.` : 'Tutto allineato con Promemoria.';
+  $('rulesTitle').textContent = 'Automazioni · ' + curList;
+  const rs = S.rules.filter(r => r.list === curList);
+  $('rules').innerHTML = rs.length ? rs.map(r => `<div class="item rule ${r.on ? '' : 'off'}"><div class="grow"><b>${esc(r.msg)}</b><div class="sub">${esc(daysText(r.days))} alle ${esc(r.time)}${r.onlyPending ? ' · solo se la lista non è finita' : ''}</div></div><button class="btn ghost small" data-rule-toggle="${r.id}">${r.on ? 'Pausa' : 'Attiva'}</button><button class="btn ghost small" data-rule-del="${r.id}">✕</button></div>`).join('') : '<div class="empty">Nessuna automazione per questa lista.</div>';
+}
+function daysText(days) {
+  const s = [...days].sort((a, b) => ((a + 6) % 7) - ((b + 6) % 7));
+  if (s.length === 7) return 'Ogni giorno';
+  return 'Ogni ' + s.map(d => WDL[d]).join(', ');
+}
+$('listChips').onclick = e => {
+  if (e.target.closest('#newList')) { const n = prompt('Nome della nuova lista:'); if (n && n.trim()) { curList = ensureList(n); save(); render(); } return; }
+  const b = e.target.closest('[data-list]'); if (!b) return;
+  if (b.dataset.list === curList && confirm(`Eliminare la lista “${curList}” e le sue voci?`)) { S.items = S.items.filter(i => i.list !== curList); S.rules = S.rules.filter(r => r.list !== curList); S.lists = S.lists.filter(l => l !== curList); if (!S.lists.length) S.lists = ['Altro']; save(); render(); return; }
+  curList = b.dataset.list; $('listTipsOut').innerHTML = ''; renderListe();
+};
+function addItem() { const v = $('itemInput').value.trim(); if (!v) return; v.split(/,\s*/).filter(Boolean).forEach(t => S.items.push({ id: uid(), title: t, list: curList, done: false, synced: false })); $('itemInput').value = ''; save(); render(); }
+$('itemAdd').onclick = addItem;
+$('itemInput').onkeydown = e => { if (e.key === 'Enter') addItem(); };
+$('items').onclick = e => {
+  const d = e.target.closest('[data-del-item]'); if (d) { queueRemoval(S.items.find(i => i.id === d.dataset.delItem)); S.items = S.items.filter(i => i.id !== d.dataset.delItem); save(); render(); return; }
+  const r = e.target.closest('[data-item]'); if (!r) return;
+  const it = S.items.find(i => i.id === r.dataset.item); it.done = !it.done; if (!it.done && it.doneSent) { it.synced = false; it.doneSent = false; it.seen = false; } save(); render();
+  if (!pending(curList).length) toast(`${curList}: completata`);
+};
+$('shopMode').onclick = () => { shopMode = !shopMode; renderListe(); };
+$('clearDone').onclick = () => { S.items.filter(i => i.done && i.list === curList).forEach(queueRemoval); S.items = S.items.filter(i => !(i.done && i.list === curList)); save(); render(); };
+$('listTips').onclick = async () => {
+  if (!S.settings.apiKey) return toast('Serve la chiave API (⚙︎)');
+  const out = $('listTipsOut'); out.innerHTML = '<div class="empty">…</div>';
+  const list = curList, its = S.items.filter(i => i.list === list && !i.done).map(i => i.title);
+  const ctx = list === 'Scadenze' ? '' : `Scadenze già inserite: ${S.deadlines.map(d => d.title).join(', ') || 'nessuna'}.`;
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-api-key': S.settings.apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model: S.settings.model, max_tokens: 300,
+        system: 'Suggerisci al massimo 3 voci che probabilmente mancano in una lista personale. Solo voci concrete e brevi (max 5 parole), una per riga, senza numeri, trattini, commenti o spiegazioni. Se non manca nulla rispondi solo: NIENTE',
+        messages: [{ role: 'user', content: `Lista "${list}". Voci attuali: ${its.join(', ') || '(vuota)'}. ${ctx} Memoria: ${S.memory.map(m => m.text).join('; ') || '-'}` }] }) });
+    const data = await res.json(); if (!res.ok) throw new Error(data?.error?.message || res.status);
+    const lines = data.content.map(c => c.text || '').join('\n').split('\n').map(l => l.replace(/^[-•*\d.)\s]+/, '').trim()).filter(l => l && !/^niente$/i.test(l)).slice(0, 3);
+    out.innerHTML = lines.length ? lines.map(l => `<div class="item"><div class="grow">${esc(l)}</div><button class="btn small" data-add-tip="${esc(l)}">＋</button></div>`).join('') : '<div class="empty">Non manca niente.</div>';
+  } catch (e) { out.innerHTML = `<div class="empty">Errore: ${esc(e.message)}</div>`; }
+};
+$('listTipsOut').onclick = e => { const b = e.target.closest('[data-add-tip]'); if (!b) return; S.items.push({ id: uid(), title: b.dataset.addTip, list: curList, done: false, synced: false }); b.closest('.item').remove(); save(); render(); };
+$('shareWa').onclick = () => {
+  const its = pending(curList); if (!its.length) return toast('Lista vuota');
+  const text = `${curList}:\n` + its.map(i => '• ' + i.title).join('\n');
+  window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+};
+
+/* --- Automazioni --- */
+let ruDays = new Set([1]);
+function drawDays(el, set) { el.innerHTML = [1, 2, 3, 4, 5, 6, 0].map(d => `<button data-d="${d}" class="${set.has(d) ? 'on' : ''}">${'DLMMGVS'[d]}</button>`).join(''); }
+$('ruDays').onclick = e => { const b = e.target.closest('[data-d]'); if (!b) return; const d = +b.dataset.d; ruDays.has(d) ? ruDays.delete(d) : ruDays.add(d); drawDays($('ruDays'), ruDays); };
+$('ruList').onchange = () => { $('ruMsg').value = `Oh ${NAME()}, vai: ${$('ruList').value}!`; };
+$('ruleNew').onclick = () => {
+  $('ruList').innerHTML = S.lists.map(l => `<option ${l === curList ? 'selected' : ''}>${esc(l)}</option>`).join('');
+  ruDays = new Set([1]); drawDays($('ruDays'), ruDays); $('ruTime').value = '18:00'; $('ruPending').checked = true;
+  $('ruMsg').value = `Oh ${NAME()}, vai: ${curList}!`; $('dlgRule').showModal();
+};
+$('ruOk').onclick = () => {
+  if (!ruDays.size) return toast('Scegli almeno un giorno');
+  S.rules.push({ id: uid(), list: $('ruList').value, days: [...ruDays], time: $('ruTime').value || '18:00', msg: $('ruMsg').value.trim() || `${$('ruList').value}: da fare`, onlyPending: $('ruPending').checked, on: true, dismissed: new Date().toISOString() });
+  save(); render(); $('dlgRule').close(); toast('Automazione salvata');
+};
+$('rules').onclick = e => {
+  const t = e.target.closest('[data-rule-toggle]'); if (t) { const r = S.rules.find(r => r.id === t.dataset.ruleToggle); r.on = !r.on; save(); render(); }
+  const d = e.target.closest('[data-rule-del]'); if (d && confirm('Eliminare questa automazione?')) { S.rules = S.rules.filter(r => r.id !== d.dataset.ruleDel); save(); render(); }
+};
+
+/* --- Ponte con Promemoria (Comandi Rapidi) --- */
+function runShortcut(name, text) {
+  let url = 'shortcuts://run-shortcut?name=' + encodeURIComponent(name);
+  if (text != null) url += '&input=text&text=' + encodeURIComponent(text);
+  location.href = url;
+}
+/* Sincronizzazione nei due sensi con un solo Comando Rapido "Otto Sync":
+   righe "+|Lista|Voce" = aggiungi, "x|Lista|Voce" = completa/togli.
+   Il comando poi copia tutti i promemoria aperti ("#OTTO" + "Lista|Voce") e l'app li incolla. */
+function queueRemoval(i) { if (i && i.synced && !i.doneSent) { S.remQueue.push(`${i.list}|${i.title}`); i.doneSent = true; } }
+function syncPayload() {
+  const add = S.items.filter(i => !i.synced && !i.done), done = S.items.filter(i => i.done && i.synced && !i.doneSent);
+  const lines = ['#OTTO', ...add.map(i => `+|${i.list}|${i.title}`), ...done.map(i => `x|${i.list}|${i.title}`), ...S.remQueue.map(r => 'x|' + r)];
+  return { lines, add, done };
+}
+$('syncAll').onclick = () => {
+  const { lines, add, done } = syncPayload();
+  add.forEach(i => i.synced = true); done.forEach(i => i.doneSent = true); S.remQueue = [];
+  S.syncPending = Date.now(); save(); render();
+  runShortcut('Otto Sync', lines.join('\n'));
+};
+async function finishSync() {
+  try { const t = await navigator.clipboard.readText(); if (!/^#OTTO/.test(t.trim())) throw new Error('niente'); importText(t); }
+  catch { $('impText').value = ''; $('dlgImport').showModal(); }
+}
+document.addEventListener('click', e => { if (e.target.closest('[data-sync-x]')) { S.syncPending = false; save(); render(); return; } if (e.target.closest('.syncBanner')) finishSync(); });
+$('syncPull').onclick = () => { $('impText').value = ''; $('dlgImport').showModal(); };
+$('impDo').onclick = () => importText($('impText').value);
+function importText(t) {
+  const lines = (t || '').split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  if (lines[0] === '#OTTO') return importSnapshot(lines.slice(1));
+  let added = 0;
+  (t || '').split(/\r?\n/).map(l => l.trim()).filter(Boolean).forEach(line => {
+    let [list, title] = line.includes('|') ? line.split('|').map(s => s.trim()) : ['Casa', line];
+    if (!title) return;
+    list = ensureList(list || 'Casa');
+    if (S.items.some(i => !i.done && i.list === list && i.title.toLowerCase() === title.toLowerCase())) return;
+    S.items.push({ id: uid(), title, list, done: false, synced: true }); added++;
+  });
+  save(); render(); $('dlgImport').close(); toast(added ? `Importate ${added} voci` : 'Nessuna voce nuova');
+}
+function importSnapshot(lines) {
+  const key = (l, t) => l.toLowerCase() + '|' + t.toLowerCase(), present = new Set();
+  let added = 0, completed = 0;
+  lines.forEach(line => {
+    const [l, ...rest] = line.split('|'), title = rest.join('|').trim(); if (!l || !title) return;
+    const list = ensureList(l.trim()); present.add(key(list, title));
+    const it = S.items.find(i => !i.done && key(i.list, i.title) === key(list, title));
+    if (it) { it.synced = true; it.seen = true; }
+    else { S.items.push({ id: uid(), title, list, done: false, synced: true, seen: true }); added++; }
+  });
+  // completate in Promemoria → completate anche qui
+  S.items.forEach(i => { if (!i.done && i.synced && i.seen && !present.has(key(i.list, i.title))) { i.done = true; i.doneSent = true; completed++; } });
+  S.syncPending = false; save(); render(); $('dlgImport').close();
+  toast(`Sincronizzato · ${added} nuove · ${completed} completate`);
+}
+
+/* =====================================================================
+   VITA: scadenze, compleanni, palestra, piante, borsa, routine, notifiche
+   ===================================================================== */
+const COND = { '': 'sempre', work: 'se il giorno dopo lavori', gym: 'se devi fare palestra' };
+function renderVita() {
+  const t = today();
+  const sg = suggestions(); $('sugCard').style.display = sg.length ? '' : 'none'; $('sugg').innerHTML = suggHtml(sg);
+  $('reminders').innerHTML = S.reminders.length ? S.reminders.map(r => `<div class="item rule ${r.on === false ? 'off' : ''}"><div class="grow"><b>${esc(r.title)}</b><div class="sub">${esc(REP_TXT(r))} alle ${esc(r.time)}${r.body ? ' · ' + esc(r.body) : ''}</div></div>${noteBtn('rem', r, r.title)}<button class="btn ghost small" data-rem-toggle="${r.id}">${r.on === false ? 'Attiva' : 'Pausa'}</button><button class="btn ghost small" data-rem-del="${r.id}">✕</button></div>`).join('') : '<div class="empty">Nessuno.</div>';
+  $('counters').innerHTML = S.counters.length ? S.counters.map(c => `<div class="item"><div class="grow">${esc(c.name)}<div class="sub">${counterWeek(c)}/${c.goal} questa settimana</div></div>${noteBtn('counter', c, c.name)}<button class="btn ghost small" data-counter-del="${c.id}">✕</button></div>`).join('') : '<div class="empty">Nessuno.</div>';
+  $('memory').innerHTML = S.memory.length ? S.memory.map(m => `<div class="item"><div class="grow">${esc(m.text)}</div><button class="btn ghost small" data-mem-del="${m.id}">✕</button></div>`).join('') : '<div class="empty">Ancora niente.</div>';
+  const dls = [...S.deadlines].sort((a, b) => nextDeadline(a).localeCompare(nextDeadline(b)));
+  $('deadlines').innerHTML = dls.length ? dls.map(dl => { const nd = nextDeadline(dl), n = daysBetween(t, nd);
+    return `<div class="item"><div class="grow">${esc(dl.title)}<div class="sub">${esc(longDate(nd))}${dl.rec !== 'none' ? ' · ' + (dl.rec === 'yearly' ? 'ogni anno' : 'ogni 2 anni') : ''} · avviso ${esc(dl.remind.join(', '))} gg prima</div></div><span class="badge ${n <= 30 ? 'warn' : 'zero'}">${n < 0 ? 'scaduta' : n + ' gg'}</span>${noteBtn('deadline', dl, dl.title)}<button class="btn ghost small" data-del-dl="${dl.id}">✕</button></div>`; }).join('') : '<div class="empty">Nessuna scadenza.</div>';
+  const bds = [...S.birthdays].sort((a, b) => nextBirthday(a).localeCompare(nextBirthday(b)));
+  $('bdays').innerHTML = bds.length ? bds.map(b => { const nb = nextBirthday(b), n = daysBetween(t, nb);
+    return `<div class="item"><div class="grow">${esc(b.name)}<div class="sub">${esc(longDate(nb))}${b.gift ? ' · regalo in lista ' + b.gift + ' gg prima' : ''}</div></div><span class="badge ${n <= 21 ? 'warn' : 'zero'}">${n} gg</span>${noteBtn('bday', b, b.name)}<button class="btn ghost small" data-del-bd="${b.id}">✕</button></div>`; }).join('') : '<div class="empty">Nessuna data.</div>';
+  // palestra
+  $('gymGoal').value = String(S.gym.goal);
+  $('gymCount2').textContent = `${gymWeek()}/${S.gym.goal} questa settimana`;
+  const ws = weekStart(t), hist = [];
+  for (let i = 1; i <= 4; i++) { const s = shift(ws, -7 * i); hist.push(`${shortDate(s)}: ${gymWeek(s)}/${S.gym.goal}`); }
+  $('gymHist').textContent = 'Settimane precedenti — ' + hist.join(' · ');
+  // piante
+  $('plants').innerHTML = S.plants.length ? S.plants.map(p => { const n = daysBetween(t, plantNext(p));
+    return `<div class="item"><div class="grow">${esc(p.name)}<div class="sub">ogni ${p.every} gg · ultima ${esc(shortDate(p.last))} · ${n <= 0 ? 'da annaffiare' : 'tra ' + n + ' gg'}</div></div><button class="btn small ${n <= 0 ? '' : 'ghost'}" data-water="${p.id}">💧</button>${noteBtn('plant', p, p.name)}<button class="btn ghost small" data-del-pl="${p.id}">✕</button></div>`; }).join('') : '<div class="empty">Nessuna pianta.</div>';
+  // borsa
+  $('bagItems').innerHTML = S.bag.items.map(i => `<div class="item"><div class="grow">${esc(i.t)}<div class="sub">${COND[i.cond || '']}</div></div><button class="btn ghost small" data-del-bag="${i.id}">✕</button></div>`).join('') || '<div class="empty">Vuota.</div>';
+  // routine (solo se non si sta scrivendo lì)
+  if (!document.activeElement || !document.activeElement.closest('#v-vita')) {
+    drawDays($('workDays'), new Set(R().workDays));
+    $('workStart').value = R().workStart; $('workEnd').value = R().workEnd;
+    $('rcMorning').value = R().morning; $('rcEvening').value = R().evening; $('rcSunday').value = R().sunday;
+    $('pushUrl').value = S.settings.push.url; $('pushPw').value = S.settings.push.password;
+  }
+  $('iphoneStatus').textContent = S.ext.calAt ? `Ultimo aggiornamento dall'iPhone: ${shortDate(S.ext.calAt.slice(0, 10))} ${new Date(S.ext.calAt).toTimeString().slice(0, 5)} · ${S.ext.cal.length} eventi` : "Nessun dato ancora ricevuto dall'iPhone (Comando Rapido “Otto iPhone”, facoltativo).";
+  $('pushStatus').textContent = S.settings.push.on ? `Notifiche attive${lastSync ? ' · ultimo invio ' + lastSync : ''}.` : 'Notifiche non attive.';
+}
+$('dlAdd').onclick = () => {
+  const title = $('dlTitle').value.trim(), date = $('dlDate').value;
+  if (!title || !date) return toast('Servono nome e data');
+  S.deadlines.push({ id: uid(), title, date, rec: $('dlRec').value, remind: $('dlRemind').value.split(',').map(Number) });
+  $('dlTitle').value = $('dlDate').value = ''; save(); render(); toast('Scadenza aggiunta');
+};
+$('dlTitle').addEventListener('change', () => { const t = $('dlTitle').value.toLowerCase(); if (/bollo|assicuraz/.test(t)) $('dlRec').value = 'yearly'; else if (/revisione/.test(t)) $('dlRec').value = 'biennial'; });
+$('bdAdd').onclick = () => {
+  const name = $('bdName').value.trim(), date = $('bdDate').value;
+  if (!name || !date) return toast('Servono nome e data');
+  S.birthdays.push({ id: uid(), name, date, gift: Number($('bdGift').value), added: {} });
+  $('bdName').value = $('bdDate').value = ''; housekeeping(); save(); render(); toast('Aggiunto');
+};
+$('gymGoal').onchange = () => { S.gym.goal = Number($('gymGoal').value); save(); render(); };
+$('plAdd').onclick = () => { const n = $('plName').value.trim(); if (!n) return; S.plants.push({ id: uid(), name: n, every: Number($('plEvery').value), last: today() }); $('plName').value = ''; save(); render(); };
+$('bgAdd').onclick = () => { const n = $('bgName').value.trim(); if (!n) return; S.bag.items.push({ id: uid(), t: n, cond: $('bgCond').value }); $('bgName').value = ''; save(); render(); };
+let workSet = null;
+$('workDays').onclick = e => { const b = e.target.closest('[data-d]'); if (!b) return; workSet = workSet || new Set(R().workDays); const d = +b.dataset.d; workSet.has(d) ? workSet.delete(d) : workSet.add(d); drawDays($('workDays'), workSet); };
+$('routineSave').onclick = () => {
+  Object.assign(R(), { workDays: [...(workSet || new Set(R().workDays))], workStart: $('workStart').value || '08:30', workEnd: $('workEnd').value || '17:30', morning: $('rcMorning').value || '08:00', evening: $('rcEvening').value || '21:00', sunday: $('rcSunday').value || '19:00' });
+  workSet = null; document.activeElement?.blur(); save(); render(); toast('Routine salvata');
+};
+document.addEventListener('click', e => {
+  const rt = e.target.closest('[data-rem-toggle]'); if (rt) { const r = S.reminders.find(x => x.id === rt.dataset.remToggle); r.on = r.on === false; save(); render(); }
+  const rd = e.target.closest('[data-rem-del]'); if (rd && confirm('Eliminare il promemoria?')) { S.reminders = S.reminders.filter(x => x.id !== rd.dataset.remDel); save(); render(); }
+  const cd = e.target.closest('[data-counter-del]'); if (cd && confirm('Eliminare il contatore?')) { S.counters = S.counters.filter(x => x.id !== cd.dataset.counterDel); save(); render(); }
+  const md = e.target.closest('[data-mem-del]'); if (md) { S.memory = S.memory.filter(x => x.id !== md.dataset.memDel); save(); render(); }
+  const a = e.target.closest('[data-del-dl]'); if (a && confirm('Eliminare la scadenza?')) { S.deadlines = S.deadlines.filter(x => x.id !== a.dataset.delDl); save(); render(); }
+  const b = e.target.closest('[data-del-bd]'); if (b && confirm('Eliminare?')) { S.birthdays = S.birthdays.filter(x => x.id !== b.dataset.delBd); save(); render(); }
+  const c = e.target.closest('[data-del-pl]'); if (c && confirm('Eliminare la pianta?')) { S.plants = S.plants.filter(x => x.id !== c.dataset.delPl); save(); render(); }
+  const d = e.target.closest('[data-del-bag]'); if (d) { S.bag.items = S.bag.items.filter(x => x.id !== d.dataset.delBag); save(); render(); }
+});
+
+/* =====================================================================
+   NOTE E ALLEGATI (foto/PDF salvati sul telefono in IndexedDB)
+   ===================================================================== */
+const DB = new Promise((res, rej) => { const r = indexedDB.open('gestiotto', 1); r.onupgradeneeded = () => r.result.createObjectStore('files'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
+const idb = (mode, fn) => DB.then(db => new Promise((res, rej) => { const tx = db.transaction('files', mode), st = tx.objectStore('files'), q = fn(st); tx.oncomplete = () => res(q && q.result); tx.onerror = () => rej(tx.error); }));
+const fileGet = id => idb('readonly', s => s.get(id)), filePut = (id, v) => idb('readwrite', s => s.put(v, id)), fileDel = id => idb('readwrite', s => s.delete(id));
+const KINDS = { rem: () => S.reminders, counter: () => S.counters, appt: () => S.appts, deadline: () => S.deadlines, bday: () => S.birthdays, plant: () => S.plants, item: () => S.items };
+const ent = (kind, id) => kind === 'gym' ? S.gym : KINDS[kind]?.().find(x => x.id === id);
+let ntCur = null, urls = [];
+function openNotes(kind, id, title) {
+  const e = ent(kind, id); if (!e) return;
+  ntCur = { kind, id }; $('ntTitle').textContent = title; $('ntText').value = e.notes || '';
+  drawFiles(e); $('dlgNotes').showModal();
+}
+async function drawFiles(e) {
+  urls.forEach(u => URL.revokeObjectURL(u)); urls = [];
+  let h = '';
+  for (const fid of e.files || []) {
+    const f = await fileGet(fid).catch(() => null); if (!f) continue;
+    const u = URL.createObjectURL(f.blob); urls.push(u);
+    h += `<div class="th" data-view="${fid}">${f.type.startsWith('image/') ? `<img src="${u}" alt="">` : '📄<br>' + esc(f.name.slice(0, 18))}<button class="x" data-rmfile="${fid}">✕</button></div>`;
+  }
+  $('ntFiles').innerHTML = h || '<span class="muted">Nessun allegato.</span>';
+}
+async function shrink(file) {
+  if (!file.type.startsWith('image/')) return file;
+  try {
+    const bmp = await createImageBitmap(file), k = Math.min(1, 1600 / Math.max(bmp.width, bmp.height));
+    const c = document.createElement('canvas'); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+    c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+    return await new Promise(r => c.toBlob(b => r(b || file), 'image/jpeg', 0.82));
+  } catch { return file; }
+}
+$('ntFile').onchange = async ev => {
+  const e = ent(ntCur.kind, ntCur.id);
+  for (const file of ev.target.files) {
+    if (file.size > 15e6) { toast(file.name + ': file troppo grande'); continue; }
+    const blob = await shrink(file), id = uid();
+    await filePut(id, { blob, name: file.name || 'allegato', type: blob.type || file.type });
+    e.files = [...(e.files || []), id];
+  }
+  ev.target.value = ''; save(); drawFiles(e); render();
+};
+$('ntFiles').onclick = async ev => {
+  const rm = ev.target.closest('[data-rmfile]');
+  if (rm) { ev.stopPropagation(); if (!confirm('Eliminare questo allegato?')) return; const e = ent(ntCur.kind, ntCur.id); e.files = (e.files || []).filter(x => x !== rm.dataset.rmfile); await fileDel(rm.dataset.rmfile); save(); drawFiles(e); render(); return; }
+  const v = ev.target.closest('[data-view]'); if (!v) return;
+  const f = await fileGet(v.dataset.view); if (!f) return;
+  const u = URL.createObjectURL(f.blob);
+  if (f.type.startsWith('image/')) { $('vwImg').src = u; $('dlgView').showModal(); } else window.open(u, '_blank');
+};
+$('ntSave').onclick = () => { const e = ent(ntCur.kind, ntCur.id); if (e) e.notes = $('ntText').value.trim(); save(); $('dlgNotes').close(); render(); toast('Note salvate'); };
+$('ntClose').onclick = () => $('dlgNotes').close();
+document.addEventListener('click', e => { const n = e.target.closest('[data-note]'); if (!n) return; e.stopPropagation(); const [k, id, ...t] = n.dataset.note.split('|'); openNotes(k, id, t.join('|')); }, true);
+
+/* =====================================================================
+   PROGRAMMA NOTIFICHE (calcolato qui, spedito al server)
+   ===================================================================== */
+function recapMorning(d) {
+  const L = [], ap = apptsOn(d);
+  L.push(ap.length ? ap.map(apptLine).join('\n') : 'Nessun appuntamento.');
+  L.push(`Stanotte: ${WHERE_TXT[where(d)]}.`);
+  if (where(d) === 'giada') L.push('Borsa: ' + bagFor(d).map(i => i.t.toLowerCase()).join(', ') + '.');
+  const p = S.lists.filter(l => pending(l).length);
+  if (p.length) L.push('Liste: ' + p.slice(0, 4).map(l => `${l} ${pending(l).length}`).join(', ') + '.');
+  L.push(`Palestra: ${gymWeek(d)}/${S.gym.goal}.`);
+  S.deadlines.forEach(dl => { const n = daysBetween(d, nextDeadline(dl)); if (n >= 0 && n <= 7) L.push(`${dl.title}: scade ${inDays(n)}.`); });
+  return L.join('\n');
+}
+function recapEvening(d) {
+  const tom = shift(d, 1), L = [], ap = apptsOn(tom);
+  L.push(ap.length ? 'Domani: ' + ap.map(apptLine).join(' · ') : 'Domani: niente in agenda.');
+  L.push(where(tom) === 'none' ? 'Domani notte: da segnare nell\'app.' : `Domani notte: ${WHERE_TXT[where(tom)]}.`);
+  if (where(tom) === 'giada') L.push('Prepara: ' + bagFor(tom).map(i => i.t.toLowerCase()).join(', ') + '.');
+  ap.filter(a => inWorkHours(tom, a.time)).forEach(a => L.push(`${a.time} ${a.title} è in orario d'ufficio.`));
+  if (where(d) !== 'giada') { const due = plantsDueBy(tom); if (due.length) L.push('Annaffia: ' + due.map(p => p.name).join(', ') + '.'); }
+  return L.join('\n');
+}
+function recapSunday(d) {
+  const L = [], unset = [];
+  for (let i = 1; i <= 7; i++) {
+    const x = shift(d, i), ap = apptsOn(x);
+    if (where(x) === 'none') unset.push(WD[parse(x).getDay()]);
+    if (ap.length) L.push(`${shortDate(x)}: ${ap.map(a => (a.time ? a.time + ' ' : '') + a.title).join(', ')}`);
+  }
+  if (!L.length) L.push('Settimana senza appuntamenti.');
+  if (unset.length) L.push(`Notti da segnare: ${unset.join(', ')}.`);
+  S.deadlines.forEach(dl => { const n = daysBetween(d, nextDeadline(dl)); if (n >= 0 && n <= 14) L.push(`${dl.title}: ${shortDate(nextDeadline(dl))}.`); });
+  S.birthdays.forEach(b => { const n = daysBetween(d, nextBirthday(b)); if (n >= 0 && n <= 7) L.push(`${b.name}: ${shortDate(nextBirthday(b))}.`); });
+  L.push(`Obiettivo palestra: ${S.gym.goal}.`);
+  suggestions().slice(0, 2).forEach(x => L.push(x.text));
+  return L.join('\n');
+}
+function buildSchedule() {
+  const now = Date.now(), t = today(), out = [];
+  const add = (id, when, title, body) => { if (when > now) out.push({ id, at: when, title, body }); };
+  for (let i = 0; i < 14; i++) {
+    const d = shift(t, i), dow = parse(d).getDay();
+    add('m-' + d, at(d, R().morning), `Oggi · ${shortDate(d)}`, recapMorning(d));
+    add('e-' + d, at(d, R().evening), `Domani · ${shortDate(shift(d, 1))}`, recapEvening(d));
+    if (dow === 0) add('w-' + d, at(d, R().sunday), `Settimana · da ${shortDate(shift(d, 1))}`, recapSunday(d));
+    apptsOn(d).forEach(a => { if (a.alert >= 0) { const st = a.time ? at(d, a.time) : at(d, '09:00');
+      add(`a-${a.id}-${d}`, st - a.alert * 6e4, a.title, `${d === t ? 'Oggi' : longDate(d)}${a.time ? ' alle ' + a.time : ''}${a.place ? ' · ' + a.place : ''}`); } });
+    S.rules.filter(r => r.on && r.days.includes(dow)).forEach(r => { const n = pending(r.list).length;
+      if (!r.onlyPending || n) add(`r-${r.id}-${d}`, at(d, r.time), r.msg, n ? `${n} voci in ${r.list}` : r.list); });
+  }
+  S.deadlines.forEach(dl => { const nd = nextDeadline(dl);
+    [...dl.remind, 0].forEach(n => { const d = shift(nd, -n); if (daysBetween(t, d) < 60) add(`d-${dl.id}-${nd}-${n}`, at(d, '09:00'), `Scadenza: ${dl.title}`, n ? `Scade ${inDays(n)}, ${longDate(nd)}.` : 'Scade oggi.'); }); });
+  S.birthdays.forEach(b => { const nb = nextBirthday(b);
+    add(`b-${b.id}-${nb}`, at(nb, '09:00'), b.name, `Oggi, ${longDate(nb)}.`);
+    if (b.gift) add(`bg-${b.id}-${nb}`, at(shift(nb, -b.gift), '09:00'), `${b.name} tra ${b.gift} giorni`, `Regalo aggiunto alla lista Regali.`); });
+  for (let i = 0; i < 14; i++) { const d = shift(t, i); S.reminders.forEach(r => { if (remOn(r, d)) add(`p-${r.id}-${d}`, at(d, r.time), r.title, r.body || ''); }); }
+  return out.sort((a, b) => a.at - b.at).slice(0, 350);
+}
+
+/* =====================================================================
+   SERVER NOTIFICHE
+   ===================================================================== */
+let lastSync = '', lastHash = '';
+const P = () => S.settings.push;
+const api = (path, body) => fetch(P().url.replace(/\/$/, '') + path, { method: body ? 'POST' : 'GET', headers: { authorization: 'Bearer ' + P().password, 'content-type': 'application/json' }, body: body ? JSON.stringify(body) : undefined })
+  .then(async r => { const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || 'errore ' + r.status); return j; });
+/* Messaggi dettati a Siri (comando "Gestiotto"): il server li tiene, l'app li passa alla chat */
+let inboxBusy = false;
+async function pullInbox() {
+  if (inboxBusy || !P().on || !P().url || !navigator.onLine) return;
+  inboxBusy = true;
+  try {
+    const { messages = [] } = await api('/inbox?take=1');
+    const talk = messages.filter(m => !m.text.trim().startsWith('#'));
+    messages.filter(m => m.text.trim().startsWith('#')).forEach(handleDeviceData);
+    if (talk.length) {
+      if (S.settings.apiKey) { go('chat'); for (const m of talk) { while (busy) await new Promise(r => setTimeout(r, 300)); const t = m.text.trim(); await send(t.startsWith('(') ? t : '(da Siri) ' + t); } }
+      else { talk.forEach(m => S.items.push({ id: uid(), title: m.text.replace(/^\(da \w+\)\s*/, ''), list: ensureList('Casa'), done: false, synced: false })); save(); render(); toast(`${talk.length} messaggi aggiunti in Casa`); }
+    }
+  } catch (e) { console.warn('inbox', e); }
+  inboxBusy = false;
+}
+/* Dati inviati dai Comandi Rapidi dell'iPhone:
+   #IPHONE  → sezioni #CAL (Titolo|YYYY-MM-DD|HH:MM|Luogo) e #COMP (Nome|YYYY-MM-DD)
+   #NOTTE giada|casa  (automazione "quando arrivo")      #GYM  (automazione "quando arrivo in palestra") */
+function handleDeviceData(m) {
+  const lines = m.text.split(/\r?\n/).map(l => l.trim()).filter(Boolean), head = lines[0].toUpperCase();
+  const when = new Date(m.at || Date.now()), day = ymd(when.getHours() < 5 ? addDays(when, -1) : when);
+  const isDate = s => /^\d{4}-\d{2}-\d{2}$/.test(s);
+  if (head.startsWith('#NOTTE')) { const w = /giada/i.test(lines[0]) ? 'giada' : 'casa'; setNight(day, w); toast(`Notte ${shortDate(day)}: ${WHERE_TXT[w]}`); }
+  else if (head.startsWith('#GYM')) { if (!S.gym.log.includes(ymd(when))) { S.gym.log.push(ymd(when)); S.gym.log.sort(); toast('Palestra segnata'); } }
+  else if (head.startsWith('#IPHONE') || head.startsWith('#CAL') || head.startsWith('#COMP')) {
+    let sec = head.startsWith('#COMP') ? 'comp' : 'cal', cal = [], comp = 0, sawCal = false;
+    lines.forEach(l => {
+      const u = l.toUpperCase();
+      if (u.startsWith('#CAL')) { sec = 'cal'; sawCal = true; return; } if (u.startsWith('#COMP')) { sec = 'comp'; return; } if (l.startsWith('#')) return;
+      const f = l.split('|').map(s => s.trim());
+      if (sec === 'cal' && f[0] && isDate(f[1])) cal.push({ title: f[0], date: f[1], time: /^\d{1,2}:\d{2}$/.test(f[2] || '') && f[2].padStart(5, '0') !== '00:00' ? f[2].padStart(5, '0') : '', place: f[3] || '' });
+      if (sec === 'comp' && f[0] && isDate(f[1]) && !S.birthdays.some(b => b.name.trim().toLowerCase() === ('compleanno ' + f[0]).toLowerCase() || b.name.trim().toLowerCase() === f[0].toLowerCase())) {
+        S.birthdays.push({ id: uid(), name: 'Compleanno ' + f[0], date: f[1], gift: 21, added: {}, fromContacts: true }); comp++; }
+    });
+    if (sawCal || head.startsWith('#CAL')) { S.ext.cal = cal.slice(0, 300); S.ext.calAt = new Date().toISOString(); }
+    housekeeping(); toast(`iPhone: ${cal.length} eventi${comp ? ', ' + comp + ' compleanni nuovi' : ''}`);
+  }
+  save(); render();
+}
+async function syncServer() {
+  if (!P().on || !P().url || !navigator.onLine) return;
+  try {
+    const items = buildSchedule(), hash = JSON.stringify(items.map(i => [i.id, i.at, i.body]));
+    if (hash !== lastHash) { await api('/schedule', { items }); lastHash = hash; }
+    const backup = { ...S, settings: { ...S.settings, apiKey: '', push: { ...P(), password: '' } }, chat: S.chat.slice(-30) };
+    await api('/backup', backup);
+    lastSync = new Date().toTimeString().slice(0, 5);
+    if (view === 'vita') renderVita();
+  } catch (e) { console.warn('sync', e); }
+}
+const b64ToU8 = s => { s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; return Uint8Array.from(atob(s), c => c.charCodeAt(0)); };
+$('pushOn').onclick = async () => {
+  P().url = $('pushUrl').value.trim(); P().password = $('pushPw').value.trim();
+  if (!P().url || !P().password) return toast('Inserisci indirizzo e password del server');
+  if (!('Notification' in window) || !('PushManager' in window)) return toast("Apri Gestiotto dall'icona sulla Home (serve iOS 16.4 o più recente)");
+  const perm = await Notification.requestPermission();
+  if (perm !== 'granted') return toast('Permesso notifiche negato: abilitalo in Impostazioni › Notifiche › Gestiotto');
+  try {
+    const { publicKey } = await api('/vapid');
+    const reg = await navigator.serviceWorker.ready;
+    let sub = await reg.pushManager.getSubscription();
+    if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToU8(publicKey) });
+    await api('/register', { subscription: sub.toJSON() });
+    P().on = true; lastHash = ''; save(); await syncServer(); render(); toast('Notifiche attive');
+  } catch (e) { toast('Errore: ' + e.message); $('pushStatus').textContent = 'Errore: ' + e.message; }
+};
+$('pushTest').onclick = async () => { try { await api('/test', {}); toast('Notifica di prova inviata'); } catch (e) { toast('Errore: ' + e.message); } };
+$('bkServer').onclick = async () => {
+  if (!P().url) return toast('Configura prima il server in Vita › Notifiche');
+  if (!confirm('Sostituire i dati di questo telefono con il backup del server?')) return;
+  try { const d = await fetch(P().url.replace(/\/$/, '') + '/backup', { headers: { authorization: 'Bearer ' + P().password } }).then(r => r.json());
+    if (!d.lists) throw new Error('backup vuoto'); const keep = { apiKey: S.settings.apiKey, push: P() };
+    S = hydrate(d); S.settings.apiKey = keep.apiKey; S.settings.push = keep.push; save(); render(); toast('Ripristinato'); }
+  catch (e) { toast('Errore: ' + e.message); }
+};
+
+/* =====================================================================
+   CHAT CON CLAUDE
+   ===================================================================== */
+let undoSnap = null;
+function renderChat() {
+  $('chatlog').innerHTML = S.chat.map(m => `<div class="msg ${m.role === 'user' ? 'u' : m.role === 'tool' ? 't' : 'a'}">${esc(m.text)}</div>`).join('')
+    + (undoSnap && !busy ? '<button class="btn ghost small" id="undoBtn" style="align-self:center">↶ Annulla le ultime modifiche di Claude</button>' : '');
+  $('suggest').style.display = S.chat.length ? 'none' : 'flex';
+}
+$('suggest').onclick = e => { const b = e.target.closest('button'); if (b) { $('chatIn').value = b.textContent; send(); } };
+$('chatSend').onclick = () => send();
+/* Chat vocale: microfono (riconoscimento italiano) + risposta letta ad alta voce */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let voiceTurn = false, recog = null;
+if (!SR) $('micBtn').style.display = 'none';
+$('micBtn').onclick = () => {
+  if (recog) { recog.stop(); return; }
+  try { speechSynthesis.cancel(); } catch {}
+  recog = new SR(); recog.lang = 'it-IT'; recog.interimResults = true; recog.continuous = false;
+  let finalText = '';
+  recog.onresult = e => { finalText = Array.from(e.results).map(r => r[0].transcript).join(''); $('chatIn').value = finalText; };
+  recog.onerror = e => { toast('Microfono: ' + (e.error === 'not-allowed' ? 'permesso negato' : e.error)); };
+  recog.onend = () => { $('micBtn').classList.remove('rec'); recog = null; if (finalText.trim()) { voiceTurn = true; send(); } };
+  $('micBtn').classList.add('rec'); recog.start();
+};
+function speak(text) {
+  try { const u = new SpeechSynthesisUtterance(text.replace(/[✓✕↶⚠︎📝🔔•]/g, '')); u.lang = 'it-IT';
+    const v = speechSynthesis.getVoices().find(v => v.lang && v.lang.startsWith('it')); if (v) u.voice = v;
+    speechSynthesis.cancel(); speechSynthesis.speak(u); } catch {}
+}
+$('chatlog').addEventListener('click', e => {
+  if (!e.target.closest('#undoBtn') || !undoSnap) return;
+  if (!confirm("Riportare tutto a prima dell'ultima richiesta?")) return;
+  const keep = { chat: S.chat, settings: S.settings }, snap = JSON.parse(undoSnap); S = hydrate(snap); S.chat = keep.chat; S.settings = { ...keep.settings, name: snap.settings.name, routine: snap.settings.routine };
+  S.chat.push({ role: 'tool', text: '↶ Modifiche annullate' }); undoSnap = null; save(); render();
+});
+const dataSnap = () => JSON.stringify({ ...S, chat: [], settings: { name: S.settings.name, routine: S.settings.routine } });
+$('chatIn').onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } };
+
+const TOOLS = [
+  { name: 'aggiungi_articoli', description: 'Aggiunge voci a una lista (spesa, regali, idee, viaggi, diario…). Se la lista non esiste viene creata.',
+    input_schema: { type: 'object', properties: { articoli: { type: 'array', items: { type: 'object', properties: { titolo: { type: 'string' }, lista: { type: 'string' } }, required: ['titolo', 'lista'] } } }, required: ['articoli'] } },
+  { name: 'segna_comprati', description: 'Segna come fatte/comprate (o elimina) voci, tramite i loro id.',
+    input_schema: { type: 'object', properties: { ids: { type: 'array', items: { type: 'string' } }, elimina: { type: 'boolean' } }, required: ['ids'] } },
+  { name: 'crea_lista', description: "Crea una nuova lista (anche vuota), es. 'Regali di Natale', 'Valigia'. Può includere subito delle voci.",
+    input_schema: { type: 'object', properties: { nome: { type: 'string' }, articoli: { type: 'array', items: { type: 'string' } } }, required: ['nome'] } },
+  { name: 'rinomina_lista', description: 'Rinomina una lista esistente.',
+    input_schema: { type: 'object', properties: { nome_attuale: { type: 'string' }, nuovo_nome: { type: 'string' } }, required: ['nome_attuale', 'nuovo_nome'] } },
+  { name: 'elimina_lista', description: 'Elimina una lista con le sue voci. Solo dopo conferma di Otto in chat.',
+    input_schema: { type: 'object', properties: { nome: { type: 'string' } }, required: ['nome'] } },
+  { name: 'proponi_appuntamento', description: "Mostra a Otto la schermata di conferma per un nuovo appuntamento. Otto controlla, corregge, conferma o annulla. Restituisce l'esito.",
+    input_schema: { type: 'object', properties: { titolo: { type: 'string' }, data: { type: 'string', description: 'YYYY-MM-DD' }, ora: { type: 'string', description: 'HH:MM, vuoto se tutto il giorno' }, luogo: { type: 'string' },
+      ricorrenza: { type: 'string', enum: ['none', 'daily', 'weekly', 'biweekly', 'monthly', 'yearly'] },
+      preavviso_minuti: { type: 'integer', description: "-1 nessuno, 0 all'ora, 10, 30, 60, 120, 1440, 2880, 10080" }, note: { type: 'string' } }, required: ['titolo', 'data', 'ricorrenza', 'preavviso_minuti'] } },
+  { name: 'elimina_appuntamento', description: 'Elimina un appuntamento (tutte le ripetizioni) tramite id. Solo dopo conferma in chat.',
+    input_schema: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] } },
+  { name: 'imposta_notti', description: 'Imposta dove dorme Otto in certe notti: casa, giada o nessuno.',
+    input_schema: { type: 'object', properties: { date: { type: 'array', items: { type: 'string', description: 'YYYY-MM-DD' } }, dove: { type: 'string', enum: ['casa', 'giada', 'nessuno'] } }, required: ['date', 'dove'] } },
+  { name: 'crea_automazione', description: 'Crea un avviso ricorrente per una lista.',
+    input_schema: { type: 'object', properties: { lista: { type: 'string' }, giorni: { type: 'array', items: { type: 'integer', description: '0=domenica … 6=sabato' } }, ora: { type: 'string' }, messaggio: { type: 'string' }, solo_se_da_fare: { type: 'boolean' } }, required: ['lista', 'giorni', 'ora', 'messaggio'] } },
+  { name: 'registra_palestra', description: 'Segna (o annulla) un allenamento in un giorno.',
+    input_schema: { type: 'object', properties: { data: { type: 'string', description: 'YYYY-MM-DD, default oggi' }, annulla: { type: 'boolean' } } } },
+  { name: 'imposta_obiettivo_palestra', description: 'Imposta quante volte a settimana vuole allenarsi.',
+    input_schema: { type: 'object', properties: { volte: { type: 'integer' } }, required: ['volte'] } },
+  { name: 'aggiungi_scadenza', description: 'Aggiunge una scadenza (bollo, assicurazione, revisione scooter, documenti…).',
+    input_schema: { type: 'object', properties: { titolo: { type: 'string' }, data: { type: 'string', description: 'YYYY-MM-DD' }, ricorrenza: { type: 'string', enum: ['none', 'yearly', 'biennial'] }, avvisi_giorni_prima: { type: 'array', items: { type: 'integer' } } }, required: ['titolo', 'data', 'ricorrenza'] } },
+  { name: 'aggiungi_compleanno', description: 'Aggiunge un compleanno o una ricorrenza annuale. Il regalo finisce in lista Regali qualche giorno prima.',
+    input_schema: { type: 'object', properties: { nome: { type: 'string' }, data: { type: 'string', description: 'YYYY-MM-DD (anno qualsiasi)' }, regalo_giorni_prima: { type: 'integer', description: '0 = niente regalo' } }, required: ['nome', 'data'] } },
+  { name: 'aggiungi_pianta', description: 'Aggiunge una pianta di casa con frequenza di annaffiatura.',
+    input_schema: { type: 'object', properties: { nome: { type: 'string' }, ogni_giorni: { type: 'integer' } }, required: ['nome', 'ogni_giorni'] } },
+  { name: 'scrivi_note', description: "Scrive o aggiunge note a qualcosa: la scheda palestra (cosa='palestra'), una scadenza, un appuntamento, un compleanno, una pianta o una voce di lista. Per tutto tranne la palestra serve 'id'.",
+    input_schema: { type: 'object', properties: { cosa: { type: 'string', enum: ['palestra', 'scadenza', 'appuntamento', 'compleanno', 'pianta', 'voce'] }, id: { type: 'string' }, testo: { type: 'string' }, modo: { type: 'string', enum: ['aggiungi', 'sostituisci'] } }, required: ['cosa', 'testo'] } },
+  { name: 'modifica_appuntamento', description: "Modifica un appuntamento esistente (id). Apre la schermata di conferma con le modifiche: Otto conferma o annulla. Passa solo i campi da cambiare.",
+    input_schema: { type: 'object', properties: { id: { type: 'string' }, titolo: { type: 'string' }, data: { type: 'string' }, ora: { type: 'string' }, luogo: { type: 'string' }, ricorrenza: { type: 'string', enum: ['none', 'daily', 'weekly', 'biweekly', 'monthly', 'yearly'] }, preavviso_minuti: { type: 'integer' }, note: { type: 'string' } }, required: ['id'] } },
+  { name: 'modifica_voce', description: "Rinomina una voce di lista o la sposta in un'altra lista.",
+    input_schema: { type: 'object', properties: { id: { type: 'string' }, titolo: { type: 'string' }, lista: { type: 'string' } }, required: ['id'] } },
+  { name: 'gestisci_elemento', description: "Modifica, mette in pausa/attiva o elimina scadenze, compleanni, piante, automazioni, promemoria, contatori, voci della borsa. 'campi' contiene solo ciò che cambia. Elimina solo dopo conferma di Otto in chat.",
+    input_schema: { type: 'object', properties: {
+      tipo: { type: 'string', enum: ['scadenza', 'compleanno', 'pianta', 'automazione', 'promemoria', 'contatore', 'borsa'] },
+      id: { type: 'string' }, azione: { type: 'string', enum: ['modifica', 'elimina', 'pausa', 'attiva'] },
+      campi: { type: 'object', description: 'scadenza: titolo,data,ricorrenza(none|yearly|biennial),avvisi_giorni_prima[] · compleanno: nome,data,regalo_giorni_prima · pianta: nome,ogni_giorni,ultima_annaffiatura · automazione: lista,giorni[],ora,messaggio,solo_se_da_fare · promemoria: titolo,testo,ripetizione,giorni[],giorno_mese,data,ora · contatore: nome,obiettivo · borsa: cosa,condizione(sempre|lavoro|palestra)' } },
+      required: ['tipo', 'id', 'azione'] } },
+  { name: 'aggiungi_borsa', description: 'Aggiunge una cosa da portare da Giada. condizione: sempre | lavoro (se il giorno dopo lavora) | palestra (se deve allenarsi).',
+    input_schema: { type: 'object', properties: { cosa: { type: 'string' }, condizione: { type: 'string', enum: ['sempre', 'lavoro', 'palestra'] } }, required: ['cosa'] } },
+  { name: 'imposta_routine', description: 'Cambia routine e impostazioni: giorni e orari ufficio, orari dei riepiloghi, nome con cui chiamarlo.',
+    input_schema: { type: 'object', properties: { giorni_ufficio: { type: 'array', items: { type: 'integer', description: '0=dom … 6=sab' } }, entrata: { type: 'string' }, uscita: { type: 'string' }, recap_mattina: { type: 'string' }, recap_sera: { type: 'string' }, recap_domenica: { type: 'string' }, nome: { type: 'string' } } } },
+  { name: 'crea_promemoria', description: "Crea un promemoria su misura con notifica, per qualsiasi cosa (affitto, medicine, chiamare la nonna, buttare la plastica…). ripetizione: once (serve data) | daily | weekly (serve giorni) | monthly (serve giorno_mese) | yearly (serve data).",
+    input_schema: { type: 'object', properties: { titolo: { type: 'string' }, testo: { type: 'string' }, ripetizione: { type: 'string', enum: ['once', 'daily', 'weekly', 'monthly', 'yearly'] }, giorni: { type: 'array', items: { type: 'integer' } }, giorno_mese: { type: 'integer' }, data: { type: 'string' }, ora: { type: 'string' } }, required: ['titolo', 'ripetizione', 'ora'] } },
+  { name: 'crea_contatore', description: "Crea un contatore settimanale per un'abitudine (es. Lettura 5 volte, Corsa 2 volte). Compare in Oggi con il tasto Fatto.",
+    input_schema: { type: 'object', properties: { nome: { type: 'string' }, obiettivo: { type: 'integer' } }, required: ['nome', 'obiettivo'] } },
+  { name: 'registra_contatore', description: 'Segna (o annulla) un contatore in un giorno.',
+    input_schema: { type: 'object', properties: { id: { type: 'string' }, data: { type: 'string' }, annulla: { type: 'boolean' } }, required: ['id'] } },
+  { name: 'ricorda', description: "Salva un'informazione stabile su Otto da usare sempre (es. 'la palestra è in via Roma', 'non fissare nulla il giovedì sera').",
+    input_schema: { type: 'object', properties: { testo: { type: 'string' } }, required: ['testo'] } },
+  { name: 'dimentica', description: "Cancella un'informazione ricordata (id).",
+    input_schema: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] } },
+  { name: 'segna_annaffiata', description: 'Segna una pianta come annaffiata oggi.',
+    input_schema: { type: 'object', properties: { nome: { type: 'string' } }, required: ['nome'] } }
+];
+const findList = n => S.lists.find(l => l.toLowerCase() === String(n).trim().toLowerCase());
+
+async function runTool(name, x) {
+  switch (name) {
+    case 'aggiungi_articoli': {
+      const out = (x.articoli || []).map(a => { const list = ensureList(a.lista || 'Casa'); S.items.push({ id: uid(), title: a.titolo, list, done: false, synced: false }); return `${a.titolo} → ${list}`; });
+      return 'Aggiunti: ' + out.join(', ');
+    }
+    case 'segna_comprati': {
+      const ids = new Set(x.ids || []); let n = 0;
+      if (x.elimina) { S.items.filter(i => ids.has(i.id)).forEach(queueRemoval); const before = S.items.length; S.items = S.items.filter(i => !ids.has(i.id)); n = before - S.items.length; }
+      else S.items.forEach(i => { if (ids.has(i.id)) { i.done = true; n++; } });
+      return `${n} voci aggiornate`;
+    }
+    case 'crea_lista': {
+      const existed = !!findList(x.nome), list = ensureList(x.nome);
+      (x.articoli || []).forEach(t => S.items.push({ id: uid(), title: t, list, done: false, synced: false }));
+      curList = list;
+      return `${existed ? 'La lista esisteva già' : 'Lista creata'}: “${list}”${(x.articoli || []).length ? ' con ' + x.articoli.length + ' voci' : ''}`;
+    }
+    case 'rinomina_lista': {
+      const old = findList(x.nome_attuale); if (!old) throw new Error('lista non trovata');
+      const nu = x.nuovo_nome.trim(); if (!nu) throw new Error('nome vuoto');
+      S.lists = S.lists.map(l => l === old ? nu : l);
+      S.items.forEach(i => { if (i.list === old) { i.list = nu; i.synced = false; } });
+      S.rules.forEach(r => { if (r.list === old) r.list = nu; });
+      if (curList === old) curList = nu;
+      return `Lista “${old}” ora si chiama “${nu}”`;
+    }
+    case 'elimina_lista': {
+      const old = findList(x.nome); if (!old) throw new Error('lista non trovata');
+      S.items = S.items.filter(i => i.list !== old); S.rules = S.rules.filter(r => r.list !== old);
+      S.lists = S.lists.filter(l => l !== old); if (!S.lists.length) S.lists = ['Casa'];
+      return `Lista “${old}” eliminata`;
+    }
+    case 'proponi_appuntamento': {
+      const a = await confirmAppt({ title: x.titolo, date: x.data, time: x.ora || '', place: x.luogo || '', rec: x.ricorrenza || 'none', alert: x.preavviso_minuti ?? 60, notes: x.note || '' });
+      if (!a) return 'ANNULLATO da Otto: non è stato salvato nulla.';
+      return `CONFERMATO: “${a.title}” ${longDate(a.date)}${a.time ? ' alle ' + a.time : ''}${REC[a.rec] ? ', ' + REC[a.rec] : ''}, ${ALERT[a.alert]}`;
+    }
+    case 'elimina_appuntamento': {
+      const a = S.appts.find(a => a.id === x.id); if (!a) throw new Error('appuntamento non trovato');
+      S.appts = S.appts.filter(b => b.id !== x.id); return `Eliminato “${a.title}”`;
+    }
+    case 'imposta_notti': {
+      (x.date || []).forEach(d => setNight(d, x.dove === 'nessuno' ? 'none' : x.dove));
+      return `Notti aggiornate (${(x.date || []).length})`;
+    }
+    case 'crea_automazione': {
+      const list = ensureList(x.lista);
+      S.rules.push({ id: uid(), list, days: x.giorni, time: x.ora, msg: x.messaggio, onlyPending: x.solo_se_da_fare !== false, on: true, dismissed: new Date().toISOString() });
+      return `Automazione creata: ${daysText(x.giorni)} alle ${x.ora} per ${list}`;
+    }
+    case 'registra_palestra': {
+      const d = x.data || today(), has = S.gym.log.includes(d);
+      if (x.annulla) { if (has) S.gym.log = S.gym.log.filter(v => v !== d); }
+      else if (!has) { S.gym.log.push(d); S.gym.log.sort(); }
+      return `Palestra ${x.annulla ? 'annullata' : 'segnata'} il ${shortDate(d)}. Settimana: ${gymWeek(d)}/${S.gym.goal}`;
+    }
+    case 'imposta_obiettivo_palestra': { S.gym.goal = Math.max(1, Math.min(7, x.volte)); return `Obiettivo: ${S.gym.goal} a settimana`; }
+    case 'aggiungi_scadenza': {
+      S.deadlines.push({ id: uid(), title: x.titolo, date: x.data, rec: x.ricorrenza || 'none', remind: x.avvisi_giorni_prima?.length ? x.avvisi_giorni_prima : [30, 7, 1] });
+      return `Scadenza aggiunta: ${x.titolo}, ${longDate(x.data)}`;
+    }
+    case 'aggiungi_compleanno': {
+      S.birthdays.push({ id: uid(), name: x.nome, date: x.data, gift: x.regalo_giorni_prima ?? 21, added: {} }); housekeeping();
+      return `Aggiunto: ${x.nome}, ${shortDate(nextBirthday({ date: x.data }))}`;
+    }
+    case 'aggiungi_pianta': { S.plants.push({ id: uid(), name: x.nome, every: x.ogni_giorni, last: today() }); return `Pianta aggiunta: ${x.nome}, ogni ${x.ogni_giorni} giorni`; }
+    case 'scrivi_note': {
+      const k = { palestra: 'gym', scadenza: 'deadline', appuntamento: 'appt', compleanno: 'bday', pianta: 'plant', voce: 'item' }[x.cosa];
+      const e = ent(k, x.id); if (!e) throw new Error('elemento non trovato (serve id)');
+      e.notes = x.modo === 'sostituisci' || !e.notes ? x.testo : e.notes + '\n' + x.testo;
+      return `Note aggiornate (${x.cosa})`;
+    }
+    case 'modifica_appuntamento': {
+      const a = S.appts.find(a => a.id === x.id); if (!a) throw new Error('appuntamento non trovato');
+      const d = { ...a };
+      if (x.titolo != null) d.title = x.titolo; if (x.data) d.date = x.data; if (x.ora != null) d.time = x.ora; if (x.luogo != null) d.place = x.luogo;
+      if (x.ricorrenza) d.rec = x.ricorrenza; if (x.preavviso_minuti != null) d.alert = x.preavviso_minuti; if (x.note != null) d.notes = x.note;
+      const r = await confirmAppt(d, true);
+      if (!r) return 'ANNULLATO da Otto: nessuna modifica.';
+      return `CONFERMATO: “${r.title}” ${longDate(r.date)}${r.time ? ' alle ' + r.time : ''}${REC[r.rec] ? ', ' + REC[r.rec] : ''}`;
+    }
+    case 'modifica_voce': {
+      const i = S.items.find(i => i.id === x.id); if (!i) throw new Error('voce non trovata');
+      if (x.titolo) i.title = x.titolo; if (x.lista) i.list = ensureList(x.lista); i.synced = false;
+      return `Voce aggiornata: ${i.title} (${i.list})`;
+    }
+    case 'gestisci_elemento': {
+      const map = { scadenza: 'deadlines', compleanno: 'birthdays', pianta: 'plants', automazione: 'rules', promemoria: 'reminders', contatore: 'counters' };
+      const arr = x.tipo === 'borsa' ? S.bag.items : S[map[x.tipo]];
+      const e = arr?.find(e => e.id === x.id); if (!e) throw new Error(x.tipo + ' non trovato/a');
+      const label = e.title || e.name || e.msg || e.t;
+      if (x.azione === 'elimina') { arr.splice(arr.indexOf(e), 1); return `Eliminato: ${label}`; }
+      if (x.azione === 'pausa' || x.azione === 'attiva') { e.on = x.azione === 'attiva'; return `${label}: ${x.azione === 'attiva' ? 'attivo' : 'in pausa'}`; }
+      const c = x.campi || {};
+      const set = (k, v) => { if (v !== undefined && v !== null) e[k] = v; };
+      switch (x.tipo) {
+        case 'scadenza': set('title', c.titolo); set('date', c.data); set('rec', c.ricorrenza); if (c.avvisi_giorni_prima?.length) e.remind = c.avvisi_giorni_prima; break;
+        case 'compleanno': set('name', c.nome); if (c.data) { e.date = c.data; e.added = {}; } set('gift', c.regalo_giorni_prima); break;
+        case 'pianta': set('name', c.nome); set('every', c.ogni_giorni); set('last', c.ultima_annaffiatura); break;
+        case 'automazione': if (c.lista) e.list = ensureList(c.lista); set('days', c.giorni); set('time', c.ora); set('msg', c.messaggio); set('onlyPending', c.solo_se_da_fare); break;
+        case 'promemoria': set('title', c.titolo); set('body', c.testo); set('rep', c.ripetizione); set('days', c.giorni); set('dom', c.giorno_mese); set('date', c.data); set('time', c.ora); break;
+        case 'contatore': set('name', c.nome); set('goal', c.obiettivo); break;
+        case 'borsa': set('t', c.cosa); if (c.condizione) e.cond = { sempre: '', lavoro: 'work', palestra: 'gym' }[c.condizione] ?? ''; break;
+      }
+      housekeeping();
+      return `Aggiornato: ${e.title || e.name || e.msg || e.t}`;
+    }
+    case 'aggiungi_borsa': { S.bag.items.push({ id: uid(), t: x.cosa, cond: { lavoro: 'work', palestra: 'gym' }[x.condizione] || '' }); return `Borsa: aggiunto “${x.cosa}”`; }
+    case 'imposta_routine': {
+      const r = R();
+      if (x.giorni_ufficio) r.workDays = x.giorni_ufficio; if (x.entrata) r.workStart = x.entrata; if (x.uscita) r.workEnd = x.uscita;
+      if (x.recap_mattina) r.morning = x.recap_mattina; if (x.recap_sera) r.evening = x.recap_sera; if (x.recap_domenica) r.sunday = x.recap_domenica;
+      if (x.nome) S.settings.name = x.nome;
+      return `Routine aggiornata: ufficio ${r.workDays.map(d => WD[d]).join(', ')} ${r.workStart}–${r.workEnd}; recap ${r.morning} / ${r.evening} / dom ${r.sunday}`;
+    }
+    case 'crea_promemoria': {
+      const r = { id: uid(), title: x.titolo, body: x.testo || '', rep: x.ripetizione, days: x.giorni || [], dom: x.giorno_mese || 1, date: x.data || '', time: x.ora, on: true };
+      if ((r.rep === 'once' || r.rep === 'yearly') && !r.date) throw new Error('serve la data');
+      if (r.rep === 'weekly' && !r.days.length) throw new Error('servono i giorni');
+      S.reminders.push(r); return `Promemoria creato: ${r.title}, ${REP_TXT(r)} alle ${r.time}`;
+    }
+    case 'crea_contatore': { S.counters.push({ id: uid(), name: x.nome, goal: x.obiettivo, log: [] }); return `Contatore creato: ${x.nome}, ${x.obiettivo} a settimana`; }
+    case 'registra_contatore': {
+      const c = S.counters.find(c => c.id === x.id); if (!c) throw new Error('contatore non trovato');
+      const d = x.data || today(), i = c.log.indexOf(d);
+      if (x.annulla) { if (i >= 0) c.log.splice(i, 1); } else if (i < 0) c.log.push(d);
+      return `${c.name}: ${counterWeek(c, d)}/${c.goal} questa settimana`;
+    }
+    case 'ricorda': { S.memory.push({ id: uid(), text: x.testo }); return 'Ricordato: ' + x.testo; }
+    case 'dimentica': { const m = S.memory.find(m => m.id === x.id); if (!m) throw new Error('non trovato'); S.memory = S.memory.filter(v => v !== m); return 'Dimenticato: ' + m.text; }
+    case 'segna_annaffiata': {
+      const p = S.plants.find(p => p.name.toLowerCase() === x.nome.trim().toLowerCase()); if (!p) throw new Error('pianta non trovata');
+      p.last = today(); return `${p.name} annaffiata`;
+    }
+  }
+  throw new Error('strumento sconosciuto');
+}
+
+function systemPrompt() {
+  const t = today();
+  const nights = []; for (let i = 0; i < 14; i++) { const d = shift(t, i); nights.push(`${d} (${WD[parse(d).getDay()]}): ${where(d)}`); }
+  const appts = S.appts.map(a => `- [${a.id}] dal ${a.date} ${a.time || 'tutto il giorno'} ${a.title}${a.place ? ' @ ' + a.place : ''}${REC[a.rec] ? ' (' + REC[a.rec] + ')' : ''}${a.notes ? ' — note: ' + a.notes.replace(/\s+/g, ' ').slice(0, 300) : ''}`).join('\n') || '(nessuno)';
+  const next = upcoming(14).map(a => `- ${a.date} ${a.time || ''} ${a.title}${a.ext ? ' (Calendario iPhone)' : ''}`).join('\n') || '(niente)';
+  const items = S.lists.map(l => `${l}:\n` + (pending(l).map(i => `  - [${i.id}] ${i.title}`).join('\n') || '  (vuota)')).join('\n');
+  const rules = S.rules.map(r => `- [${r.id}] ${r.list}: ${daysText(r.days)} ${r.time} "${r.msg}"${r.on ? '' : ' (in pausa)'}`).join('\n') || '(nessuna)';
+  const rems = S.reminders.map(r => `- [${r.id}] ${r.title}: ${REP_TXT(r)} alle ${r.time}${r.body ? ' — ' + r.body : ''}${r.on === false ? ' (in pausa)' : ''}`).join('\n') || '(nessuno)';
+  const ctrs = S.counters.map(c => `- [${c.id}] ${c.name}: ${counterWeek(c)}/${c.goal} questa settimana`).join('\n') || '(nessuno)';
+  const mem = S.memory.map(m => `- [${m.id}] ${m.text}`).join('\n') || '(niente)';
+  const nt = e => e.notes ? ` — note: ${e.notes.replace(/\s+/g, ' ').slice(0, 300)}` : '';
+  const dls = S.deadlines.map(d => `- [${d.id}] ${d.title}: ${nextDeadline(d)} (${d.rec})${nt(d)}`).join('\n') || '(nessuna)';
+  const bds = S.birthdays.map(b => `- [${b.id}] ${b.name}: ${nextBirthday(b)}${nt(b)}`).join('\n') || '(nessuno)';
+  const pls = S.plants.map(p => `- [${p.id}] ${p.name}: ogni ${p.every} gg, prossima ${plantNext(p)}${nt(p)}`).join('\n') || '(nessuna)';
+  return `Sei l'assistente dentro "Gestiotto", l'app personale di Otto. Chiamalo "Otto". Tono NEUTRO e PRECISO: frasi brevi, solo informazioni utili, niente battute né enfasi. Rispondi in italiano.
+Oggi è ${longDate(t)} (${t}), fuso Europe/Rome.
+
+ROUTINE: ufficio ${R().workDays.map(d => WD[d]).join(', ')} ${R().workStart}–${R().workEnd}. Le notti (casa sua / da Giada, la sua ragazza) cambiano ogni settimana. Palestra: obiettivo ${S.gym.goal} volte a settimana (fatte ${gymWeek()}).
+SIRI: i messaggi che iniziano con "(da Siri)" sono stati dettati a Siri: eseguili direttamente e rispondi in una riga.
+KEEP: i messaggi che iniziano con "(da Keep)" sono note copiate da Google Keep. Smistale: voci → liste giuste (o crea una lista se è un elenco a sé); date di appuntamenti → proponi_appuntamento; scadenze → aggiungi_scadenza; compleanni → aggiungi_compleanno; informazioni stabili → ricorda; il resto → lista "Note". Poi riassumi in 2-3 righe cosa hai fatto.
+CALENDARIO IPHONE: gli appuntamenti con "(Calendario iPhone)" arrivano dal Calendario dell'iPhone: puoi leggerli e usarli nei controlli, ma non modificarli (si cambiano nell'app Calendario).
+AUTONOMIA: Otto vuole gestire TUTTO dalla chat. Puoi creare, modificare ed eliminare ogni cosa con gli strumenti (gli id sono tra [quadre]). Prima di eliminare chiedi conferma in chat. Se chiede qualcosa che l'app non ha come funzione, realizzalo con ciò che esiste: promemoria su misura (notifiche ricorrenti), contatori (abitudini), liste, note, ricorda. Solo se è davvero impossibile, dillo chiaramente e spiega che serve un aggiornamento dell'app.
+NOTE: ogni cosa può avere note e allegati (foto/PDF). Puoi scrivere note con scrivi_note; gli allegati li aggiunge Otto dal tasto 📝.
+
+APPUNTAMENTI:
+- Prima di proponi_appuntamento, se non l'ha detto, chiedi in UNA domanda se si ripete e quanto prima avvisarlo.
+- Segnala conflitti: altri impegni vicini, orario d'ufficio, dove dorme quella notte.
+- proponi_appuntamento apre una schermata di conferma; se ANNULLATO non insistere, chiedi cosa cambiare.
+- Non puoi prenotare servizi esterni: fissi in agenda e dici chi contattare.
+Converti date relative in YYYY-MM-DD.
+
+LISTE: sono qualsiasi elenco (spesa, Regali, Idee e desideri, Viaggi, Visite e medicine, Diario…). Crea liste nuove quando richiesto. Per il Diario, aggiungi voci con la data davanti (es. "${shortDate(t)}: …").
+RICETTE: se Otto dice cosa vuole cucinare, elenca gli ingredienti e chiedi cosa ha già; poi aggiungi i mancanti in Supermercato.
+CONSIGLI: quando utile aggiungi in fondo UNA riga "Suggerimento:" con un consiglio pratico (es. "Manca la scadenza del bollo scooter.", "Domani sei da Giada: prepara la borsa."). Niente commenti, battute, complimenti o incoraggiamenti: solo il fatto utile. Otto può ignorarli: non ripeterli se non li segue.
+
+LISTE (voci da fare):
+${items}
+
+APPUNTAMENTI salvati:
+${appts}
+
+PROSSIMI 14 GIORNI:
+${next}
+
+NOTTI (casa / giada / none = da segnare):
+${nights.join('\n')}
+
+SCADENZE:
+${dls}
+
+COMPLEANNI/RICORRENZE:
+${bds}
+
+PIANTE:
+${pls}
+
+SCHEDA PALESTRA (note di Otto):
+${(S.gym.notes || '(vuota)').slice(0, 2000)}
+
+BORSA PER GIADA:
+${S.bag.items.map(i => `- [${i.id}] ${i.t}${i.cond ? ' (' + COND[i.cond] + ')' : ''}`).join('\n')}
+
+PROMEMORIA SU MISURA:
+${rems}
+
+CONTATORI:
+${ctrs}
+
+COSE DA RICORDARE SU OTTO (rispettale sempre):
+${mem}
+
+AUTOMAZIONI:
+${rules}`;
+}
+
+let busy = false;
+async function send(override) {
+  const text = (override ?? $('chatIn').value).trim(); if (!text || busy) return;
+  const spoken = voiceTurn; voiceTurn = false;
+  if (!S.settings.apiKey) { toast('Inserisci la chiave API nelle impostazioni ⚙︎'); $('btnSettings').click(); return; }
+  $('chatIn').value = ''; busy = true; undoSnap = null;
+  const before = dataSnap();
+  S.chat.push({ role: 'user', text }); save(); renderChat();
+  const thinking = document.createElement('div'); thinking.className = 'msg t'; thinking.textContent = '…'; $('chatlog').appendChild(thinking);
+  window.scrollTo(0, document.body.scrollHeight);
+  const msgs = S.chat.filter(m => m.role !== 'tool').slice(-20).map(m => ({ role: m.role, content: m.text }));
+  while (msgs.length && msgs[0].role !== 'user') msgs.shift();
+  try {
+    for (let round = 0; round < 8; round++) {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'x-api-key': S.settings.apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+        body: JSON.stringify({ model: S.settings.model, max_tokens: 1024, system: systemPrompt(), tools: TOOLS, messages: msgs })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error?.message || ('Errore ' + res.status));
+      msgs.push({ role: 'assistant', content: data.content });
+      const said = data.content.filter(c => c.type === 'text').map(c => c.text).join('\n').trim();
+      const uses = data.content.filter(c => c.type === 'tool_use');
+      if (!uses.length || data.stop_reason !== 'tool_use') { S.chat.push({ role: 'assistant', text: said || '✓' }); break; }
+      if (said) { S.chat.push({ role: 'assistant', text: said }); renderChat(); }
+      const results = [];
+      for (const u of uses) {
+        try { const r = await runTool(u.name, u.input); S.chat.push({ role: 'tool', text: (r.startsWith('ANNULLATO') ? '✕ ' : '✓ ') + r }); results.push({ type: 'tool_result', tool_use_id: u.id, content: r }); }
+        catch (err) { results.push({ type: 'tool_result', tool_use_id: u.id, content: 'Errore: ' + err.message, is_error: true }); }
+      }
+      save(); render();
+      msgs.push({ role: 'user', content: results });
+    }
+  } catch (err) {
+    S.chat.push({ role: 'tool', text: '⚠︎ ' + err.message });
+  }
+  if (dataSnap() !== before) undoSnap = before;
+  thinking.remove(); busy = false; save(); render();
+  if (spoken || S.settings.voice) { const last = [...S.chat].reverse().find(m => m.role === 'assistant'); if (last) speak(last.text); }
+  window.scrollTo(0, document.body.scrollHeight);
+}
+
+/* =====================================================================
+   IMPOSTAZIONI & BACKUP
+   ===================================================================== */
+$('btnSettings').onclick = () => { $('setVoice').checked = !!S.settings.voice; $('setName').value = S.settings.name; $('setKey').value = S.settings.apiKey; $('setModel').value = S.settings.model; $('dlgSettings').showModal(); };
+$('setSave').onclick = () => { S.settings.name = $('setName').value.trim() || 'Otto'; S.settings.apiKey = $('setKey').value.trim(); S.settings.model = $('setModel').value.trim() || 'claude-sonnet-4-5'; S.settings.voice = $('setVoice').checked; save(); render(); $('dlgSettings').close(); toast('Salvato'); };
+$('chatReset').onclick = () => { if (confirm('Cancellare la conversazione?')) { S.chat = []; save(); render(); } };
+$('bkExport').onclick = () => {
+  const data = JSON.stringify({ ...S, settings: { ...S.settings, apiKey: '', push: { ...P(), password: '' } } }, null, 2);
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([data], { type: 'application/json' })); a.download = `gestiotto-backup-${today()}.json`; a.click();
+};
+$('bkImport').onclick = () => $('bkFile').click();
+$('bkFile').onchange = async e => {
+  const f = e.target.files[0]; if (!f) return;
+  try { const d = JSON.parse(await f.text()); const keep = { apiKey: S.settings.apiKey, push: P() }; S = hydrate(d); S.settings.apiKey = keep.apiKey; S.settings.push = keep.push; save(); render(); toast('Backup ripristinato'); }
+  catch { toast('File non valido'); }
+};
+
+/* =====================================================================
+   AVVIO
+   ===================================================================== */
+document.addEventListener('visibilitychange', () => { if (!document.hidden) { housekeeping(); render(); syncServer(); pullInbox(); } });
+setInterval(() => { if (!document.hidden && view === 'oggi') renderOggi(); }, 60000);
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+if (navigator.storage?.persist) navigator.storage.persist();
+housekeeping(); render(); setTimeout(syncServer, 1500); setTimeout(pullInbox, 1200);
+</script>
+</body>
+</html>
