@@ -1,5 +1,5 @@
 // Service worker Gestiotto: offline, aggiornamenti e notifiche push.
-const CACHE = 'gestiotto-v9';
+const CACHE = 'gestiotto-v10';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png', './logo.svg'];
 
 self.addEventListener('install', e => {

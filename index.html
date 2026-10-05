@@ -231,8 +231,8 @@ body.chat .fab,body.vita .fab{display:none}
     <div class="card"><h2>Contatori</h2>
       <p class="muted" style="margin-top:0">Abitudini da contare a settimana: “crea un contatore Lettura, 5 volte a settimana”.</p>
       <div id="counters"></div></div>
-    <div class="card"><h2>Cosa Claude sa di te</h2>
-      <p class="muted" style="margin-top:0">Dì in chat “ricorda che…”. Claude lo userà sempre.</p>
+    <div class="card"><h2>Cosa la chat sa di te</h2>
+      <p class="muted" style="margin-top:0">Dì in chat “ricorda che…”. La chat lo userà sempre.</p>
       <div id="memory"></div></div>
     <div class="card"><h2><span>Scadenze</span></h2>
       <div id="deadlines"></div>
@@ -308,14 +308,14 @@ body.chat .fab,body.vita .fab{display:none}
 </main>
 
 <div class="chatbar"><button class="btn ghost" id="micBtn" aria-label="Parla">🎙︎</button><textarea id="chatIn" placeholder="Scrivi o parla…" rows="1"></textarea><button class="btn" id="chatSend">➤</button></div>
-<button class="fab" id="fab">✦ Chiedi a Claude</button>
+<button class="fab" id="fab">✦ Chiedi</button>
 
 <nav id="nav">
   <button data-v="oggi" class="on"><span>☀︎</span>Oggi</button>
   <button data-v="agenda"><span>▦</span>Agenda</button>
   <button data-v="liste"><span>☑︎</span>Liste</button>
   <button data-v="vita"><span>◎</span>Vita</button>
-  <button data-v="chat"><span>✦</span>Claude</button>
+  <button data-v="chat"><span>✦</span>Chat</button>
 </nav>
 
 <!-- Conferma appuntamento -->
@@ -361,14 +361,22 @@ body.chat .fab,body.vita .fab{display:none}
   <h3>Impostazioni</h3>
   <div class="stack">
     <label class="lbl">Come ti chiamo</label><input type="text" id="setName">
-    <label class="lbl">Chiave API Anthropic (resta solo su questo telefono)</label><input type="password" id="setKey" placeholder="sk-ant-…" autocomplete="off">
-    <label class="lbl">Modello</label><input type="text" id="setModel">
-    <label class="toggle"><input type="checkbox" id="setVoice"> Leggi sempre ad alta voce le risposte di Claude</label>
+    <label class="lbl">Intelligenza artificiale della chat</label>
+    <select id="setProvider"><option value="gemini">Google Gemini (gratis, con limiti)</option><option value="anthropic">Claude (a pagamento)</option></select>
+    <div id="boxGemini" class="stack">
+      <label class="lbl">Chiave Gemini (aistudio.google.com → Get API key)</label><input type="password" id="setGKey" placeholder="AIza…" autocomplete="off">
+      <label class="lbl">Modello (lascia vuoto: lo scelgo io)</label><input type="text" id="setGModel" placeholder="automatico">
+    </div>
+    <div id="boxClaude" class="stack">
+      <label class="lbl">Chiave API Anthropic (resta solo su questo telefono)</label><input type="password" id="setKey" placeholder="sk-ant-…" autocomplete="off">
+      <label class="lbl">Modello</label><input type="text" id="setModel">
+    </div>
+    <label class="toggle"><input type="checkbox" id="setVoice"> Leggi sempre ad alta voce le risposte della chat</label>
     <button class="btn full" id="setSave">Salva</button>
     <div class="grid2"><button class="btn ghost" id="bkExport">Esporta backup</button><button class="btn ghost" id="bkImport">Importa backup</button></div>
     <button class="btn ghost full" id="bkServer">Ripristina dal server</button>
     <input type="file" id="bkFile" accept="application/json,.json" hidden>
-    <button class="btn ghost full" id="chatReset">Cancella conversazione con Claude</button>
+    <button class="btn ghost full" id="chatReset">Cancella conversazione</button>
     <button class="btn ghost full" onclick="dlgSettings.close()">Chiudi</button>
   </div>
 </dialog>
@@ -425,7 +433,7 @@ const defaults = () => ({
   remQueue: [],  // voci da togliere da Promemoria ('Lista|Voce')
   ext: { cal: [], calAt: '' }, // eventi letti dal Calendario iPhone (sola lettura)
   syncPending: false,
-  settings: { name: 'Otto', apiKey: '', model: 'claude-sonnet-4-5', voice: false,
+  settings: { name: 'Otto', provider: 'gemini', geminiKey: '', geminiModel: '', apiKey: '', model: 'claude-sonnet-4-5', voice: false,
     routine: { workDays: [1, 2, 3, 4, 5], workStart: '08:30', workEnd: '17:30', morning: '08:00', evening: '21:00', sunday: '19:00' },
     push: { url: '', password: '', on: false } },
   chat: []
@@ -600,7 +608,7 @@ function suggestions() {
   S.deadlines.filter(d => d.rec === 'none' && /bollo|assicuraz|revisione/i.test(d.title)).forEach(d => add('dl-rec-' + d.id, `${d.title}: impostata “una volta”, di solito si ripete.`));
   if (S.lists.includes('Viaggi') && pending('Viaggi').length && !pending('Viaggi').some(i => /document|carta|passaport/i.test(i.title))) add('vg-doc', 'Viaggi: documenti non in lista.');
   if (!S.settings.push.on) add('push', 'Notifiche ad app chiusa non attive (Vita › Notifiche).');
-  if (!S.settings.apiKey) add('key', 'Chat non attiva: manca la chiave API (⚙︎).');
+  if (!aiReady()) add('key', 'Chat non attiva: manca la chiave (⚙︎).');
   return s;
 }
 const suggHtml = list => list.map(x => `<div class="item"><div class="grow">${esc(x.text)}</div><button class="btn ghost small" data-hide-tip="${x.key}">Nascondi</button></div>`).join('');
@@ -893,18 +901,14 @@ $('items').onclick = e => {
 $('shopMode').onclick = () => { shopMode = !shopMode; renderListe(); };
 $('clearDone').onclick = () => { S.items.filter(i => i.done && i.list === curList).forEach(queueRemoval); S.items = S.items.filter(i => !(i.done && i.list === curList)); save(); render(); };
 $('listTips').onclick = async () => {
-  if (!S.settings.apiKey) return toast('Serve la chiave API (⚙︎)');
+  if (!aiReady()) return toast('Serve la chiave (⚙︎)');
   const out = $('listTipsOut'); out.innerHTML = '<div class="empty">…</div>';
   const list = curList, its = S.items.filter(i => i.list === list && !i.done).map(i => i.title);
   const ctx = list === 'Scadenze' ? '' : `Scadenze già inserite: ${S.deadlines.map(d => d.title).join(', ') || 'nessuna'}.`;
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST',
-      headers: { 'content-type': 'application/json', 'x-api-key': S.settings.apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-      body: JSON.stringify({ model: S.settings.model, max_tokens: 300,
-        system: 'Suggerisci al massimo 3 voci che probabilmente mancano in una lista personale. Solo voci concrete e brevi (max 5 parole), una per riga, senza numeri, trattini, commenti o spiegazioni. Se non manca nulla rispondi solo: NIENTE',
-        messages: [{ role: 'user', content: `Lista "${list}". Voci attuali: ${its.join(', ') || '(vuota)'}. ${ctx} Memoria: ${S.memory.map(m => m.text).join('; ') || '-'}` }] }) });
-    const data = await res.json(); if (!res.ok) throw new Error(data?.error?.message || res.status);
-    const lines = data.content.map(c => c.text || '').join('\n').split('\n').map(l => l.replace(/^[-•*\d.)\s]+/, '').trim()).filter(l => l && !/^niente$/i.test(l)).slice(0, 3);
+    const said = await aiOnce('Suggerisci al massimo 3 voci che probabilmente mancano in una lista personale. Solo voci concrete e brevi (max 5 parole), una per riga, senza numeri, trattini, commenti o spiegazioni. Se non manca nulla rispondi solo: NIENTE',
+      `Lista "${list}". Voci attuali: ${its.join(', ') || '(vuota)'}. ${ctx} Memoria: ${S.memory.map(m => m.text).join('; ') || '-'}`);
+    const lines = said.split('\n').map(l => l.replace(/^[-•*\d.)\s]+/, '').trim()).filter(l => l && !/^niente$/i.test(l)).slice(0, 3);
     out.innerHTML = lines.length ? lines.map(l => `<div class="item"><div class="grow">${esc(l)}</div><button class="btn small" data-add-tip="${esc(l)}">＋</button></div>`).join('') : '<div class="empty">Non manca niente.</div>';
   } catch (e) { out.innerHTML = `<div class="empty">Errore: ${esc(e.message)}</div>`; }
 };
@@ -1194,7 +1198,7 @@ async function pullInbox() {
     const talk = messages.filter(m => !m.text.trim().startsWith('#'));
     messages.filter(m => m.text.trim().startsWith('#')).forEach(handleDeviceData);
     if (talk.length) {
-      if (S.settings.apiKey) { go('chat'); for (const m of talk) { while (busy) await new Promise(r => setTimeout(r, 300)); const t = m.text.trim(); await send(t.startsWith('(') ? t : '(da Siri) ' + t); } }
+      if (aiReady()) { go('chat'); for (const m of talk) { while (busy) await new Promise(r => setTimeout(r, 300)); const t = m.text.trim(); await send(t.startsWith('(') ? t : '(da Siri) ' + t); } }
       else { talk.forEach(m => S.items.push({ id: uid(), title: m.text.replace(/^\(da \w+\)\s*/, ''), list: ensureList('Casa'), done: false, synced: false })); save(); render(); toast(`${talk.length} messaggi aggiunti in Casa`); }
     }
   } catch (e) { console.warn('inbox', e); }
@@ -1229,7 +1233,7 @@ async function syncServer() {
   try {
     const items = buildSchedule(), hash = JSON.stringify(items.map(i => [i.id, i.at, i.body]));
     if (hash !== lastHash) { await api('/schedule', { items }); lastHash = hash; }
-    const backup = { ...S, settings: { ...S.settings, apiKey: '', push: { ...P(), password: '' } }, chat: S.chat.slice(-30) };
+    const backup = { ...S, settings: { ...S.settings, apiKey: '', geminiKey: '', push: { ...P(), password: '' } }, chat: S.chat.slice(-30) };
     await api('/backup', backup);
     lastSync = new Date().toTimeString().slice(0, 5);
     if (view === 'vita') renderVita();
@@ -1256,8 +1260,8 @@ $('bkServer').onclick = async () => {
   if (!P().url) return toast('Configura prima il server in Vita › Notifiche');
   if (!confirm('Sostituire i dati di questo telefono con il backup del server?')) return;
   try { const d = await fetch(P().url.replace(/\/$/, '') + '/backup', { headers: { authorization: 'Bearer ' + P().password } }).then(r => r.json());
-    if (!d.lists) throw new Error('backup vuoto'); const keep = { apiKey: S.settings.apiKey, push: P() };
-    S = hydrate(d); S.settings.apiKey = keep.apiKey; S.settings.push = keep.push; save(); render(); toast('Ripristinato'); }
+    if (!d.lists) throw new Error('backup vuoto'); const keep = { ...S.settings };
+    S = hydrate(d); Object.assign(S.settings, { apiKey: keep.apiKey, geminiKey: keep.geminiKey, geminiModel: keep.geminiModel, provider: keep.provider, push: keep.push }); save(); render(); toast('Ripristinato'); }
   catch (e) { toast('Errore: ' + e.message); }
 };
 
@@ -1267,7 +1271,7 @@ $('bkServer').onclick = async () => {
 let undoSnap = null;
 function renderChat() {
   $('chatlog').innerHTML = S.chat.map(m => `<div class="msg ${m.role === 'user' ? 'u' : m.role === 'tool' ? 't' : 'a'}">${esc(m.text)}</div>`).join('')
-    + (undoSnap && !busy ? '<button class="btn ghost small" id="undoBtn" style="align-self:center">↶ Annulla le ultime modifiche di Claude</button>' : '');
+    + (undoSnap && !busy ? '<button class="btn ghost small" id="undoBtn" style="align-self:center">↶ Annulla le ultime modifiche della chat</button>' : '');
   $('suggest').style.display = S.chat.length ? 'none' : 'flex';
 }
 $('suggest').onclick = e => { const b = e.target.closest('button'); if (b) { $('chatIn').value = b.textContent; send(); } };
@@ -1456,7 +1460,7 @@ async function runTool(name, x) {
       const label = e.title || e.name || e.msg || e.t;
       if (x.azione === 'elimina') { arr.splice(arr.indexOf(e), 1); return `Eliminato: ${label}`; }
       if (x.azione === 'pausa' || x.azione === 'attiva') { e.on = x.azione === 'attiva'; return `${label}: ${x.azione === 'attiva' ? 'attivo' : 'in pausa'}`; }
-      const c = x.campi || {};
+      let c = x.campi || {}; if (typeof c === 'string') { try { c = JSON.parse(c); } catch { throw new Error('campi non leggibili'); } }
       const set = (k, v) => { if (v !== undefined && v !== null) e[k] = v; };
       switch (x.tipo) {
         case 'scadenza': set('title', c.titolo); set('date', c.data); set('rec', c.ricorrenza); if (c.avvisi_giorni_prima?.length) e.remind = c.avvisi_giorni_prima; break;
@@ -1576,39 +1580,98 @@ AUTOMAZIONI:
 ${rules}`;
 }
 
+/* =====================================================================
+   ADATTATORE IA: stessa chat con Claude (a pagamento) o Gemini (gratis)
+   ===================================================================== */
+const aiReady = () => S.settings.provider === 'gemini' ? !!S.settings.geminiKey : !!S.settings.apiKey;
+const GEM = 'https://generativelanguage.googleapis.com/v1beta/';
+async function pickGeminiModel() {
+  const r = await fetch(GEM + 'models?pageSize=200', { headers: { 'x-goog-api-key': S.settings.geminiKey } });
+  const d = await r.json(); if (!r.ok) throw new Error(d?.error?.message || 'errore ' + r.status);
+  const ok = (d.models || []).filter(m => (m.supportedGenerationMethods || []).includes('generateContent')).map(m => m.name.replace('models/', ''));
+  if (ok.includes('gemini-flash-latest')) return 'gemini-flash-latest';
+  const ver = n => (n.match(/(\d+(?:\.\d+)?)/) || [0, 0])[1] * 1;
+  const flash = ok.filter(n => /^gemini-[\d.]+-flash$/.test(n)).sort((a, b) => ver(b) - ver(a));
+  if (flash.length) return flash[0];
+  const any = ok.filter(n => /flash/.test(n) && !/lite|image|tts|live|audio|embed/.test(n)).sort((a, b) => ver(b) - ver(a));
+  if (any.length) return any[0];
+  throw new Error('nessun modello disponibile');
+}
+function gSchema(s) {
+  if (!s || typeof s !== 'object') return s;
+  const o = { ...s };
+  if (o.type === 'object') {
+    const props = o.properties || {};
+    if (!Object.keys(props).length) return { type: 'string', description: (o.description || '') + ' (scrivilo come JSON)' };
+    o.properties = Object.fromEntries(Object.entries(props).map(([k, v]) => [k, gSchema(v)]));
+  }
+  if (o.type === 'array' && o.items) o.items = gSchema(o.items);
+  return o;
+}
+const AI = {
+  anthropic: {
+    init: hist => hist.map(m => ({ role: m.role, content: m.text })),
+    async call(native, system, tools, maxTokens) {
+      const res = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST',
+        headers: { 'content-type': 'application/json', 'x-api-key': S.settings.apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+        body: JSON.stringify({ model: S.settings.model, max_tokens: maxTokens, system, ...(tools ? { tools } : {}), messages: native }) });
+      const data = await res.json(); if (!res.ok) throw new Error(data?.error?.message || ('Errore ' + res.status));
+      return { said: data.content.filter(c => c.type === 'text').map(c => c.text).join('\n').trim(),
+        uses: data.content.filter(c => c.type === 'tool_use').map(c => ({ id: c.id, name: c.name, input: c.input })),
+        assistant: { role: 'assistant', content: data.content } };
+    },
+    results: outs => ({ role: 'user', content: outs.map(o => ({ type: 'tool_result', tool_use_id: o.id, content: o.content, ...(o.error ? { is_error: true } : {}) })) })
+  },
+  gemini: {
+    init: hist => hist.map(m => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.text }] })),
+    async call(native, system, tools, maxTokens) {
+      if (!S.settings.geminiModel) { S.settings.geminiModel = await pickGeminiModel(); save(); }
+      const body = { systemInstruction: { parts: [{ text: system }] }, contents: native, generationConfig: { maxOutputTokens: Math.max(2048, maxTokens * 2) } };
+      if (tools) body.tools = [{ functionDeclarations: tools.map(t => ({ name: t.name, description: t.description, parameters: gSchema(t.input_schema) })) }];
+      const res = await fetch(GEM + 'models/' + S.settings.geminiModel + ':generateContent', { method: 'POST',
+        headers: { 'content-type': 'application/json', 'x-goog-api-key': S.settings.geminiKey }, body: JSON.stringify(body) });
+      const data = await res.json();
+      if (!res.ok) { if (res.status === 404) { S.settings.geminiModel = ''; save(); } throw new Error(res.status === 429 ? 'Limite gratuito raggiunto: riprova tra un minuto' : (data?.error?.message || ('Errore ' + res.status))); }
+      const content = data.candidates?.[0]?.content || { role: 'model', parts: [{ text: '' }] };
+      const parts = content.parts || [];
+      return { said: parts.filter(p => p.text && !p.thought).map(p => p.text).join('\n').trim(),
+        uses: parts.filter(p => p.functionCall).map((p, i) => ({ id: 'g' + i, name: p.functionCall.name, input: p.functionCall.args || {} })),
+        assistant: { role: 'model', parts } };
+    },
+    results: outs => ({ role: 'user', parts: outs.map(o => ({ functionResponse: { name: o.name, response: { result: o.content } } })) })
+  }
+};
+const ai = () => AI[S.settings.provider === 'gemini' ? 'gemini' : 'anthropic'];
+async function aiOnce(system, text, maxTokens = 300) {
+  const A = ai(); const r = await A.call(A.init([{ role: 'user', text }]), system, null, maxTokens); return r.said;
+}
+
 let busy = false;
 async function send(override) {
   const text = (override ?? $('chatIn').value).trim(); if (!text || busy) return;
   const spoken = voiceTurn; voiceTurn = false;
-  if (!S.settings.apiKey) { toast('Inserisci la chiave API nelle impostazioni ⚙︎'); $('btnSettings').click(); return; }
+  if (!aiReady()) { toast('Inserisci la chiave nelle impostazioni ⚙︎'); $('btnSettings').click(); return; }
   $('chatIn').value = ''; busy = true; undoSnap = null;
   const before = dataSnap();
   S.chat.push({ role: 'user', text }); save(); renderChat();
   const thinking = document.createElement('div'); thinking.className = 'msg t'; thinking.textContent = '…'; $('chatlog').appendChild(thinking);
   window.scrollTo(0, document.body.scrollHeight);
-  const msgs = S.chat.filter(m => m.role !== 'tool').slice(-20).map(m => ({ role: m.role, content: m.text }));
-  while (msgs.length && msgs[0].role !== 'user') msgs.shift();
+  const hist = S.chat.filter(m => m.role !== 'tool').slice(-20);
+  while (hist.length && hist[0].role !== 'user') hist.shift();
+  const A = ai(), native = A.init(hist);
   try {
     for (let round = 0; round < 8; round++) {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json', 'x-api-key': S.settings.apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-        body: JSON.stringify({ model: S.settings.model, max_tokens: 1024, system: systemPrompt(), tools: TOOLS, messages: msgs })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.error?.message || ('Errore ' + res.status));
-      msgs.push({ role: 'assistant', content: data.content });
-      const said = data.content.filter(c => c.type === 'text').map(c => c.text).join('\n').trim();
-      const uses = data.content.filter(c => c.type === 'tool_use');
-      if (!uses.length || data.stop_reason !== 'tool_use') { S.chat.push({ role: 'assistant', text: said || '✓' }); break; }
-      if (said) { S.chat.push({ role: 'assistant', text: said }); renderChat(); }
-      const results = [];
-      for (const u of uses) {
-        try { const r = await runTool(u.name, u.input); S.chat.push({ role: 'tool', text: (r.startsWith('ANNULLATO') ? '✕ ' : '✓ ') + r }); results.push({ type: 'tool_result', tool_use_id: u.id, content: r }); }
-        catch (err) { results.push({ type: 'tool_result', tool_use_id: u.id, content: 'Errore: ' + err.message, is_error: true }); }
+      const r = await A.call(native, systemPrompt(), TOOLS, 1024);
+      native.push(r.assistant);
+      if (!r.uses.length) { S.chat.push({ role: 'assistant', text: r.said || '✓' }); break; }
+      if (r.said) { S.chat.push({ role: 'assistant', text: r.said }); renderChat(); }
+      const outs = [];
+      for (const u of r.uses) {
+        try { const res = await runTool(u.name, u.input); S.chat.push({ role: 'tool', text: (res.startsWith('ANNULLATO') ? '✕ ' : '✓ ') + res }); outs.push({ id: u.id, name: u.name, content: res }); }
+        catch (err) { outs.push({ id: u.id, name: u.name, content: 'Errore: ' + err.message, error: true }); }
       }
       save(); render();
-      msgs.push({ role: 'user', content: results });
+      native.push(A.results(outs));
     }
   } catch (err) {
     S.chat.push({ role: 'tool', text: '⚠︎ ' + err.message });
@@ -1622,17 +1685,28 @@ async function send(override) {
 /* =====================================================================
    IMPOSTAZIONI & BACKUP
    ===================================================================== */
-$('btnSettings').onclick = () => { $('setVoice').checked = !!S.settings.voice; $('setName').value = S.settings.name; $('setKey').value = S.settings.apiKey; $('setModel').value = S.settings.model; $('dlgSettings').showModal(); };
-$('setSave').onclick = () => { S.settings.name = $('setName').value.trim() || 'Otto'; S.settings.apiKey = $('setKey').value.trim(); S.settings.model = $('setModel').value.trim() || 'claude-sonnet-4-5'; S.settings.voice = $('setVoice').checked; save(); render(); $('dlgSettings').close(); toast('Salvato'); };
+const provBoxes = () => { const g = $('setProvider').value === 'gemini'; $('boxGemini').style.display = g ? '' : 'none'; $('boxClaude').style.display = g ? 'none' : ''; };
+$('setProvider').onchange = provBoxes;
+$('btnSettings').onclick = () => { const s = S.settings; $('setVoice').checked = !!s.voice; $('setName').value = s.name; $('setProvider').value = s.provider; $('setGKey').value = s.geminiKey; $('setGModel').value = s.geminiModel; $('setKey').value = s.apiKey; $('setModel').value = s.model; provBoxes(); $('dlgSettings').showModal(); };
+$('setSave').onclick = async () => {
+  const s = S.settings, oldKey = s.geminiKey;
+  s.name = $('setName').value.trim() || 'Otto'; s.provider = $('setProvider').value; s.geminiKey = $('setGKey').value.trim(); s.geminiModel = $('setGModel').value.trim();
+  s.apiKey = $('setKey').value.trim(); s.model = $('setModel').value.trim() || 'claude-sonnet-4-5'; s.voice = $('setVoice').checked;
+  save(); render(); $('dlgSettings').close();
+  if (s.provider === 'gemini' && s.geminiKey && (!s.geminiModel || s.geminiKey !== oldKey)) {
+    try { toast('Controllo la chiave…'); s.geminiModel = await pickGeminiModel(); save(); toast('Chat pronta · ' + s.geminiModel); }
+    catch (e) { toast('Chiave Gemini: ' + e.message); }
+  } else toast('Salvato');
+};
 $('chatReset').onclick = () => { if (confirm('Cancellare la conversazione?')) { S.chat = []; save(); render(); } };
 $('bkExport').onclick = () => {
-  const data = JSON.stringify({ ...S, settings: { ...S.settings, apiKey: '', push: { ...P(), password: '' } } }, null, 2);
+  const data = JSON.stringify({ ...S, settings: { ...S.settings, apiKey: '', geminiKey: '', push: { ...P(), password: '' } } }, null, 2);
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([data], { type: 'application/json' })); a.download = `gestiotto-backup-${today()}.json`; a.click();
 };
 $('bkImport').onclick = () => $('bkFile').click();
 $('bkFile').onchange = async e => {
   const f = e.target.files[0]; if (!f) return;
-  try { const d = JSON.parse(await f.text()); const keep = { apiKey: S.settings.apiKey, push: P() }; S = hydrate(d); S.settings.apiKey = keep.apiKey; S.settings.push = keep.push; save(); render(); toast('Backup ripristinato'); }
+  try { const d = JSON.parse(await f.text()); const keep = { ...S.settings }; S = hydrate(d); Object.assign(S.settings, { apiKey: keep.apiKey, geminiKey: keep.geminiKey, geminiModel: keep.geminiModel, provider: keep.provider, push: keep.push }); save(); render(); toast('Backup ripristinato'); }
   catch { toast('File non valido'); }
 };
 
