@@ -454,7 +454,7 @@ try { S = hydrate(JSON.parse(localStorage.getItem(KEY) || 'null')); } catch { S 
 let syncT;
 const save = () => {
   try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { toast('Impossibile salvare: ' + e.message); }
-  clearTimeout(syncT); syncT = setTimeout(syncServer, 4000);
+  clearTimeout(syncT); syncT = setTimeout(syncServer, 800);
 };
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 const NAME = () => S.settings.name || 'Otto';
@@ -475,8 +475,24 @@ const WDL = ['domenica', 'lunedì', 'martedì', 'mercoledì', 'giovedì', 'vener
 const MON = ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'];
 const longDate = s => { const d = parse(s); return `${WDL[d.getDay()]} ${d.getDate()} ${MON[d.getMonth()]}`; };
 const shortDate = s => { const d = parse(s); return `${WD[d.getDay()]} ${d.getDate()} ${MON[d.getMonth()].slice(0, 3)}`; };
-const toMin = t => { if (!t) return null; const [h, m] = t.split(':').map(Number); return h * 60 + m; };
-const at = (dateStr, time) => parse(dateStr).getTime() + toMin(time) * 6e4;
+/* Patch 1 (orari): accetta 15 · 15.30 · 15:30 · 9:5 · "ore 15" → "15:30"; date 2026-10-7 o 7/10/2026 → "2026-10-07" */
+function normTime(t) {
+  if (t == null) return '';
+  const s = String(t).trim().toLowerCase().replace(/^ore\s*/, '').replace(/\s/g, '').replace(/[.,h]/, ':');
+  const m = s.match(/^(\d{1,2})(?::(\d{1,2}))?$/); if (!m) return '';
+  const hh = +m[1], mm = +(m[2] || 0); if (hh > 23 || mm > 59) return '';
+  return pad(hh) + ':' + pad(mm);
+}
+function normDate(d) {
+  if (!d) return '';
+  const s = String(d).trim();
+  let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/); if (m) return `${m[1]}-${pad(+m[2])}-${pad(+m[3])}`;
+  m = s.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{2,4})$/); if (m) return `${m[3].length === 2 ? '20' + m[3] : m[3]}-${pad(+m[2])}-${pad(+m[1])}`;
+  return '';
+}
+const toMin = t => { const n = normTime(t); if (!n) return null; const [h, m] = n.split(':').map(Number); return h * 60 + m; };
+const at = (dateStr, time) => parse(normDate(dateStr) || dateStr).getTime() + (toMin(time) ?? 9 * 60) * 6e4; // senza orario valido: 9:00
+const nowHM = () => { const d = new Date(); return pad(d.getHours()) + ':' + pad(d.getMinutes()); };
 const weekStart = s => { const d = parse(s); return shift(s, -((d.getDay() + 6) % 7)); };
 const REC = { none: '', daily: 'ogni giorno', weekly: 'ogni settimana', biweekly: 'ogni 2 settimane', monthly: 'ogni mese', yearly: 'ogni anno' };
 const ALERT = { '-1': 'nessun avviso', 0: "avviso all'ora esatta", 10: 'avviso 10 min prima', 30: 'avviso 30 min prima', 60: 'avviso 1 ora prima', 120: 'avviso 2 ore prima', 1440: 'avviso 1 giorno prima', 2880: 'avviso 2 giorni prima', 10080: 'avviso 1 settimana prima' };
@@ -1031,7 +1047,8 @@ function renderVita() {
     $('pushUrl').value = S.settings.push.url; $('pushPw').value = S.settings.push.password;
   }
   $('iphoneStatus').textContent = S.ext.calAt ? `Ultimo aggiornamento dall'iPhone: ${shortDate(S.ext.calAt.slice(0, 10))} ${new Date(S.ext.calAt).toTimeString().slice(0, 5)} · ${S.ext.cal.length} eventi` : "Nessun dato ancora ricevuto dall'iPhone (Comando Rapido “Otto iPhone”, facoltativo).";
-  $('pushStatus').textContent = S.settings.push.on ? `Notifiche attive${lastSync ? ' · ultimo invio ' + lastSync : ''}.` : 'Notifiche non attive.';
+  const nx = S.settings.push.on ? buildSchedule()[0] : null;
+  $('pushStatus').textContent = S.settings.push.on ? `Notifiche attive${lastSync ? ' · ultimo invio al server ' + lastSync : ''}.${nx ? ` Prossima: “${nx.title}” ${shortDate(ymd(new Date(nx.at)))} alle ${new Date(nx.at).toTimeString().slice(0, 5)}.` : ''}` : 'Notifiche non attive.';
 }
 $('dlAdd').onclick = () => {
   const title = $('dlTitle').value.trim(), date = $('dlDate').value;
@@ -1161,23 +1178,23 @@ function recapSunday(d) {
 }
 function buildSchedule() {
   const now = Date.now(), t = today(), out = [];
-  const add = (id, when, title, body) => { if (when > now) out.push({ id, at: when, title, body }); };
+  const add = (id, when, title, body) => { if (Number.isFinite(when) && when > now) out.push({ id, at: Math.round(when), title, body }); };
   for (let i = 0; i < 14; i++) {
     const d = shift(t, i), dow = parse(d).getDay();
-    add('m-' + d, at(d, R().morning), `Oggi · ${shortDate(d)}`, recapMorning(d));
-    add('e-' + d, at(d, R().evening), `Domani · ${shortDate(shift(d, 1))}`, recapEvening(d));
-    if (dow === 0) add('w-' + d, at(d, R().sunday), `Settimana · da ${shortDate(shift(d, 1))}`, recapSunday(d));
+    add(`m-${d}-${R().morning}`, at(d, R().morning), `Oggi · ${shortDate(d)}`, recapMorning(d));
+    add(`e-${d}-${R().evening}`, at(d, R().evening), `Domani · ${shortDate(shift(d, 1))}`, recapEvening(d));
+    if (dow === 0) add(`w-${d}-${R().sunday}`, at(d, R().sunday), `Settimana · da ${shortDate(shift(d, 1))}`, recapSunday(d));
     apptsOn(d).forEach(a => { if (a.alert >= 0) { const st = a.time ? at(d, a.time) : at(d, '09:00');
-      add(`a-${a.id}-${d}`, st - a.alert * 6e4, a.title, `${d === t ? 'Oggi' : longDate(d)}${a.time ? ' alle ' + a.time : ''}${a.place ? ' · ' + a.place : ''}`); } });
+      add(`a-${a.id}-${d}-${a.time || ''}-${a.alert}`, st - a.alert * 6e4, a.title, `${d === t ? 'Oggi' : longDate(d)}${a.time ? ' alle ' + a.time : ''}${a.place ? ' · ' + a.place : ''}`); } });
     S.rules.filter(r => r.on && r.days.includes(dow)).forEach(r => { const n = pending(r.list).length;
-      if (!r.onlyPending || n) add(`r-${r.id}-${d}`, at(d, r.time), r.msg, n ? `${n} voci in ${r.list}` : r.list); });
+      if (!r.onlyPending || n) add(`r-${r.id}-${d}-${r.time}`, at(d, r.time), r.msg, n ? `${n} voci in ${r.list}` : r.list); });
   }
   S.deadlines.forEach(dl => { const nd = nextDeadline(dl);
     [...dl.remind, 0].forEach(n => { const d = shift(nd, -n); if (daysBetween(t, d) < 60) add(`d-${dl.id}-${nd}-${n}`, at(d, '09:00'), `Scadenza: ${dl.title}`, n ? `Scade ${inDays(n)}, ${longDate(nd)}.` : 'Scade oggi.'); }); });
   S.birthdays.forEach(b => { const nb = nextBirthday(b);
     add(`b-${b.id}-${nb}`, at(nb, '09:00'), b.name, `Oggi, ${longDate(nb)}.`);
     if (b.gift) add(`bg-${b.id}-${nb}`, at(shift(nb, -b.gift), '09:00'), `${b.name} tra ${b.gift} giorni`, `Regalo aggiunto alla lista Regali.`); });
-  for (let i = 0; i < 14; i++) { const d = shift(t, i); S.reminders.forEach(r => { if (remOn(r, d)) add(`p-${r.id}-${d}`, at(d, r.time), r.title, r.body || ''); }); }
+  for (let i = 0; i < 14; i++) { const d = shift(t, i); S.reminders.forEach(r => { if (remOn(r, d)) add(`p-${r.id}-${d}-${r.time}`, at(d, r.time), r.title, r.body || ''); }); }
   return out.sort((a, b) => a.at - b.at).slice(0, 350);
 }
 
@@ -1228,10 +1245,22 @@ function handleDeviceData(m) {
   }
   save(); render();
 }
+let nextNotif = null;
+function pushScheduleNow() {
+  // all'uscita dall'app: invio "keepalive", arriva anche se l'iPhone sospende Gestiotto
+  if (!P().on || !P().url) return;
+  try {
+    const items = buildSchedule(), hash = JSON.stringify(items.map(i => [i.id, i.at, i.body]));
+    if (hash === lastHash) return;
+    fetch(P().url.replace(/\/$/, '') + '/schedule', { method: 'POST', keepalive: true, headers: { authorization: 'Bearer ' + P().password, 'content-type': 'application/json' }, body: JSON.stringify({ items }) })
+      .then(r => { if (r.ok) lastHash = hash; }).catch(() => {});
+  } catch {}
+}
 async function syncServer() {
   if (!P().on || !P().url || !navigator.onLine) return;
   try {
     const items = buildSchedule(), hash = JSON.stringify(items.map(i => [i.id, i.at, i.body]));
+    nextNotif = items[0] || null;
     if (hash !== lastHash) { await api('/schedule', { items }); lastHash = hash; }
     const backup = { ...S, settings: { ...S.settings, apiKey: '', geminiKey: '', push: { ...P(), password: '' } }, chat: S.chat.slice(-30) };
     await api('/backup', backup);
@@ -1366,7 +1395,21 @@ const TOOLS = [
 ];
 const findList = n => S.lists.find(l => l.toLowerCase() === String(n).trim().toLowerCase());
 
+const DATE_KEYS = /^(data|ultima_annaffiatura)$/, TIME_KEYS = /^(ora|entrata|uscita|recap_mattina|recap_sera|recap_domenica)$/;
+function normArgs(o) {
+  if (!o || typeof o !== 'object') return o;
+  for (const k of Object.keys(o)) {
+    const v = o[k];
+    if (typeof v === 'string' && DATE_KEYS.test(k) && v) { const n = normDate(v); if (!n) throw new Error(`data non valida: "${v}" (usa YYYY-MM-DD)`); o[k] = n; }
+    else if (typeof v === 'string' && TIME_KEYS.test(k) && v) { const n = normTime(v); if (!n) throw new Error(`orario non valido: "${v}" (usa HH:MM, 24 ore)`); o[k] = n; }
+    else if (k === 'date' && Array.isArray(v)) o[k] = v.map(d => { const n = normDate(d); if (!n) throw new Error(`data non valida: "${d}"`); return n; });
+    else if (v && typeof v === 'object' && !Array.isArray(v)) normArgs(v);
+  }
+  return o;
+}
 async function runTool(name, x) {
+  x = normArgs(x || {});
+  if (x.campi && typeof x.campi === 'string') { try { x.campi = normArgs(JSON.parse(x.campi)); } catch (e) { if (/non valid/.test(e.message)) throw e; } }
   switch (name) {
     case 'aggiungi_articoli': {
       const out = (x.articoli || []).map(a => { const list = ensureList(a.lista || 'Casa'); S.items.push({ id: uid(), title: a.titolo, list, done: false, synced: false }); return `${a.titolo} → ${list}`; });
@@ -1485,6 +1528,8 @@ async function runTool(name, x) {
     case 'crea_promemoria': {
       const r = { id: uid(), title: x.titolo, body: x.testo || '', rep: x.ripetizione, days: x.giorni || [], dom: x.giorno_mese || 1, date: x.data || '', time: x.ora, on: true };
       if ((r.rep === 'once' || r.rep === 'yearly') && !r.date) throw new Error('serve la data');
+      if (!r.time) throw new Error('serve l\'orario (HH:MM)');
+      if (r.rep === 'once' && at(r.date, r.time) <= Date.now()) throw new Error(`orario già passato: adesso sono le ${nowHM()} del ${today()}`);
       if (r.rep === 'weekly' && !r.days.length) throw new Error('servono i giorni');
       S.reminders.push(r); return `Promemoria creato: ${r.title}, ${REP_TXT(r)} alle ${r.time}`;
     }
@@ -1520,7 +1565,9 @@ function systemPrompt() {
   const bds = S.birthdays.map(b => `- [${b.id}] ${b.name}: ${nextBirthday(b)}${nt(b)}`).join('\n') || '(nessuno)';
   const pls = S.plants.map(p => `- [${p.id}] ${p.name}: ogni ${p.every} gg, prossima ${plantNext(p)}${nt(p)}`).join('\n') || '(nessuna)';
   return `Sei l'assistente dentro "Gestiotto", l'app personale di Otto. Chiamalo "Otto". Tono NEUTRO e PRECISO: frasi brevi, solo informazioni utili, niente battute né enfasi. Rispondi in italiano.
-Oggi è ${longDate(t)} (${t}), fuso Europe/Rome.
+ADESSO: ${longDate(t)} ${t}, ore ${nowHM()} (ora italiana, Europe/Rome).
+CALENDARIO PROSSIMI GIORNI: ${Array.from({ length: 15 }, (_, i) => { const d = shift(t, i); return `${i === 0 ? 'oggi' : i === 1 ? 'domani' : WDL[parse(d).getDay()]}=${d}`; }).join(', ')}.
+ORARI: usa SEMPRE date YYYY-MM-DD e orari HH:MM a 24 ore (es. 08:30, 21:00). "Tra X minuti/ore" si calcola dall'ora attuale (${nowHM()}). "Stamattina/stasera/domani pomeriggio" senza ora precisa: chiedi l'ora. Non creare mai promemoria o appuntamenti in un orario già passato.
 
 ROUTINE: ufficio ${R().workDays.map(d => WD[d]).join(', ')} ${R().workStart}–${R().workEnd}. Le notti (casa sua / da Giada, la sua ragazza) cambiano ogni settimana. Palestra: obiettivo ${S.gym.goal} volte a settimana (fatte ${gymWeek()}).
 SIRI: i messaggi che iniziano con "(da Siri)" sono stati dettati a Siri: eseguili direttamente e rispondi in una riga.
@@ -1677,7 +1724,7 @@ async function send(override) {
     S.chat.push({ role: 'tool', text: '⚠︎ ' + err.message });
   }
   if (dataSnap() !== before) undoSnap = before;
-  thinking.remove(); busy = false; save(); render();
+  thinking.remove(); busy = false; save(); render(); clearTimeout(syncT); syncServer();
   if (spoken || S.settings.voice) { const last = [...S.chat].reverse().find(m => m.role === 'assistant'); if (last) speak(last.text); }
   window.scrollTo(0, document.body.scrollHeight);
 }
@@ -1713,7 +1760,8 @@ $('bkFile').onchange = async e => {
 /* =====================================================================
    AVVIO
    ===================================================================== */
-document.addEventListener('visibilitychange', () => { if (!document.hidden) { housekeeping(); render(); syncServer(); pullInbox(); } });
+document.addEventListener('visibilitychange', () => { if (!document.hidden) { housekeeping(); render(); syncServer(); pullInbox(); } else { clearTimeout(syncT); pushScheduleNow(); } });
+window.addEventListener('pagehide', pushScheduleNow);
 setInterval(() => { if (!document.hidden && view === 'oggi') renderOggi(); }, 60000);
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 if (navigator.storage?.persist) navigator.storage.persist();
