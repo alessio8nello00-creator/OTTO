@@ -32,6 +32,8 @@
     --giada:#d4869a; --giada-soft:#3d2830; --none-soft:#2f261e; --warn-soft:#3d2a1c; --ok:#93b07f; }
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{overscroll-behavior-x:none}
+main{overflow-x:clip}
 html,body{margin:0;background:var(--bg);color:var(--ink);font:500 16px/1.5 var(--sans);-webkit-font-smoothing:antialiased;font-feature-settings:"tnum" 0}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer;border:0;background:none}
@@ -123,7 +125,7 @@ label.lbl{display:block;font-size:13px;color:var(--muted);margin:2px 0 -4px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.grid2>*{min-width:0}.grid2 .btn{white-space:normal;font-size:15px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.grid3>*{min-width:0}
 .stack>*+*{margin-top:8px}
-nav{position:fixed;bottom:0;left:0;right:0;z-index:6;background:color-mix(in srgb,var(--card) 82%,transparent);-webkit-backdrop-filter:saturate(1.6) blur(18px);backdrop-filter:saturate(1.6) blur(18px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding:6px 6px calc(6px + var(--safe-b))}
+nav{position:fixed;bottom:0;left:0;right:0;z-index:20;transform:translateZ(0);background:var(--card);background:color-mix(in srgb,var(--card) 94%,transparent);-webkit-backdrop-filter:saturate(1.6) blur(18px);backdrop-filter:saturate(1.6) blur(18px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding:6px 6px calc(6px + var(--safe-b))}
 nav button{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:600;color:var(--muted);padding:5px 0;border-radius:14px;transition:background .2s,color .2s}
 nav button span{font-size:20px;line-height:1;transition:transform .2s}
 nav button.on{color:var(--brand);font-weight:800;background:var(--brand-soft)}
@@ -163,11 +165,20 @@ dialog h3{margin:0 0 10px;font:800 21px var(--serif);letter-spacing:-.3px}
 .toast{position:fixed;left:50%;top:calc(var(--safe-t) + 74px);transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;z-index:20;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90vw}
 .toast.on{opacity:1}
 .fab{position:fixed;right:16px;bottom:calc(78px + var(--safe-b));z-index:6;background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fbf3e8;border-radius:999px;padding:13px 19px;font-weight:800;box-shadow:0 8px 22px rgba(60,35,20,.32);animation:pop .3s ease-out}
-body.chat .fab,body.settings .fab{display:none}
+body.chat .fab,body.settings .fab,body.outfit .fab{display:none}
 /* V2: outfit e spesa */
 .wgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .wcell{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:6px;text-align:left;min-width:0;display:block}
 .wcell.wash{opacity:.5}
+.wcell.pending .ph::after,.spin{content:'';position:absolute;inset:0;margin:auto;width:28px;height:28px;border-radius:50%;border:3px solid rgba(255,255,255,.55);border-top-color:var(--brand);animation:spin .8s linear infinite}
+.wcell.pending .ph::before{content:'';position:absolute;inset:0;background:rgba(40,25,15,.25)}
+.wcell.pending .wname{color:var(--muted)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.prog{margin-top:12px;padding:10px 12px;border-radius:14px;background:var(--brand-soft)}
+.prog .bar{height:6px;border-radius:9px;background:rgba(0,0,0,.08);overflow:hidden;margin-top:7px}
+.prog .bar i{display:block;height:100%;border-radius:9px;background:var(--brand);transition:width .35s}
+.prog .bar.ind i{width:35%!important;animation:ind 1.1s ease-in-out infinite}
+@keyframes ind{0%{transform:translateX(-100%)}100%{transform:translateX(300%)}}
 .wcell .wname{font-size:13px;font-weight:600;line-height:1.2;margin-top:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .wcell .sub{font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ph{position:relative;width:100%;aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--brand-soft);display:grid;place-items:center;font-size:28px}
@@ -393,6 +404,7 @@ details.fold[open]>summary{margin-bottom:8px}
     <div class="card"><h2><span>Outfit</span><span class="r" id="wxLine"></span></h2>
       <div class="sub" id="ofContext"></div>
       <div class="grid2" style="margin-top:10px"><button class="btn" id="ofSuggest">✦ Suggerisci outfit</button><button class="btn ghost" id="ofAdd">＋ Aggiungi capi</button></div>
+      <div class="prog" id="ofProg" style="display:none"></div>
       <p class="muted" style="margin:8px 0 0">Scatta o scegli le foto: tipo, colore, marca e stile li riconosco io. Per partire da un capo: toccalo → “✦ Abbina”.</p>
       <input type="file" id="ofFiles" accept="image/*" multiple hidden>
     </div>
@@ -628,7 +640,7 @@ function hydrate(raw) {
   s.tastes = Object.assign(defaults().tastes, s.tastes);
   // data di oggi calcolata qui: hydrate gira prima che le funzioni sulle date siano pronte
   const n0 = new Date(), td = `${n0.getFullYear()}-${String(n0.getMonth() + 1).padStart(2, '0')}-${String(n0.getDate()).padStart(2, '0')}`;
-  try { (Array.isArray(s.clothes) ? s.clothes : []).forEach(c => { if (c && (c.wash === true || (typeof c.wash === 'string' && c.wash > td))) c.wash = td; }); } catch (e) { console.warn('wash', e); }
+  try { (Array.isArray(s.clothes) ? s.clothes : []).forEach(c => { if (c && (c.wash === true || (typeof c.wash === 'string' && c.wash > td))) c.wash = td; if (c && c.pending) { delete c.pending; if (c.name === 'Riconosco…') c.name = 'Capo nuovo'; } }); } catch (e) { console.warn('wash', e); }
   if (!s.settings.gemAutoV3) { s.settings.geminiModel = ''; s.settings.gemAutoV3 = true; }
   if (!s.settings.coopV5) { s.settings.stores = [...new Set([...(s.settings.stores || []), 'Coop'])]; s.settings.coopV5 = true; }
   if (!s.settings.name || s.settings.name === 'Ale') s.settings.name = 'Otto';
@@ -637,7 +649,7 @@ function hydrate(raw) {
 /* PROTEZIONE DATI
    1) prima di usare una versione nuova dell'app, copia intatta dei dati com'erano (otto.v1.pre-<versione>)
    2) se i dati non si leggono, l'app NON salva nulla sopra: restano intatti e si possono esportare */
-const APP_VER = '2.3';
+const APP_VER = '2.4';
 let RAW = null, LOAD_FAIL = false;
 try { RAW = localStorage.getItem(KEY); } catch {}
 try {
@@ -889,6 +901,7 @@ function go(v) {
   document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
   document.body.classList.toggle('chat', v === 'chat');
   document.body.classList.toggle('settings', v === 'settings');
+  document.body.classList.toggle('outfit', v === 'outfit');
   render();
   if (v === 'settings') fillSettings();
   if (v === 'chat') setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 50);
@@ -2009,20 +2022,30 @@ const AI = {
       const now = Date.now(), busy = S.settings.gemBusy = S.settings.gemBusy || {};
       for (const k in busy) if (busy[k] <= now) delete busy[k];
       const manual = (S.settings.geminiModel || '').trim();
-      let order = [...new Set([...(manual ? [manual] : []), ...(await geminiModels())])];
+      const last = S.settings.geminiLast && !busy[S.settings.geminiLast] ? [S.settings.geminiLast] : [];
+      let order = [...new Set([...(manual ? [manual] : []), ...last, ...(await geminiModels())])];
       order = [...order.filter(m => !busy[m]), ...order.filter(m => busy[m])].slice(0, 6);
       let data = null, lastStatus = 0, lastMsg = '';
       for (let round = 0; round < 2 && !data; round++) {
         if (round === 1) await new Promise(r => setTimeout(r, 2000)); // tutti occupati: un ultimo tentativo
         for (const model of order) {
-          let res;
+          let res, d;
           aiProgress(model);
-          try { res = await fetchT(GEM + 'models/' + model + ':generateContent', { method: 'POST', headers: { 'content-type': 'application/json', 'x-goog-api-key': gKey() }, body: JSON.stringify(body) }, 40000, 'Google non risponde'); }
-          catch (e) {
-            if (e.timeout) { lastStatus = 408; lastMsg = model + ': nessuna risposta in 40 secondi'; busy[model] = Date.now() + 10 * 60e3; save(); continue; }
-            throw new Error('Connessione assente o bloccata: ' + e.message);
+          const noThink = S.settings.noThink = S.settings.noThink || {};
+          for (let att = 0; att < 2; att++) {
+            const gc = body.generationConfig;
+            if (/flash/.test(model) && !noThink[model]) gc.thinkingConfig = { thinkingBudget: 0 }; else delete gc.thinkingConfig;
+            try { res = await fetchT(GEM + 'models/' + model + ':generateContent', { method: 'POST', headers: { 'content-type': 'application/json', 'x-goog-api-key': gKey() }, body: JSON.stringify(body) }, 25000, 'Google non risponde'); }
+            catch (e) {
+              if (e.timeout) { res = null; break; }
+              throw new Error('Connessione assente o bloccata: ' + e.message);
+            }
+            d = await res.json().catch(() => ({}));
+            // il modello non accetta l'impostazione "senza ragionamento": riprova subito senza, e lo ricorda
+            if (res.status === 400 && gc.thinkingConfig && /think/i.test(d?.error?.message || '')) { noThink[model] = true; save(); continue; }
+            break;
           }
-          const d = await res.json().catch(() => ({}));
+          if (!res) { lastStatus = 408; lastMsg = model + ': nessuna risposta in 25 secondi'; busy[model] = Date.now() + 10 * 60e3; save(); continue; }
           if (res.ok) { data = d; if (S.settings.geminiLast !== model) { S.settings.geminiLast = model; } delete busy[model]; save(); break; }
           lastStatus = res.status; lastMsg = d?.error?.message || ('Errore ' + res.status);
           if (/api key|api_key/i.test(lastMsg)) throw new Error('Chiave Gemini non valida: ricontrollala in ⚙︎');
@@ -2031,7 +2054,7 @@ const AI = {
         }
         if (lastStatus && ![429, 500, 503, 504].includes(lastStatus)) break;
       }
-      if (!data && /40 secondi/.test(lastMsg)) throw new Error('Google non risponde: ' + lastMsg);
+      if (!data && /25 secondi/.test(lastMsg)) throw new Error('Google non risponde: ' + lastMsg);
       if (!data) throw new Error(lastStatus === 429 ? 'Limite gratuito raggiunto su tutti i modelli: riprova tra qualche minuto' : [500, 503, 504].includes(lastStatus) ? 'Google è sovraccarico in questo momento: riprova tra qualche minuto' : lastMsg);
       const content = data.candidates?.[0]?.content || { role: 'model', parts: [{ text: '' }] };
       const parts = content.parts || [];
@@ -2250,8 +2273,8 @@ function renderOutfit() {
   const cats = [['all', 'Tutti'], ...CAT_ORDER.filter(k => S.clothes.some(c => c.cat === k)).map(k => [k, CATS[k]])];
   if (!cats.some(c => c[0] === ofFilter)) ofFilter = 'all';
   $('ofCats').innerHTML = cats.map(([k, l]) => `<button class="chip ${k === ofFilter ? 'on' : ''}" data-ofcat="${k}">${esc(l)}</button>`).join('');
-  const list = S.clothes.filter(c => ofFilter === 'all' || c.cat === ofFilter).sort((a, b) => (b.rating || 0) - (a.rating || 0));
-  $('ofGrid').innerHTML = (list.length ? list.map(c => `<button class="wcell ${isWash(c) ? 'wash' : ''}" data-cloth="${c.id}"><div class="ph" data-ph="${c.photo || ''}">${c.photo ? '' : '👕'}</div><div class="wname">${isWash(c) ? '🧺 ' : ''}${esc(c.name)}</div><div class="sub">${esc(c.brand || '')}${c.brand ? ' · ' : ''}${'★'.repeat(c.rating || 0) || '–'}</div></button>`).join('')
+  const list = S.clothes.filter(c => ofFilter === 'all' || c.cat === ofFilter || c.pending).sort((a, b) => (b.pending ? 1 : 0) - (a.pending ? 1 : 0) || (b.rating || 0) - (a.rating || 0));
+  $('ofGrid').innerHTML = (list.length ? list.map(c => `<button class="wcell ${isWash(c) ? 'wash' : ''} ${c.pending ? 'pending' : ''}" data-cloth="${c.id}"><div class="ph" data-ph="${c.photo || ''}">${c.photo ? '' : '👕'}</div><div class="wname">${isWash(c) ? '🧺 ' : ''}${esc(c.name)}</div><div class="sub">${esc(c.brand || '')}${c.brand ? ' · ' : ''}${'★'.repeat(c.rating || 0) || '–'}</div></button>`).join('')
       : '<div class="empty" style="grid-column:1/-1">Armadio vuoto. Tocca “Aggiungi capi” e scatta o scegli le foto.</div>');
   document.querySelectorAll('#v-outfit [data-ph]').forEach(async el => { const u = await thumbURL(el.dataset.ph); if (u) el.innerHTML = `<img src="${u}" alt="">`; });
 }
@@ -2274,34 +2297,43 @@ $('v-outfit').addEventListener('click', e => {
 /* --- Aggiunta veloce dei capi: foto → riconoscimento → marca e voto --- */
 let clQueue = [], clTotal = 0, clEditing = null, clRating = 3;
 $('ofAdd').onclick = () => { $('ofFiles').value = ''; $('ofFiles').click(); };
+/* Aggiunta capi: compaiono SUBITO con la rotellina, poi si completano da soli (fino a 3 foto insieme) */
+function ofProgress(done, n, phase) {
+  const el = $('ofProg'); if (!el) return;
+  if (done >= n) { el.style.display = 'none'; return; }
+  el.style.display = '';
+  el.innerHTML = `<div class="addrow"><b class="grow">${phase || 'Riconosco i capi'}…</b><span class="sub">${done}/${n}</span></div><div class="bar ${done ? '' : 'ind'}"><i style="width:${Math.max(6, done / n * 100)}%"></i></div>`;
+}
+const CLOTH_PROMPT = 'Riconosci il capo di abbigliamento nella foto. Guarda bene loghi ed etichette per la marca. Rispondi SOLO JSON: {"tipo":"top|mid|outer|bottom|shoes|acc","nome":"nome breve in italiano, es. Felpa grigia con cappuccio","colore":"colore principale","marca":"marca se leggibile su etichetta o logo, altrimenti vuoto","pesantezza":1,"stile":"casual|elegante|sport"}. top=maglia, t-shirt, camicia, polo; mid=felpa, maglione, cardigan; outer=giacca, giubbotto, cappotto; bottom=pantaloni, jeans, pantaloncini; shoes=scarpe; acc=cappello, sciarpa, cintura, borsa. pesantezza: 1 leggero, 2 medio, 3 pesante.';
 $('ofFiles').onchange = async ev => {
   const files = [...ev.target.files]; ev.target.value = ''; if (!files.length) return;
-  const added = [];
-  go('outfit');
-  for (const [i, file] of files.entries()) {
-    toast(`Riconosco la foto ${i + 1} di ${files.length}…`);
-    let blob = file, fid = uid();
-    try { blob = await shrink(file); } catch (e) { logErr('foto', e); }
-    toast(`Foto ${i + 1}: salvo…`);
-    try { await filePut(fid, { blob, name: file.name || 'capo.jpg', type: blob.type || 'image/jpeg' }); } catch (e) { fid = ''; logErr('salvataggio foto', e); }
-    const c = { id: uid(), cat: 'top', name: 'Capo ' + (S.clothes.length + 1), brand: '', color: '', warm: 2, style: 'casual', rating: 3, photo: fid, wash: false, worn: '' };
-    if (!aiReady()) toast('Chiave Gemini mancante (⚙︎): capo aggiunto senza riconoscimento');
-    else {
+  ofFilter = 'all'; go('outfit');
+  const n = files.length, jobs = files.map(file => ({ file, c: { id: uid(), cat: 'top', name: 'Riconosco…', brand: '', color: '', warm: 2, style: 'casual', rating: 3, photo: '', wash: false, worn: '', pending: true } }));
+  jobs.forEach(j => S.clothes.push(j.c)); save(); render(); ofProgress(0, n);
+  setTimeout(() => $('ofGrid')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
+  let done = 0, noKey = !aiReady();
+  const work = async ({ file, c }) => {
+    let blob = file;
+    try { blob = await shrink(file); } catch {}
+    const fid = uid();
+    try { await filePut(fid, { blob, name: file.name || 'capo.jpg', type: blob.type || 'image/jpeg' }); c.photo = fid; thumbs[fid] = URL.createObjectURL(blob); }
+    catch (e) { logErr('salvataggio foto', e); }
+    save(); renderOutfit();
+    if (!noKey) {
       try {
-        toast(`Foto ${i + 1}: la mando a Google…`);
-        const j = parseJSON(await aiAsk({ json: true, maxTokens: 300, images: [await imgB64(blob, 768, 0.75)],
-          system: 'Riconosci il capo di abbigliamento nella foto. Guarda bene loghi ed etichette per la marca. Rispondi SOLO JSON: {"tipo":"top|mid|outer|bottom|shoes|acc","nome":"nome breve in italiano, es. Felpa grigia con cappuccio","colore":"colore principale","marca":"marca se leggibile su etichetta o logo, altrimenti vuoto","pesantezza":1,"stile":"casual|elegante|sport"}. top=maglia, t-shirt, camicia, polo; mid=felpa, maglione, cardigan; outer=giacca, giubbotto, cappotto; bottom=pantaloni, jeans, pantaloncini; shoes=scarpe; acc=cappello, sciarpa, cintura, borsa. pesantezza: 1 leggero, 2 medio, 3 pesante.',
-          text: 'Che capo è?' }));
+        const j = parseJSON(await aiAsk({ json: true, maxTokens: 250, images: [await imgB64(blob, 512, 0.7)], system: CLOTH_PROMPT, text: 'Che capo è?' }));
         if (CATS[j.tipo]) c.cat = j.tipo; if (j.nome) c.name = j.nome; c.color = j.colore || ''; c.brand = j.marca || '';
         if ([1, 2, 3].includes(+j.pesantezza)) c.warm = +j.pesantezza; if (['casual', 'elegante', 'sport'].includes(j.stile)) c.style = j.stile;
       } catch (e) { logErr('riconoscimento', e); }
     }
-    S.clothes.push(c); added.push(c.id); save();
-  }
+    if (c.name === 'Riconosco…') c.name = 'Capo nuovo';
+    delete c.pending; done++; save(); renderOutfit(); ofProgress(done, n);
+  };
+  const queue = jobs.slice();
+  await Promise.all([0, 1, 2].map(async () => { while (queue.length) await work(queue.shift()); }));
   render();
-  const names = added.map(id => clothById(id)).filter(Boolean).map(c => c.name + (c.brand ? ' (' + c.brand + ')' : ''));
-  toast(added.length === 1 ? 'Aggiunto: ' + names[0] : `${added.length} capi aggiunti`);
-  ofFilter = 'all'; render();
+  const names = jobs.map(j => j.c.name + (j.c.brand ? ' (' + j.c.brand + ')' : ''));
+  toast(noKey ? 'Capi aggiunti senza riconoscimento: manca la chiave (⚙︎)' : n === 1 ? 'Aggiunto: ' + names[0] : `${n} capi aggiunti`);
 };
 function drawStars() { $('clStars').innerHTML = [1, 2, 3, 4, 5].map(n => `<button data-star="${n}">${n <= clRating ? '★' : '☆'}</button>`).join(''); }
 $('clStars').onclick = e => { const b = e.target.closest('[data-star]'); if (b) { clRating = +b.dataset.star; drawStars(); } };
@@ -2670,7 +2702,8 @@ if (location.hash === '#plan') { history.replaceState(null, '', location.pathnam
 if (navigator.storage?.persist) navigator.storage.persist();
 if (!LOAD_FAIL && S.settings.geminiKey && S.settings.geminiKey !== cleanKey(S.settings.geminiKey)) { S.settings.geminiKey = cleanKey(S.settings.geminiKey); save(); }
 if (LOAD_FAIL) setTimeout(() => { alert('Gestiotto non è riuscito a leggere i tuoi dati. Sono ancora intatti sul telefono e non verranno toccati: vai in ⚙︎ › Esporta tutti i dati e manda il file a Claude.'); go('settings'); }, 500);
-housekeeping(); render(); setTimeout(syncServer, 1500); setTimeout(pullInbox, 1200); getWeather().then(w => { if (w) render(); });
+housekeeping(); render(); setTimeout(syncServer, 1500);
+setTimeout(() => { if (!LOAD_FAIL && aiReady() && S.settings.provider === 'gemini') geminiModels().catch(() => {}); }, 2500); setTimeout(pullInbox, 1200); getWeather().then(w => { if (w) render(); });
 </script>
 </body>
 </html>
