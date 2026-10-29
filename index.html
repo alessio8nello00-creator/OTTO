@@ -649,7 +649,7 @@ function hydrate(raw) {
 /* PROTEZIONE DATI
    1) prima di usare una versione nuova dell'app, copia intatta dei dati com'erano (otto.v1.pre-<versione>)
    2) se i dati non si leggono, l'app NON salva nulla sopra: restano intatti e si possono esportare */
-const APP_VER = '2.4';
+const APP_VER = '2.5';
 let RAW = null, LOAD_FAIL = false;
 try { RAW = localStorage.getItem(KEY); } catch {}
 try {
@@ -2025,37 +2025,51 @@ const AI = {
       const last = S.settings.geminiLast && !busy[S.settings.geminiLast] ? [S.settings.geminiLast] : [];
       let order = [...new Set([...(manual ? [manual] : []), ...last, ...(await geminiModels())])];
       order = [...order.filter(m => !busy[m]), ...order.filter(m => busy[m])].slice(0, 6);
-      let data = null, lastStatus = 0, lastMsg = '';
-      for (let round = 0; round < 2 && !data; round++) {
-        if (round === 1) await new Promise(r => setTimeout(r, 2000)); // tutti occupati: un ultimo tentativo
-        for (const model of order) {
-          let res, d;
-          aiProgress(model);
-          const noThink = S.settings.noThink = S.settings.noThink || {};
-          for (let att = 0; att < 2; att++) {
-            const gc = body.generationConfig;
-            if (/flash/.test(model) && !noThink[model]) gc.thinkingConfig = { thinkingBudget: 0 }; else delete gc.thinkingConfig;
-            try { res = await fetchT(GEM + 'models/' + model + ':generateContent', { method: 'POST', headers: { 'content-type': 'application/json', 'x-goog-api-key': gKey() }, body: JSON.stringify(body) }, 25000, 'Google non risponde'); }
-            catch (e) {
-              if (e.timeout) { res = null; break; }
-              throw new Error('Connessione assente o bloccata: ' + e.message);
-            }
-            d = await res.json().catch(() => ({}));
-            // il modello non accetta l'impostazione "senza ragionamento": riprova subito senza, e lo ricorda
-            if (res.status === 400 && gc.thinkingConfig && /think/i.test(d?.error?.message || '')) { noThink[model] = true; save(); continue; }
-            break;
-          }
-          if (!res) { lastStatus = 408; lastMsg = model + ': nessuna risposta in 25 secondi'; busy[model] = Date.now() + 10 * 60e3; save(); continue; }
-          if (res.ok) { data = d; if (S.settings.geminiLast !== model) { S.settings.geminiLast = model; } delete busy[model]; save(); break; }
-          lastStatus = res.status; lastMsg = d?.error?.message || ('Errore ' + res.status);
-          if (/api key|api_key/i.test(lastMsg)) throw new Error('Chiave Gemini non valida: ricontrollala in ⚙︎');
-          const overloaded = [429, 500, 503, 504].includes(res.status) || /overload|high demand|unavailable|exhausted/i.test(lastMsg);
-          busy[model] = Date.now() + (overloaded ? 10 * 60e3 : 24 * 3600e3); save(); // 404 / non adatto: fuori per un giorno
+      /* Patch 13: più modelli IN PARALLELO, vince il primo che risponde.
+         Parte il preferito; se dopo 4 s tace parte anche il successivo, poi un terzo a 9 s.
+         Un errore (sovraccarico, limite, modello sparito) fa partire subito il prossimo. Tetto: 35 s. */
+      const noThink = S.settings.noThink = S.settings.noThink || {};
+      const tryModel = async (model, signal) => {
+        for (let att = 0; att < 2; att++) {
+          const gc = { ...body.generationConfig };
+          if (/flash/.test(model) && !noThink[model]) gc.thinkingConfig = { thinkingBudget: 0 };
+          let res;
+          try { res = await fetch(GEM + 'models/' + model + ':generateContent', { method: 'POST', headers: { 'content-type': 'application/json', 'x-goog-api-key': gKey() }, body: JSON.stringify({ ...body, generationConfig: gc }), signal }); }
+          catch (e) { if (e.name === 'AbortError') throw Object.assign(new Error('annullato'), { aborted: true }); throw Object.assign(new Error('Connessione assente o bloccata: ' + e.message), { net: true }); }
+          const d = await res.json().catch(() => ({}));
+          if (res.ok) return d;
+          const msg = d?.error?.message || ('Errore ' + res.status);
+          if (res.status === 400 && gc.thinkingConfig && /think/i.test(msg)) { noThink[model] = true; save(); continue; }
+          throw Object.assign(new Error(msg), { status: res.status });
         }
-        if (lastStatus && ![429, 500, 503, 504].includes(lastStatus)) break;
-      }
-      if (!data && /25 secondi/.test(lastMsg)) throw new Error('Google non risponde: ' + lastMsg);
-      if (!data) throw new Error(lastStatus === 429 ? 'Limite gratuito raggiunto su tutti i modelli: riprova tra qualche minuto' : [500, 503, 504].includes(lastStatus) ? 'Google è sovraccarico in questo momento: riprova tra qualche minuto' : lastMsg);
+        throw new Error('modello non adatto');
+      };
+      const data = await new Promise((resolve, reject) => {
+        const ctrls = [], timers = []; let idx = 0, running = 0, finished = false, lastErr = null, netErr = null;
+        const finish = (fn, v) => { if (finished) return; finished = true; timers.forEach(clearTimeout); ctrls.forEach(c => { try { c.abort(); } catch {} }); fn(v); };
+        const failAll = () => {
+          if (lastErr) return finish(reject, new Error(lastErr.status === 429 ? 'Limite gratuito raggiunto su tutti i modelli: riprova tra qualche minuto' : [500, 503, 504].includes(lastErr.status) ? 'Google è sovraccarico in questo momento: riprova tra qualche minuto' : lastErr.message));
+          finish(reject, netErr || new Error('Nessun modello disponibile'));
+        };
+        const launch = () => {
+          if (finished) return;
+          if (idx >= order.length) { if (!running) failAll(); return; }
+          const model = order[idx++], ac = new AbortController(); ctrls.push(ac); running++;
+          aiProgress(model);
+          tryModel(model, ac.signal).then(d => {
+            S.settings.geminiLast = model; delete busy[model]; save(); finish(resolve, d);
+          }).catch(e => {
+            running--; if (e.aborted || finished) return;
+            if (/api key|api_key/i.test(e.message)) return finish(reject, new Error('Chiave Gemini non valida: ricontrollala in ⚙︎'));
+            if (e.net) netErr = e;
+            else { lastErr = e; const ov = [429, 500, 503, 504].includes(e.status) || /overload|high demand|unavailable|exhausted/i.test(e.message); busy[model] = Date.now() + (ov ? 10 * 60e3 : 24 * 3600e3); save(); }
+            launch();
+          });
+        };
+        launch();
+        timers.push(setTimeout(launch, 4000), setTimeout(launch, 9000), setTimeout(launch, 15000));
+        timers.push(setTimeout(() => finish(reject, new Error('Google non risponde in questo momento: riprova tra poco')), 35000));
+      });
       const content = data.candidates?.[0]?.content || { role: 'model', parts: [{ text: '' }] };
       const parts = content.parts || [];
       return { said: parts.filter(p => p.text && !p.thought).map(p => p.text).join('\n').trim(),
