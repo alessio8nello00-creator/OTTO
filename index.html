@@ -315,6 +315,8 @@ details.fold[open]>summary{margin-bottom:8px}
 
   <!-- ============ IMPOSTAZIONI (V2: qui anche palestra, piante, borsa, routine, notifiche) ============ -->
   <section class="view" id="v-settings">
+    <div class="card"><h2>Stato app</h2><div class="status" id="diag" style="white-space:pre-line"></div>
+      <button class="btn ghost full" id="diagTest" style="margin-top:8px">Prova la chat</button></div>
     <div class="card"><h2>I tuoi dati</h2>
       <p class="muted" style="margin-top:0">Un file con tutto: agenda, notti, liste, spesa, armadio con le foto, note e allegati. Chiavi e password escluse.</p>
       <button class="btn full" id="bkAll">⬇︎ Esporta tutti i dati</button>
@@ -635,7 +637,7 @@ function hydrate(raw) {
 /* PROTEZIONE DATI
    1) prima di usare una versione nuova dell'app, copia intatta dei dati com'erano (otto.v1.pre-<versione>)
    2) se i dati non si leggono, l'app NON salva nulla sopra: restano intatti e si possono esportare */
-const APP_VER = '2.1';
+const APP_VER = '2.2';
 let RAW = null, LOAD_FAIL = false;
 try { RAW = localStorage.getItem(KEY); } catch {}
 try {
@@ -698,6 +700,16 @@ const inDays = n => n === 0 ? 'oggi' : n === 1 ? 'domani' : `tra ${n} giorni`;
    ===================================================================== */
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+/* Errori: mai silenziosi. Ultimo errore salvato a parte (non tocca i dati) e visibile in ⚙︎ › Stato app */
+let lastErr = ''; try { lastErr = localStorage.getItem('otto.v1.lastErr') || ''; } catch {}
+function logErr(where, e) {
+  const m = (e && (e.message || e.reason?.message || e.reason)) || String(e);
+  console.error(where, e); lastErr = `${new Date().toLocaleString('it-IT')} · ${where}: ${m}`.slice(0, 300);
+  try { localStorage.setItem('otto.v1.lastErr', lastErr); } catch {}
+  try { toast('⚠︎ ' + String(m).slice(0, 120)); } catch {}
+}
+window.addEventListener('error', e => logErr('app', e.error || e.message));
+window.addEventListener('unhandledrejection', e => logErr('app', e.reason));
 let toastT; function toast(m) { const t = $('toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 2600); }
 const where = d => S.nights[d] || 'none';
 const WHERE_TXT = { casa: 'casa tua', giada: 'da Giada', altro: 'fuori casa', none: 'da segnare' };
@@ -886,7 +898,7 @@ function render() {
   $('hTitle').textContent = (hr < 5 ? 'Buonanotte' : hr < 13 ? 'Buongiorno' : hr < 18 ? 'Buon pomeriggio' : 'Buonasera') + ', ' + NAME();
   $('hSub').textContent = longDate(t);
   $('motto').textContent = MOTTI[parse(t).getDate() % MOTTI.length];
-  renderOggi(); renderAgenda(); renderListe(); renderVita(); renderChat(); renderOutfit(); renderSpesa();
+  for (const f of [renderOggi, renderAgenda, renderListe, renderVita, renderChat, renderOutfit, renderSpesa]) { try { f(); } catch (e) { logErr(f.name, e); } }
   $('wxOggi').textContent = wxDay(t) ? wxText(wxDay(t)) : (S.settings.city ? '' : 'Meteo: imposta la città in ⚙︎');
 }
 
@@ -2022,7 +2034,8 @@ async function send(override) {
   const spoken = voiceTurn; voiceTurn = false;
   if (!aiReady()) { toast('Inserisci la chiave nelle impostazioni ⚙︎'); $('btnSettings').click(); return; }
   $('chatIn').value = ''; busy = true; undoSnap = null;
-  const before = dataSnap();
+  setTimeout(() => { busy = false; }, 120e3);   // sicurezza: mai bloccata più di 2 minuti
+  let before = ''; try { before = dataSnap(); } catch {}
   S.chat.push({ role: 'user', text }); save(); renderChat();
   const thinking = document.createElement('div'); thinking.className = 'msg t'; thinking.textContent = '…'; $('chatlog').appendChild(thinking);
   window.scrollTo(0, document.body.scrollHeight);
@@ -2044,10 +2057,11 @@ async function send(override) {
       native.push(A.results(outs));
     }
   } catch (err) {
-    S.chat.push({ role: 'tool', text: '⚠︎ ' + err.message });
+    S.chat.push({ role: 'tool', text: '⚠︎ ' + err.message }); logErr('chat', err);
   }
-  if (dataSnap() !== before) undoSnap = before;
-  thinking.remove(); busy = false; save(); render(); clearTimeout(syncT); syncServer();
+  busy = false; thinking.remove();
+  try { if (dataSnap() !== before) undoSnap = before; } catch {}
+  save(); render(); clearTimeout(syncT); syncServer();
   if (spoken || S.settings.voice) { const last = [...S.chat].reverse().find(m => m.role === 'assistant'); if (last) speak(last.text); }
   window.scrollTo(0, document.body.scrollHeight);
 }
@@ -2235,23 +2249,26 @@ $('v-outfit').addEventListener('click', e => {
 
 /* --- Aggiunta veloce dei capi: foto → riconoscimento → marca e voto --- */
 let clQueue = [], clTotal = 0, clEditing = null, clRating = 3;
-$('ofAdd').onclick = () => $('ofFiles').click();
+$('ofAdd').onclick = () => { $('ofFiles').value = ''; $('ofFiles').click(); };
 $('ofFiles').onchange = async ev => {
   const files = [...ev.target.files]; ev.target.value = ''; if (!files.length) return;
   const added = [];
+  go('outfit');
   for (const [i, file] of files.entries()) {
-    toast(`Foto ${i + 1} di ${files.length}…`);
-    const blob = await shrink(file), fid = uid();
-    await filePut(fid, { blob, name: file.name || 'capo.jpg', type: blob.type || 'image/jpeg' });
+    toast(`Riconosco la foto ${i + 1} di ${files.length}…`);
+    let blob = file, fid = uid();
+    try { blob = await shrink(file); } catch (e) { logErr('foto', e); }
+    try { await filePut(fid, { blob, name: file.name || 'capo.jpg', type: blob.type || 'image/jpeg' }); } catch (e) { fid = ''; logErr('salvataggio foto', e); }
     const c = { id: uid(), cat: 'top', name: 'Capo ' + (S.clothes.length + 1), brand: '', color: '', warm: 2, style: 'casual', rating: 3, photo: fid, wash: false, worn: '' };
-    if (aiReady()) {
+    if (!aiReady()) toast('Chiave Gemini mancante (⚙︎): capo aggiunto senza riconoscimento');
+    else {
       try {
         const j = parseJSON(await aiAsk({ json: true, maxTokens: 300, images: [await imgB64(blob, 768, 0.75)],
           system: 'Riconosci il capo di abbigliamento nella foto. Guarda bene loghi ed etichette per la marca. Rispondi SOLO JSON: {"tipo":"top|mid|outer|bottom|shoes|acc","nome":"nome breve in italiano, es. Felpa grigia con cappuccio","colore":"colore principale","marca":"marca se leggibile su etichetta o logo, altrimenti vuoto","pesantezza":1,"stile":"casual|elegante|sport"}. top=maglia, t-shirt, camicia, polo; mid=felpa, maglione, cardigan; outer=giacca, giubbotto, cappotto; bottom=pantaloni, jeans, pantaloncini; shoes=scarpe; acc=cappello, sciarpa, cintura, borsa. pesantezza: 1 leggero, 2 medio, 3 pesante.',
           text: 'Che capo è?' }));
         if (CATS[j.tipo]) c.cat = j.tipo; if (j.nome) c.name = j.nome; c.color = j.colore || ''; c.brand = j.marca || '';
         if ([1, 2, 3].includes(+j.pesantezza)) c.warm = +j.pesantezza; if (['casual', 'elegante', 'sport'].includes(j.stile)) c.style = j.stile;
-      } catch (e) { console.warn('riconoscimento', e); }
+      } catch (e) { logErr('riconoscimento', e); }
     }
     S.clothes.push(c); added.push(c.id); save();
   }
@@ -2547,7 +2564,20 @@ $('qa').onclick = async e => {
    ===================================================================== */
 const provBoxes = () => { const g = $('setProvider').value === 'gemini'; $('boxGemini').style.display = g ? '' : 'none'; $('boxClaude').style.display = g ? 'none' : ''; };
 $('setProvider').onchange = provBoxes;
-function fillSettings() { const s = S.settings; $('setCity').value = s.city || ''; $('setStores').value = (s.stores || []).join(', '); $('setVoice').checked = !!s.voice; $('setName').value = s.name; $('setProvider').value = s.provider; $('setGKey').value = s.geminiKey; $('setGModel').value = s.geminiModel; $('gemStatus').textContent = gemStatusText(); $('setQuiet').checked = s.quietOrg !== false; $('setKey').value = s.apiKey; $('setModel').value = s.model; provBoxes(); }
+function fillDiag() {
+  const s = S.settings;
+  $('diag').textContent = [`Versione ${APP_VER}`, LOAD_FAIL ? '⚠︎ Dati non letti (intatti, non vengono toccati)' : `Dati letti ✓ · ${S.appts.length} appuntamenti · ${S.items.length} voci · ${S.clothes.length} capi`,
+    s.provider === 'gemini' ? (s.geminiKey ? 'Chiave Gemini ✓' : '⚠︎ Chiave Gemini mancante') : (s.apiKey ? 'Chiave Claude ✓' : '⚠︎ Chiave Claude mancante'),
+    s.geminiLast ? 'Ultimo modello usato: ' + s.geminiLast : '', lastErr ? 'Ultimo errore: ' + lastErr : 'Nessun errore registrato'].filter(Boolean).join('\n');
+}
+$('diagTest').onclick = async () => {
+  if (!aiReady()) return toast('Manca la chiave: inseriscila qui sotto e premi Salva');
+  $('diagTest').textContent = 'Provo…';
+  try { const r = await aiAsk({ system: 'Rispondi solo: ok', text: 'prova', maxTokens: 20 }); toast('Chat funzionante ✓ (' + (S.settings.geminiLast || 'ok') + ')'); }
+  catch (e) { logErr('prova chat', e); }
+  $('diagTest').textContent = 'Prova la chat'; fillDiag();
+};
+function fillSettings() { fillDiag(); const s = S.settings; $('setCity').value = s.city || ''; $('setStores').value = (s.stores || []).join(', '); $('setVoice').checked = !!s.voice; $('setName').value = s.name; $('setProvider').value = s.provider; $('setGKey').value = s.geminiKey; $('setGModel').value = s.geminiModel; $('gemStatus').textContent = gemStatusText(); $('setQuiet').checked = s.quietOrg !== false; $('setKey').value = s.apiKey; $('setModel').value = s.model; provBoxes(); }
 $('btnSettings').onclick = () => go('settings');
 $('setSave').onclick = async () => {
   const s = S.settings, oldKey = s.geminiKey;
