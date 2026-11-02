@@ -44,7 +44,9 @@ header .titles{flex:1;min-width:0}
 header h1{margin:0;font:800 20.5px/1.15 var(--serif);letter-spacing:-.4px}
 header small{opacity:.8;font-size:13px}
 .iconbtn{width:38px;height:38px;border-radius:12px;background:rgba(255,255,255,.14);color:#fbf3e8;display:grid;place-items:center;font-size:18px}
-main{padding:14px 16px calc(150px + var(--safe-b));max-width:640px;margin:0 auto}
+main{padding:14px 16px calc(150px + var(--safe-b));max-width:640px;margin:0 auto;min-height:100vh;min-height:100dvh;box-sizing:border-box}
+html{min-height:100%;background:var(--bg)}
+nav::after{content:'';position:absolute;left:0;right:0;top:100%;height:120px;background:var(--card)}
 .view{display:none}.view.on{display:block;animation:viewIn .22s ease-out}
 @keyframes viewIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @keyframes pop{0%{transform:scale(.96);opacity:0}100%{transform:scale(1);opacity:1}}
@@ -125,7 +127,7 @@ label.lbl{display:block;font-size:13px;color:var(--muted);margin:2px 0 -4px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.grid2>*{min-width:0}.grid2 .btn{white-space:normal;font-size:15px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.grid3>*{min-width:0}
 .stack>*+*{margin-top:8px}
-nav{position:fixed;bottom:0;left:0;right:0;z-index:20;transform:translateZ(0);background:var(--card);background:color-mix(in srgb,var(--card) 94%,transparent);-webkit-backdrop-filter:saturate(1.6) blur(18px);backdrop-filter:saturate(1.6) blur(18px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding:6px 6px calc(6px + var(--safe-b))}
+nav{position:fixed;bottom:0;left:0;right:0;z-index:20;background:var(--card);background:color-mix(in srgb,var(--card) 94%,transparent);-webkit-backdrop-filter:saturate(1.6) blur(18px);backdrop-filter:saturate(1.6) blur(18px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding:6px 6px calc(6px + var(--safe-b))}
 nav button{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:600;color:var(--muted);padding:5px 0;border-radius:14px;transition:background .2s,color .2s}
 nav button span{font-size:20px;line-height:1;transition:transform .2s}
 nav button.on{color:var(--brand);font-weight:800;background:var(--brand-soft)}
@@ -170,6 +172,9 @@ body.chat .fab,body.settings .fab,body.outfit .fab{display:none}
 .wgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .wcell{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:6px;text-align:left;min-width:0;display:block}
 .wcell.wash{opacity:.5}
+.sugg-go{text-align:left;padding:2px 0;line-height:1.35}
+.sugg-cta{display:block;font-size:12.5px;font-weight:700;color:var(--brand);margin-top:3px}
+#ofScooter{flex:none}#ofScooter.on{background:var(--brand);color:#fff;border-color:var(--brand)}
 .wcell.pending .ph::after,.spin{content:'';position:absolute;inset:0;margin:auto;width:28px;height:28px;border-radius:50%;border:3px solid rgba(255,255,255,.55);border-top-color:var(--brand);animation:spin .8s linear infinite}
 .wcell.pending .ph::before{content:'';position:absolute;inset:0;background:rgba(40,25,15,.25)}
 .wcell.pending .wname{color:var(--muted)}
@@ -226,6 +231,9 @@ details.fold[open]>summary{margin-bottom:8px}
   <section class="view on" id="v-oggi">
     <div class="card"><h2><span>Oggi</span><span class="r" id="todayCount"></span></h2><div id="todayAppts"></div><div id="tomorrowLine" class="sub" style="margin-top:6px"></div><div class="addrow" style="margin-top:6px"><div id="wxOggi" class="sub grow"></div><button class="btn ghost small" id="oggiOutfit">✦ Cosa mi metto</button></div></div>
     <button class="alert syncBanner" style="width:100%;text-align:left"><div style="font-size:22px">⟳</div><div class="grow"><b>Completa la sincronizzazione</b><div class="muted">Hai avviato “Otto Sync”: tocca qui per incollare il risultato</div></div><span class="btn ghost small" data-sync-x>Chiudi</span></button>
+    <div class="card" id="mornCard" style="display:none"><h2><span>👕 Cosa mettere oggi</span><span class="r" id="mornWx"></span></h2>
+      <div id="mornRows"></div><div class="sub" id="mornWhy" style="margin-top:4px"></div>
+      <div class="grid2" style="margin-top:10px"><button class="btn small" id="mornWear">✓ Lo indosso</button><button class="btn ghost small" id="mornMore">Cambia</button></div></div>
     <div id="alerts"></div>
     <div class="card" id="planCard" style="display:none"><div class="addrow"><div style="font-size:24px">🗓</div><div class="grow"><b>Pianifica la settimana</b><div class="sub">Notti, palestra e impegni in un minuto.</div></div><button class="btn small" id="planGo">Inizia</button></div></div>
     <div class="card" id="tipsCard"><h2>Da sapere</h2><ul class="tips" id="tips"></ul></div>
@@ -402,7 +410,7 @@ details.fold[open]>summary{margin-bottom:8px}
   <!-- ============ OUTFIT ============ -->
   <section class="view" id="v-outfit">
     <div class="card"><h2><span>Outfit</span><span class="r" id="wxLine"></span></h2>
-      <div class="sub" id="ofContext"></div>
+      <div class="addrow" style="margin-top:2px"><div class="sub grow" id="ofContext"></div><button class="chip" id="ofScooter">🛵 Scooter</button></div>
       <div class="grid2" style="margin-top:10px"><button class="btn" id="ofSuggest">✦ Suggerisci outfit</button><button class="btn ghost" id="ofAdd">＋ Aggiungi capi</button></div>
       <div class="prog" id="ofProg" style="display:none"></div>
       <p class="muted" style="margin:8px 0 0">Scatta o scegli le foto: tipo, colore, marca e stile li riconosco io. Per partire da un capo: toccalo → “✦ Abbina”.</p>
@@ -491,6 +499,23 @@ details.fold[open]>summary{margin-bottom:8px}
     <div class="check" id="rmCheck"></div>
     <button class="btn full" id="rmOk">✓ Salva promemoria</button>
     <button class="btn ghost full" onclick="dlgRem.close()">Annulla</button>
+  </div>
+</dialog>
+
+<dialog id="dlgSug">
+  <h3 id="sgHead">Nuova scadenza</h3>
+  <div class="stack">
+    <label class="lbl">Cosa</label><input type="text" id="sgTitle">
+    <label class="lbl" id="sgDateLbl">Quando scade</label><input type="date" id="sgDate">
+    <div id="sgDlBox" class="stack">
+      <label class="lbl">Si ripete</label><select id="sgRec"><option value="none">Una volta</option><option value="yearly">Ogni anno</option><option value="biennial">Ogni 2 anni</option></select>
+      <label class="lbl">Preavviso</label><select id="sgRemind"><option value="30,7,1">30, 7 e 1 giorno prima</option><option value="60,30,7">60, 30 e 7 giorni prima</option><option value="14,3">14 e 3 giorni prima</option><option value="7,1">7 e 1 giorno prima</option></select>
+    </div>
+    <div id="sgBdBox" class="stack">
+      <label class="lbl">Preavviso</label><select id="sgGift"><option value="21">Regalo in lista 3 settimane prima</option><option value="14">Regalo in lista 2 settimane prima</option><option value="30">Regalo in lista 1 mese prima</option><option value="0">Solo avviso il giorno stesso</option></select>
+    </div>
+    <button class="btn full" id="sgOk">✓ Salva</button>
+    <button class="btn ghost full" onclick="dlgSug.close()">Annulla</button>
   </div>
 </dialog>
 
@@ -649,7 +674,7 @@ function hydrate(raw) {
 /* PROTEZIONE DATI
    1) prima di usare una versione nuova dell'app, copia intatta dei dati com'erano (otto.v1.pre-<versione>)
    2) se i dati non si leggono, l'app NON salva nulla sopra: restano intatti e si possono esportare */
-const APP_VER = '2.5';
+const APP_VER = '2.6';
 let RAW = null, LOAD_FAIL = false;
 try { RAW = localStorage.getItem(KEY); } catch {}
 try {
@@ -871,7 +896,38 @@ document.addEventListener('click', e => {
   if (e.target.closest('[data-more-sugg]')) { showAllSugg = true; render(); }
   if (e.target.closest('[data-more-tips]')) { showAllTips = true; render(); }
 });
-const suggHtml = list => list.map(x => `<div class="item"><div class="grow">${esc(x.text)}</div><button class="btn ghost small" data-hide-tip="${x.key}">Nascondi</button></div>`).join('');
+const suggHtml = list => list.map(x => `<div class="item sugg"><button class="grow sugg-go" data-sug="${esc(x.key)}">${esc(x.text)}<span class="sugg-cta">${SUG_ACT(x.key) ? 'Tocca per aggiungere →' : ''}</span></button><button class="btn ghost small" data-hide-tip="${x.key}">Nascondi</button></div>`).join('');
+/* Ogni suggerimento → cosa preparare già compilato (tu metti solo la data) */
+const SUG_DL = {
+  'sc-bollo': ['Bollo scooter', 'yearly', '30,7,1'], 'sc-ass': ['Assicurazione scooter', 'yearly', '30,7,1'], 'sc-rev': ['Revisione scooter', 'biennial', '30,7,1'],
+  'au-bollo': ['Bollo auto', 'yearly', '30,7,1'], 'au-ass': ['Assicurazione auto', 'yearly', '30,7,1'],
+  'doc-ci': ["Carta d'identità", 'none', '60,30,7'], 'doc-pat': ['Patente', 'none', '60,30,7']
+};
+const SUG_BD = { 'bd-giada': 'Compleanno Giada', 'bd-ann': 'Anniversario con Giada' };
+function SUG_ACT(k) {
+  if (SUG_DL[k] || SUG_BD[k]) return true;
+  return /^(gym-scheda|city|push|key|tastes|vg-doc|ap-al-|dl-rec-)/.test(k);
+}
+let sgCur = null;
+function openSug(key) {
+  if (SUG_DL[key] || SUG_BD[key]) {
+    const dl = SUG_DL[key]; sgCur = { key, kind: dl ? 'dl' : 'bd' };
+    $('sgHead').textContent = dl ? 'Nuova scadenza' : 'Nuova ricorrenza';
+    $('sgTitle').value = dl ? dl[0] : SUG_BD[key]; $('sgDate').value = '';
+    $('sgDateLbl').textContent = dl ? 'Quando scade' : 'Data (l\'anno non conta)';
+    $('sgDlBox').style.display = dl ? '' : 'none'; $('sgBdBox').style.display = dl ? 'none' : '';
+    if (dl) { $('sgRec').value = dl[1]; $('sgRemind').value = dl[2]; } else $('sgGift').value = '21';
+    $('dlgSug').showModal(); setTimeout(() => { try { $('sgDate').focus(); } catch {} }, 250);
+    return;
+  }
+  if (key === 'gym-scheda') return openNotes('gym', '', 'Scheda palestra');
+  if (key === 'city' || key === 'push' || key === 'key') return go('settings');
+  if (key === 'tastes') { go('liste'); return setTimeout(() => $('spTastes')?.click(), 100); }
+  if (key === 'vg-doc') { const it = { id: uid(), title: 'Documenti (carta d\'identità, patente)', list: 'Viaggi', done: false, synced: false }; S.items.push(it); save(); render(); return toast('Aggiunto in Viaggi'); }
+  if (key.startsWith('ap-al-')) { const a = S.appts.find(x => x.id === key.slice(6)); if (a) return confirmAppt({ ...a, alert: 60 }, true); }
+  if (key.startsWith('dl-rec-')) { const d = S.deadlines.find(x => x.id === key.slice(7)); if (d) { d.rec = 'yearly'; save(); render(); return toast(d.title + ': ora si ripete ogni anno'); } }
+}
+document.addEventListener('click', e => { const b = e.target.closest('[data-sug]'); if (b) openSug(b.dataset.sug); });
 document.addEventListener('click', e => { const b = e.target.closest('[data-hide-tip]'); if (b) { S.hiddenTips[b.dataset.hideTip] = true; save(); render(); } });
 
 /* Regalo in lista automaticamente prima del compleanno */
@@ -992,6 +1048,18 @@ function renderOggi() {
   const sg = suggestions();
   $('sugCardOggi').style.display = sg.length ? '' : 'none';
   $('suggOggi').innerHTML = suggHtml(sg.slice(0, 2));
+  // 3a. Outfit del mattino (fino alle 12, se l'armadio ha capi)
+  const morn = new Date().getHours() < 12 && S.clothes.filter(c => !c.pending).length >= 2;
+  const lo = S.lastOutfit && S.lastOutfit.date === t && S.lastOutfit.ids?.length ? S.lastOutfit : null;
+  $('mornCard').style.display = morn && lo ? '' : 'none';
+  if (morn && lo) {
+    const worn = S.outfitLog.some(o => o.date === t);
+    $('mornWx').textContent = (wxDay(t) ? `${Math.round(wxDay(t).tmin)}–${Math.round(wxDay(t).tmax)}°` : '') + (scooterOn() ? ' · 🛵' : '');
+    $('mornRows').innerHTML = lo.ids.map(clothById).filter(Boolean).sort((a, b) => CAT_ORDER.indexOf(a.cat) - CAT_ORDER.indexOf(b.cat)).map(c => `<div class="sub" style="font-size:15px;color:var(--ink)">· ${esc(c.name)}${c.brand ? ' <span class="muted">(' + esc(c.brand) + ')</span>' : ''}</div>`).join('');
+    $('mornWhy').textContent = lo.reason || '';
+    $('mornWear').textContent = worn ? 'Indossato ✓' : '✓ Lo indosso'; $('mornWear').disabled = worn;
+  }
+  if (morn && !lo) ensureMorningOutfit();
   // 3c. Pianifica la settimana (domenica sera / lunedì mattina)
   const pk = planKey(); $('planCard').style.display = pk && S.weekPlanned !== pk ? '' : 'none';
   // 4. Borsa per Giada
@@ -1318,6 +1386,14 @@ function renderVita() {
   const nx = S.settings.push.on ? buildSchedule()[0] : null;
   $('pushStatus').textContent = S.settings.push.on ? `Notifiche attive${lastSync ? ' · ultimo invio al server ' + lastSync : ''}.${nx ? ` Prossima: “${nx.title}” ${shortDate(ymd(new Date(nx.at)))} alle ${new Date(nx.at).toTimeString().slice(0, 5)}.` : ''}` : 'Notifiche non attive.';
 }
+$('sgOk').onclick = () => {
+  const title = $('sgTitle').value.trim(), date = $('sgDate').value;
+  if (!title) return toast('Scrivi cosa');
+  if (!date) { toast('Manca solo la data'); try { $('sgDate').focus(); } catch {} return; }
+  if (sgCur?.kind === 'bd') { S.birthdays.push({ id: uid(), name: title, date, gift: Number($('sgGift').value), added: {} }); housekeeping(); }
+  else S.deadlines.push({ id: uid(), title, date, rec: $('sgRec').value, remind: $('sgRemind').value.split(',').map(Number) });
+  save(); render(); $('dlgSug').close(); clearTimeout(syncT); syncServer(); toast(title + ': salvato, ti avviso in anticipo');
+};
 $('dlAdd').onclick = () => {
   const title = $('dlTitle').value.trim(), date = $('dlDate').value;
   if (!title || !date) return toast('Servono nome e data');
@@ -1633,6 +1709,8 @@ const TOOLS = [
       preavviso_minuti: { type: 'integer', description: "-1 nessuno, 0 all'ora, 10, 30, 60, 120, 1440, 2880, 10080" }, note: { type: 'string' } }, required: ['titolo', 'data', 'ricorrenza', 'preavviso_minuti'] } },
   { name: 'elimina_appuntamento', description: 'Elimina un appuntamento (tutte le ripetizioni) tramite id. Solo dopo conferma in chat.',
     input_schema: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] } },
+  { name: 'imposta_scooter', description: "Attiva o disattiva 'vado in scooter' per gli outfit (se attivo propone capi più coprenti).",
+    input_schema: { type: 'object', properties: { attivo: { type: 'boolean' } }, required: ['attivo'] } },
   { name: 'imposta_notti', description: 'Imposta dove dorme Otto in certe notti: casa (sua), giada (casa di Giada), altro (trasferta o altrove) o nessuno. con_giada: se dorme con Giada (di base sì; false = da solo).',
     input_schema: { type: 'object', properties: { date: { type: 'array', items: { type: 'string', description: 'YYYY-MM-DD' } }, dove: { type: 'string', enum: ['casa', 'giada', 'altro', 'nessuno'] }, con_giada: { type: 'boolean' } }, required: ['date', 'dove'] } },
   { name: 'crea_automazione', description: 'Crea un avviso ricorrente per una lista.',
@@ -1742,6 +1820,7 @@ async function runTool(name, x) {
       const a = S.appts.find(a => a.id === x.id); if (!a) throw new Error('appuntamento non trovato');
       S.appts = S.appts.filter(b => b.id !== x.id); return `Eliminato “${a.title}”`;
     }
+    case 'imposta_scooter': { S.settings.scooter = !!x.attivo; S.packOutfit = null; return x.attivo ? 'Scooter attivo: outfit più coprenti' : 'Scooter disattivato'; }
     case 'imposta_notti': {
       (x.date || []).forEach(d => { setNight(d, x.dove === 'nessuno' ? 'none' : x.dove); if (x.con_giada != null && canSolo(d)) setSolo(d, !x.con_giada); });
       return `Notti aggiornate (${(x.date || []).length})`;
@@ -2192,6 +2271,12 @@ const setWash = (c, on) => { if (c) c.wash = on ? shift(today(), WASH_DAYS) : fa
 const stars = n => '★'.repeat(n || 0) + '☆'.repeat(5 - (n || 0));
 let ofFilter = 'all', ofCurrent = null;
 
+/* Scooter: col vento si sente circa 6° in meno e la pioggia pesa di più → ci si copre di più */
+const scooterOn = () => !!S.settings.scooter;
+function effWx(d) {
+  const x = wxDay(d); if (!x || !scooterOn()) return x;
+  return { ...x, tmax: x.tmax - 6, tmin: x.tmin - 6, rain: x.rain >= 30 ? Math.max(x.rain, 50) : x.rain, scooter: true };
+}
 function dayContext(d) {
   const ap = apptsOn(d);
   return { work: isWorkday(d), gym: ap.some(a => /palestra|gym/i.test(a.title)), appts: ap.map(a => (a.time ? a.time + ' ' : '') + a.title), night: where(d) };
@@ -2207,9 +2292,10 @@ function localPick(cat, ctx, exclude) {
 }
 function neededCats(x) {
   const c = ['top', 'bottom', 'shoes'];
+  if (x && x.scooter && x.tmax < 28 && !c.includes('outer')) c.unshift('outer');
   if (!x || x.tmax < 17) c.unshift('mid');
   if (!x || x.tmax < 19 || x.rain >= 50) c.unshift('outer');
-  return c.filter(k => S.clothes.some(cl => cl.cat === k));
+  return [...new Set(c)].filter(k => S.clothes.some(cl => cl.cat === k));
 }
 function localOutfit(ctx, baseId) {
   const ids = baseId ? [baseId] : [], base = clothById(baseId);
@@ -2220,7 +2306,7 @@ async function suggestOutfit({ baseId = null, date = today(), silent = false, ke
   if (!S.clothes.length) { toast('Aggiungi prima qualche capo'); return null; }
   if (!silent) { go('outfit'); $('ofResult').style.display = ''; $('ofRows').innerHTML = '<div class="empty">Scelgo l\'outfit…</div>'; $('ofReason').textContent = ''; }
   await getWeather();
-  const wx = wxDay(date), ctx = { ...dayContext(date), wx };
+  const wx = wxDay(date), ctx = { ...dayContext(date), wx: effWx(date) };
   let res = null;
   if (aiReady()) {
     try {
@@ -2228,7 +2314,7 @@ async function suggestOutfit({ baseId = null, date = today(), silent = false, ke
       const recent = S.outfitLog.slice(-5).map(o => o.date + ': ' + o.ids.map(i => clothById(i)?.name).filter(Boolean).join(', ')).join('\n') || '-';
       const txt = await aiAsk({ json: true, maxTokens: 800,
         system: 'Sei uno stylist per un ragazzo. Scegli un outfit SOLO tra i capi elencati (usa gli id). Regole: adatto al meteo e alla giornata; colori che stanno bene insieme; preferisci capi con voto alto; evita capi messi negli ultimi giorni; se c\'è un capo di partenza deve esserci. Struttura: maglia o camicia + pantaloni + scarpe; aggiungi felpa/maglione e giacca solo se servono per freddo o pioggia. Rispondi SOLO JSON: {"capi":["id",...],"motivo":"una frase breve e neutra"}',
-        text: `Giorno: ${longDate(date)}. Meteo: ${wx ? wxText(wx) : 'sconosciuto'}. ${ctx.work ? 'Giornata di ufficio.' : 'Giorno libero.'} ${ctx.gym ? 'Ha palestra.' : ''} Impegni: ${ctx.appts.join('; ') || 'nessuno'}. Notte: ${WHERE_TXT[ctx.night]}.\nCapo di partenza: ${baseId ? baseId + ' (' + clothById(baseId)?.name + ')' : 'nessuno'}.\nOutfit recenti:\n${recent}\nArmadio (id|tipo|nome|marca|colore|pesantezza|stile|voto|ultima volta):\n${list}` });
+        text: `Giorno: ${longDate(date)}. Meteo: ${wx ? wxText(wx) : 'sconosciuto'}. ${ctx.work ? 'Giornata di ufficio.' : 'Giorno libero.'} ${ctx.gym ? 'Ha palestra.' : ''} ${scooterOn() ? 'VA IN SCOOTER: con il vento sente circa 6 gradi in meno, quindi deve coprirsi di più: giacca o giubbotto antivento sempre sotto i 22°, uno strato in più (felpa o maglione) sotto i 16°, capi caldi e chiusi; se può piovere preferisci una giacca impermeabile e scarpe chiuse.' : ''} Impegni: ${ctx.appts.join('; ') || 'nessuno'}. Notte: ${WHERE_TXT[ctx.night]}.\nCapo di partenza: ${baseId ? baseId + ' (' + clothById(baseId)?.name + ')' : 'nessuno'}.\nOutfit recenti:\n${recent}\nArmadio (id|tipo|nome|marca|colore|pesantezza|stile|voto|ultima volta):\n${list}` });
       const j = parseJSON(txt), ids = [...new Set((j.capi || []).filter(id => clothById(id) && (!isWash(clothById(id)) || id === baseId)))];
       if (baseId && !ids.includes(baseId)) ids.unshift(baseId);
       if (ids.length >= 2) res = { ids, reason: j.motivo || '' };
@@ -2244,7 +2330,7 @@ function replacePiece(id, wash) {
   const c = clothById(id); if (!c || !ofCurrent) return;
   if (wash) { setWash(c, true); toast(`${c.name}: a lavare, ecco un'alternativa`); }
   ofCurrent.rejected.push(id);
-  const alt = localPick(c.cat, { ...dayContext(ofCurrent.date), wx: wxDay(ofCurrent.date) }, [...ofCurrent.ids, ...ofCurrent.rejected]);
+  const alt = localPick(c.cat, { ...dayContext(ofCurrent.date), wx: effWx(ofCurrent.date) }, [...ofCurrent.ids, ...ofCurrent.rejected]);
   ofCurrent.ids = ofCurrent.ids.map(x => x === id ? (alt ? alt.id : null) : x).filter(Boolean);
   if (!alt) toast(`Nessun'altra alternativa in ${CATS[c.cat]}`);
   S.lastOutfit = ofCurrent; save(); renderOutfit();
@@ -2271,6 +2357,7 @@ function renderOutfit() {
   }
   $('wxLine').textContent = x ? wxText(x) : '';
   $('ofContext').textContent = S.settings.city ? `${S.weather?.place || S.settings.city} · ${ctx.work ? 'giornata di ufficio' : 'giorno libero'}${ctx.gym ? ' · palestra' : ''}` : 'Imposta la tua città in ⚙︎ per avere il meteo.';
+  $('ofScooter').classList.toggle('on', scooterOn()); $('ofScooter').textContent = scooterOn() ? '🛵 Scooter ✓' : '🛵 Scooter';
   const cur = ofCurrent || S.lastOutfit;
   if (cur && cur.date >= t && cur.ids?.length) {
     ofCurrent = cur; cur.rejected = cur.rejected || [];
@@ -2295,6 +2382,11 @@ function renderOutfit() {
 $('ofSuggest').onclick = () => suggestOutfit();
 $('oggiOutfit').onclick = () => S.clothes.length ? suggestOutfit() : (go('outfit'), toast('Aggiungi prima qualche capo con “＋ Aggiungi capi”'));
 $('ofAgain').onclick = () => suggestOutfit({ baseId: ofCurrent?.base || null, date: ofCurrent?.date || today() });
+$('ofScooter').onclick = () => {
+  S.settings.scooter = !scooterOn(); S.packOutfit = null; save();
+  toast(scooterOn() ? 'Scooter: ti propongo capi più coprenti' : 'Scooter tolto');
+  if (S.clothes.length) suggestOutfit(); else render();
+};
 $('ofWear').onclick = () => {
   if (!ofCurrent) return; const d = ofCurrent.date;
   ofCurrent.ids.forEach(id => { const c = clothById(id); if (c) c.worn = d; });
@@ -2607,6 +2699,14 @@ $('ntDone').onclick = () => {
   save(); render(); $('dlgNight').close(); clearTimeout(syncT); syncServer();
 };
 $('ntAppt').onclick = async () => { $('dlgNight').close(); await confirmAppt({ title: '', date: wkStart, time: '', place: '', rec: 'none', alert: 60 }); openWeek('plan'); };
+/* Outfit del mattino: scelto da solo all'apertura dell'app, una volta al giorno */
+let mornTried = '';
+async function ensureMorningOutfit() {
+  const t = today(); if (mornTried === t || packBusy) return; mornTried = t;
+  try { await suggestOutfit({ date: t, silent: true }); renderOggi(); } catch (e) { console.warn('mattino', e); }
+}
+$('mornWear').onclick = () => { if (S.lastOutfit?.date === today()) { ofCurrent = S.lastOutfit; $('ofWear').onclick(); } };
+$('mornMore').onclick = () => { go('outfit'); };
 /* Outfit per il giorno dopo una notte da Giada, scelto la sera prima */
 let packBusy = false;
 async function ensurePackOutfit(day) {
