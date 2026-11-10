@@ -81,6 +81,12 @@ dialog[open]{animation:pop .18s ease-out}
 .day.solo,.cal .c.solo{background-image:repeating-linear-gradient(135deg,transparent 0 6px,rgba(255,255,255,.22) 6px 9px)}
 .day.giada{background:var(--giada);color:#fbecef}.day.giada b{color:#fff}
 .day.today{outline:2px solid var(--brand);outline-offset:1px}
+.day .gi{position:absolute;top:2px;right:3px;font-size:11px;line-height:1}
+#gymWeek .day{padding:7px 0 6px}#gymWeek .day .ic{display:block;font-size:17px;height:20px;line-height:20px;margin-top:2px}
+#gymWeek .day.plan{background:var(--brand-soft);color:var(--brand)}#gymWeek .day.plan b{color:var(--brand)}
+#gymWeek .day.done{background:var(--brand);color:#fbf3e8}#gymWeek .day.done b{color:#fff}
+#gymWeek .day.past:not(.done){opacity:.55}
+.cal .c .gi{position:absolute;top:1px;right:2px;font-size:9px;line-height:1}
 .day .dot,.cal .c .dot{position:absolute;bottom:3px;left:50%;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:currentColor}
 .legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin-top:8px;flex-wrap:wrap}
 .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
@@ -127,7 +133,7 @@ label.lbl{display:block;font-size:13px;color:var(--muted);margin:2px 0 -4px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.grid2>*{min-width:0}.grid2 .btn{white-space:normal;font-size:15px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.grid3>*{min-width:0}
 .stack>*+*{margin-top:8px}
-nav{position:fixed;bottom:0;left:0;right:0;z-index:20;background:var(--card);background:color-mix(in srgb,var(--card) 94%,transparent);-webkit-backdrop-filter:saturate(1.6) blur(18px);backdrop-filter:saturate(1.6) blur(18px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding:6px 6px calc(6px + var(--safe-b))}
+nav{position:fixed;bottom:0;left:0;right:0;z-index:20;background:var(--card);background:color-mix(in srgb,var(--card) 94%,transparent);-webkit-backdrop-filter:saturate(1.6) blur(18px);backdrop-filter:saturate(1.6) blur(18px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(6,1fr);padding:6px 6px calc(6px + var(--safe-b))}
 nav button{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:600;color:var(--muted);padding:5px 0;border-radius:14px;transition:background .2s,color .2s}
 nav button span{font-size:20px;line-height:1;transition:transform .2s}
 nav button.on{color:var(--brand);font-weight:800;background:var(--brand-soft)}
@@ -148,7 +154,18 @@ body.chat .chatbar{display:block}
 .qa button{flex:none;padding:7px 12px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-size:13.5px;font-weight:700;color:var(--ink);box-shadow:var(--shadow)}
 body.chat main{padding-bottom:calc(205px + var(--safe-b))}
 .chatbar textarea{resize:none;height:44px;max-height:120px}
-#micBtn.rec{background:var(--warn);color:#fff}
+#micBtn{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;touch-action:none;min-width:48px;font-size:19px}
+#micBtn.rec{background:var(--warn);color:#fff;transform:scale(1.12);box-shadow:0 0 0 8px color-mix(in srgb,var(--warn) 25%,transparent)}
+#micBtn.rec.cancel{background:var(--muted)}
+.vox{position:fixed;left:12px;right:12px;bottom:calc(150px + var(--safe-b));z-index:30;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px 16px;box-shadow:0 14px 40px rgba(40,25,15,.3);display:none}
+.vox.on{display:block;animation:pop .15s ease-out}
+.vox .vt{font-size:17px;font-weight:600;min-height:26px;line-height:1.35}
+.vox .vh{font-size:12.5px;color:var(--muted);margin-top:8px;display:flex;align-items:center;gap:8px}
+.vox .wave{display:inline-flex;gap:3px;align-items:end;height:16px}
+.vox .wave i{width:3px;border-radius:3px;background:var(--warn);animation:wv .9s ease-in-out infinite}
+.vox .wave i:nth-child(2){animation-delay:.15s}.vox .wave i:nth-child(3){animation-delay:.3s}.vox .wave i:nth-child(4){animation-delay:.45s}
+.vox.cancel .vt{color:var(--muted);text-decoration:line-through}
+@keyframes wv{0%,100%{height:4px}50%{height:16px}}
 .suggest{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
 .suggest button{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:7px 12px;font-size:13px;text-align:left}
 .shopmode .item{padding:16px 0;font-size:20px}.shopmode .chk{width:34px;height:34px}
@@ -167,7 +184,7 @@ dialog h3{margin:0 0 10px;font:800 21px var(--serif);letter-spacing:-.3px}
 .toast{position:fixed;left:50%;top:calc(var(--safe-t) + 74px);transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;z-index:20;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90vw}
 .toast.on{opacity:1}
 .fab{position:fixed;right:16px;bottom:calc(78px + var(--safe-b));z-index:6;background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fbf3e8;border-radius:999px;padding:13px 19px;font-weight:800;box-shadow:0 8px 22px rgba(60,35,20,.32);animation:pop .3s ease-out}
-body.chat .fab,body.settings .fab,body.outfit .fab{display:none}
+body.chat .fab,body.settings .fab,body.outfit .fab,body.liste .fab,body.soldi .fab{display:none}
 /* V2: outfit e spesa */
 .wgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .wcell{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:6px;text-align:left;min-width:0;display:block}
@@ -197,6 +214,51 @@ body.chat .fab,body.settings .fab,body.outfit .fab{display:none}
 .stars{display:flex;gap:6px}.stars button{font-size:30px;line-height:1;color:var(--amber);padding:0 2px}
 .planstore{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-bottom:4px;border-bottom:2px solid var(--line);font-family:var(--serif)}
 .price{font-weight:600;white-space:nowrap}
+.dish{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.dish:last-child{border-bottom:0}
+.dday{flex:none;width:46px;text-align:center;font-weight:800;font-size:14px;line-height:1.15;color:var(--brand)}
+.dday small{display:block;font-weight:600;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
+.dish b{display:block;font-size:15.5px;line-height:1.3}
+.dish.busy{opacity:.55}.dish.busy .dswap{animation:spin .8s linear infinite}
+.dish .iconb{width:36px;height:36px;border-radius:11px;background:var(--bg);border:1px solid var(--line);flex:none;font-size:15px}
+.tag{display:inline-block;font-size:11.5px;font-weight:700;padding:1px 7px;border-radius:999px;background:var(--brand-soft);color:var(--brand);margin-left:4px;vertical-align:1px}
+.ing{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line)}
+.ing.done .grow{text-decoration:line-through;color:var(--muted)}
+.ing .chk{width:24px;height:24px}
+.ing.done .chk{background:var(--brand);border-color:var(--brand)}
+.grp{margin:14px 0 2px;font-weight:800;display:flex;justify-content:space-between;gap:8px;font-size:14.5px}
+.grp span{color:var(--muted);font-weight:600}
+.stepper{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--line)}
+.stepper .n{width:26px;text-align:center;font-size:18px}
+.stepper .iconb{width:38px;height:38px;border-radius:12px;background:var(--bg);border:1px solid var(--line);font-size:18px;font-weight:700}
+.mbar{display:flex;align-items:center;gap:8px;padding:6px 0}
+.mbar .l{width:118px;flex:none;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mbar .b{flex:1;height:10px;border-radius:9px;background:var(--bg);overflow:hidden}.mbar .b i{display:block;height:100%;background:var(--brand);border-radius:9px}
+.mbar .v{width:84px;flex:none;text-align:right;font-weight:700;font-size:14px}
+.kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:6px 0 10px}
+.kpi div{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:10px;text-align:center}
+.kpi b{display:block;font-size:17px}.kpi span{font-size:12px;color:var(--muted)}
+.up{color:#b4532f}.down{color:#4f7a4a}
+.chart{display:flex;align-items:flex-end;gap:5px;height:110px}
+.chart div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;font-size:10.5px;color:var(--muted)}
+.chart i{display:block;width:100%;background:var(--brand);border-radius:6px 6px 2px 2px;min-height:3px}
+.chart i.neg{background:#b4532f}
+.hero-save{background:linear-gradient(150deg,var(--brand),var(--brand-2));color:#fbf3e8;border:0}
+.hero-save .big{font:800 34px/1.1 var(--sans);letter-spacing:-.5px;margin:4px 0}
+.hero-save .sub,.hero-save .lbl2{color:rgba(251,243,232,.82)}
+.hero-save .gbar{height:10px;border-radius:9px;background:rgba(255,255,255,.2);overflow:hidden;margin:10px 0 4px}.hero-save .gbar i{display:block;height:100%;background:#f3c98b;border-radius:9px}
+.hero-save .row3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.hero-save .row3 div{background:rgba(255,255,255,.12);border-radius:12px;padding:8px;text-align:center}.hero-save .row3 b{display:block;font-size:15.5px}.hero-save .row3 span{font-size:11.5px;opacity:.85}
+.savetip{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}.savetip:last-child{border-bottom:0}
+.savetip .ic{font-size:22px;flex:none}.savetip b{display:block}.savetip .gain{color:#4f7a4a;font-weight:800;white-space:nowrap}
+.guide{font-size:14.5px;line-height:1.5}
+.guide ol{padding-left:20px;margin:8px 0}.guide li{margin:4px 0}
+.guide code{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:13px;word-break:break-all}
+.docph{position:relative;aspect-ratio:1.58;border-radius:12px;overflow:hidden;background:var(--bg);border:1px solid var(--line)}
+.docph img{width:100%;height:100%;object-fit:cover}
+.docph .x{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;font-size:13px}
+.trip{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);width:100%;text-align:left}
+.trip:last-child{border-bottom:0}
 details summary{cursor:pointer;margin-top:10px}
 .grid3 .btn{white-space:normal;font-size:13px}
 details.fold{margin-top:10px}
@@ -221,7 +283,7 @@ details.fold[open]>summary{margin-bottom:8px}
   <div class="row">
     <svg class="logo" viewBox="0 0 512 512" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a26c45"/><stop offset="1" stop-color="#6b4127"/></linearGradient></defs><rect width="512" height="512" rx="112" fill="url(#lg)"/><rect x="156" y="66" width="200" height="380" rx="46" fill="none" stroke="#f6ead8" stroke-width="18"/><line x1="236" y1="100" x2="276" y2="100" stroke="#f6ead8" stroke-width="10" stroke-linecap="round" opacity=".7"/><circle cx="256" cy="204" r="44" fill="none" stroke="#f6ead8" stroke-width="22"/><circle cx="256" cy="318" r="56" fill="none" stroke="#f6ead8" stroke-width="22"/></svg>
     <div class="titles"><h1 id="hTitle">Ciao Otto</h1><small id="hSub"></small></div>
-    <span class="ver">Versione 2</span>
+    <span class="ver">Versione 3</span>
     <button class="iconbtn" id="btnSettings" aria-label="Impostazioni">⚙︎</button>
   </div>
 </header>
@@ -234,6 +296,8 @@ details.fold[open]>summary{margin-bottom:8px}
     <div class="card" id="mornCard" style="display:none"><h2><span>👕 Cosa mettere oggi</span><span class="r" id="mornWx"></span></h2>
       <div id="mornRows"></div><div class="sub" id="mornWhy" style="margin-top:4px"></div>
       <div class="grid2" style="margin-top:10px"><button class="btn small" id="mornWear">✓ Lo indosso</button><button class="btn ghost small" id="mornMore">Cambia</button></div></div>
+    <div class="card" id="tripToday" style="display:none"></div>
+    <div class="alert" id="bkNag" style="display:none"><div style="font-size:22px">💾</div><div class="grow"><b>Backup del mese</b><div class="muted">Un file con tutto, foto comprese. 10 secondi.</div></div><button class="btn small" id="bkNagGo">Salva</button></div>
     <div id="alerts"></div>
     <div class="card" id="planCard" style="display:none"><div class="addrow"><div style="font-size:24px">🗓</div><div class="grow"><b>Pianifica la settimana</b><div class="sub">Notti, palestra e impegni in un minuto.</div></div><button class="btn small" id="planGo">Inizia</button></div></div>
     <div class="card" id="tipsCard"><h2>Da sapere</h2><ul class="tips" id="tips"></ul></div>
@@ -245,6 +309,9 @@ details.fold[open]>summary{margin-bottom:8px}
       <div class="legend"><span><i style="background:var(--casa)"></i>Casa mia</span><span><i style="background:var(--giada)"></i>Da Giada</span><span><i style="background:var(--altro)"></i>Fuori</span><span>a righe = senza Giada</span></div>
     </div>
     <div class="card"><h2><span>Palestra · settimana</span><span class="r" id="gymCount"></span></h2>
+      <div class="week" id="gymWeek" style="margin-bottom:6px"></div>
+      <div class="legend" style="margin:0 0 10px"><span>🏋️ da fare</span><span>✓ fatta</span><span id="gymPlanTxt"></span><span>tocca un giorno</span></div>
+      <div id="gymNext"></div>
       <div class="addrow"><div class="dots grow" id="gymDots"></div><button class="btn ghost small" data-note="gym||Scheda palestra">📋 Scheda</button><button class="btn small" id="gymToday"></button></div></div>
     <div id="countersToday"></div>
     <div class="card" id="plantsCard"><h2>Piante da annaffiare</h2><div id="plantsDue"></div></div>
@@ -271,6 +338,9 @@ details.fold[open]>summary{margin-bottom:8px}
       <button class="btn full" id="apNew">＋ Nuovo appuntamento</button>
     </div>
     <div class="card" id="sugCard"><h2>Suggerimenti</h2><div id="sugg"></div></div>
+    <div class="card"><h2><span>🪪 Documenti</span><span class="r sub">solo su questo telefono</span></h2>
+      <div class="chips" id="docChips" style="flex-wrap:wrap;margin-bottom:0"></div>
+    </div>
     <div class="card"><h2><span>Scadenze</span></h2>
       <div id="deadlines"></div>
       <details class="fold"><summary>＋ Aggiungi scadenza</summary><div class="stack">
@@ -295,17 +365,16 @@ details.fold[open]>summary{margin-bottom:8px}
   <!-- ============ LISTE ============ -->
   <section class="view" id="v-liste">
     <button class="alert syncBanner" style="width:100%;text-align:left"><div style="font-size:22px">⟳</div><div class="grow"><b>Completa la sincronizzazione</b><div class="muted">Hai avviato “Otto Sync”: tocca qui per incollare il risultato</div></div><span class="btn ghost small" data-sync-x>Chiudi</span></button>
-    <div class="card" id="spCard"><h2><span>Spesa intelligente</span><span class="r" id="spInfo"></span></h2>
-      <div class="sub" style="margin-bottom:6px">Volantini: apri, fai gli screenshot delle pagine e torna qui.</div>
-      <div class="chips" id="flChips"></div>
-      <div class="grid3"><button class="btn ghost" id="spFlyer">📄 Volantini e coupon</button><button class="btn ghost" id="spTastes">♡ Gusti</button><button class="btn ghost" onclick="renderOffers();dlgOffers.showModal()">🏷 Offerte</button></div>
-      <details class="fold" id="spFold"><summary id="spSummary">✦ Spesa economica</summary>
-      <div class="grid2"><select id="spMode"><option value="risparmio">Spendere poco</option><option value="bene">Mangiare bene</option><option value="leggero">Leggero</option><option value="normale" selected>Normale</option><option value="sgarro">Sgarro</option></select>
-        <select id="spDays"><option value="3">3 giorni</option><option value="5">5 giorni</option><option value="7" selected>Settimana</option><option value="14">2 settimane</option></select></div>
-      <input type="text" id="spNote" placeholder="Note (es. budget 50 €, ho già pasta e riso)" style="margin-top:8px">
-      <button class="btn full" id="spPlan">✦ Prepara la spesa economica</button>
-      <div id="spResult"></div>
-      </details>
+    <div class="card" id="mnCard">
+      <h2><span>🍽 Menu della settimana</span><span class="r" id="mnTot"></span></h2>
+      <div id="mnBody"></div>
+    </div>
+    <div class="card" id="offCard">
+      <h2><span>🏷 Offerte</span><span class="r" id="spInfo"></span></h2>
+      <div class="sub" id="offStatus"></div>
+      <div class="prog" id="offProg" style="display:none"></div>
+      <div class="grid2" style="margin-top:10px"><button class="btn ghost" id="offSearch">🔎 Cerca volantini</button><button class="btn ghost" id="spFlyer">🔗 Link o foto</button></div>
+      <div class="grid2" style="margin-top:8px"><button class="btn ghost" id="offSeeAll">Vedi offerte</button><button class="btn ghost" id="spTastes">♡ Gusti</button></div>
     </div>
     <div class="chips" id="listChips"></div>
     <div class="card" id="listCard">
@@ -333,9 +402,45 @@ details.fold[open]>summary{margin-bottom:8px}
   </section>
 
   <!-- ============ IMPOSTAZIONI (V2: qui anche palestra, piante, borsa, routine, notifiche) ============ -->
+  <section class="view" id="v-soldi">
+    <div class="card"><h2><span>💶 Soldi</span><span class="r" id="mnyGoalBtn"></span></h2>
+      <div class="sub" id="mnyInfo"></div>
+      <div class="grid2" style="margin-top:10px"><button class="btn" id="mnyImport">⬆︎ Carica estratto conto</button><button class="btn ghost" id="mnyPrivacy"></button></div>
+      <input type="file" id="mnyFile" accept=".csv,.txt,.xlsx,.xls,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden>
+      <div class="prog" id="mnyProg" style="display:none"></div>
+    </div>
+    <div class="card hero-save" id="mnyHero" style="display:none"></div>
+    <div class="card" id="mnyTipsCard" style="display:none"><h2><span>💡 Dove puoi risparmiare</span><span class="r" id="mnyTipsTot"></span></h2><div id="mnyTips"></div>
+      <button class="btn ghost full" id="mnyAI" style="margin-top:8px">✦ Analisi più approfondita con l'IA</button><div id="mnyAIout"></div></div>
+    <div class="card" id="mnyCheck" style="display:none"><h2><span>⚠︎ Da controllare</span><span class="r" id="mnyCheckN"></span></h2><div id="mnyCheckList"></div></div>
+    <div class="card"><h2><span>Il mese</span><span class="r" id="mnyMonthTot"></span></h2>
+      <div class="chips" id="mnyMonths"></div>
+      <div id="mnyMonth"></div>
+    </div>
+    <div class="card"><h2><span>🔁 Ricorrenti</span><span class="r" id="mnySubsTot"></span></h2>
+      <div class="sub" style="margin:-4px 0 6px">Mutuo, affitto, bonifici, abbonamenti, stipendio. Tocca “Cos'è?” per spiegarmeli: li conto nel modo giusto.</div>
+      <div id="mnySubs"></div></div>
+    <div class="card"><h2><span>📈 Andamento risparmio</span><span class="r" id="mnyTrendTot"></span></h2><div id="mnyTrend"></div></div>
+    <div class="card"><h2><span>Patrimonio</span><span class="r" id="mnyNet"></span></h2>
+      <div id="mnyAcc"></div>
+      <div id="mnyChart" style="margin-top:12px"></div>
+      <button class="btn ghost full" id="mnyAccAdd" style="margin-top:8px">＋ Aggiungi conto</button>
+      <div class="sub" style="margin-top:8px">Solo numeri e andamento, nessun consiglio di investimento. Aggiorna i valori quando vuoi, anche dalla chat (“ETF oggi 12.400”).</div>
+    </div>
+    <div class="card"><h2>Movimenti</h2><input type="text" id="mnySearch" placeholder="Cerca (negozio, categoria, importo)"><div id="mnyTx" style="margin-top:6px"></div></div>
+  </section>
+
   <section class="view" id="v-settings">
     <div class="card"><h2>Stato app</h2><div class="status" id="diag" style="white-space:pre-line"></div>
       <button class="btn ghost full" id="diagTest" style="margin-top:8px">Prova la chat</button></div>
+    <div class="card" id="autoCard"><h2>📲 Automazioni iPhone e messaggi</h2>
+      <p class="muted" style="margin-top:0">Si impostano una volta sola nell'app Comandi › Automazione; poi vanno da sole.</p>
+      <details class="fold"><summary>🌙 Notte segnata da sola</summary><div class="guide" id="gNight"></div></details>
+      <details class="fold"><summary>🎒 Cosa portare quando esci di casa</summary><div class="guide" id="gCarry"></div></details>
+      <div class="grp" style="margin-top:16px">Messaggi programmati<span id="msgCount"></span></div>
+      <div id="msgList"></div>
+      <button class="btn ghost full" id="msgNew" style="margin-top:8px">＋ Nuovo messaggio</button>
+    </div>
     <div class="card"><h2>I tuoi dati</h2>
       <p class="muted" style="margin-top:0">Un file con tutto: agenda, notti, liste, spesa, armadio con le foto, note e allegati. Chiavi e password escluse.</p>
       <button class="btn full" id="bkAll">⬇︎ Esporta tutti i dati</button>
@@ -370,7 +475,8 @@ details.fold[open]>summary{margin-bottom:8px}
         <input type="url" id="pushUrl" placeholder="https://gestiotto.TUONOME.workers.dev">
         <input type="password" id="pushPw" placeholder="Password del server">
         <div class="grid2"><button class="btn" id="pushOn">Attiva</button><button class="btn ghost" id="pushTest">Prova</button></div>
-        <label class="toggle"><input type="checkbox" id="setQuiet"> Riepiloghi e automazioni senza suono (appuntamenti, promemoria e scadenze suonano)</label>
+        <div class="sub">🔕 Riepiloghi del mattino, della sera e della domenica: sempre senza suono. 🔔 Appuntamenti, promemoria e scadenze: con suono.</div>
+        <label class="toggle"><input type="checkbox" id="setQuiet"> Anche le automazioni delle liste senza suono</label>
         <div class="status" id="pushStatus"></div>
         <div class="status" id="iphoneStatus"></div>
       </div>
@@ -413,6 +519,7 @@ details.fold[open]>summary{margin-bottom:8px}
       <div class="addrow" style="margin-top:2px"><div class="sub grow" id="ofContext"></div><button class="chip" id="ofScooter">🛵 Scooter</button></div>
       <div class="grid2" style="margin-top:10px"><button class="btn" id="ofSuggest">✦ Suggerisci outfit</button><button class="btn ghost" id="ofAdd">＋ Aggiungi capi</button></div>
       <div class="prog" id="ofProg" style="display:none"></div>
+      <div class="chips" id="ofSmart" style="margin:10px 0 0;flex-wrap:wrap"></div>
       <p class="muted" style="margin:8px 0 0">Scatta o scegli le foto: tipo, colore, marca e stile li riconosco io. Per partire da un capo: toccalo → “✦ Abbina”.</p>
       <input type="file" id="ofFiles" accept="image/*" multiple hidden>
     </div>
@@ -421,6 +528,10 @@ details.fold[open]>summary{margin-bottom:8px}
       <div id="ofRows"></div>
       <div class="sub" id="ofReason" style="margin-top:8px"></div>
       <div class="grid2" style="margin-top:10px"><button class="btn" id="ofWear">✓ Lo indosso</button><button class="btn ghost" id="ofAgain">↻ Un altro</button></div>
+    </div>
+    <div class="card" id="tripCard"><h2><span>🧳 Valigia</span></h2>
+      <div id="trips"></div>
+      <button class="btn ghost full" id="tripNew">＋ Nuovo viaggio</button>
     </div>
     <div class="card"><h2><span>Armadio</span><span class="r" id="ofCount"></span></h2>
       <div class="chips" id="ofCats"></div>
@@ -439,7 +550,7 @@ details.fold[open]>summary{margin-bottom:8px}
       <button>Ho fatto palestra oggi</button>
       <button>Cosa ho questa settimana?</button>
       <button>Cosa mi metto oggi?</button>
-      <button>Fai la spesa economica per la settimana</button>
+      <button>Prepara il menu della settimana</button>
     </div>
     <div id="chatlog"></div>
   </section>
@@ -447,9 +558,10 @@ details.fold[open]>summary{margin-bottom:8px}
 
 <div class="chatbar">
   <div class="qa" id="qa">
-    <button data-qa="appt">📅 Appuntamento</button><button data-qa="rem">🔔 Promemoria</button><button data-qa="outfit">👕 Outfit</button><button data-qa="spesa">🛒 Spesa</button><button data-qa="gym">💪 Palestra fatta</button><button data-qa="night">🌙 Dove dormo</button><button data-qa="week">🗓 Settimana</button>
+    <button data-qa="appt">📅 Appuntamento</button><button data-qa="rem">🔔 Promemoria</button><button data-qa="outfit">👕 Outfit</button><button data-qa="spesa">🛒 Spesa</button><button data-qa="gym">💪 Palestra fatta</button><button data-qa="night">🌙 Dove dormo</button><button data-qa="week">🗓 Settimana</button><button data-qa="bday">🎂 Compleanno</button><button data-qa="trip">🧳 Valigia</button>
   </div>
-  <div class="cbrow"><button class="btn ghost" id="micBtn" aria-label="Parla">🎙︎</button><textarea id="chatIn" placeholder="Scrivi o parla…" rows="1"></textarea><button class="btn" id="chatSend">➤</button></div>
+  <div class="vox" id="vox"><div class="vt" id="voxText"></div><div class="vh"><span class="wave"><i></i><i></i><i></i><i></i></span><span id="voxHint"></span></div></div>
+  <div class="cbrow"><button class="btn ghost" id="micBtn" aria-label="Tieni premuto per parlare">🎙︎</button><textarea id="chatIn" placeholder="Scrivi o parla…" rows="1"></textarea><button class="btn" id="chatSend">➤</button></div>
 </div>
 <button class="fab" id="fab">✦ Chiedi</button>
 
@@ -458,6 +570,7 @@ details.fold[open]>summary{margin-bottom:8px}
   <button data-v="agenda"><span>▦</span>Agenda</button>
   <button data-v="liste"><span>☑︎</span>Spesa</button>
   <button data-v="outfit"><span>◇</span>Outfit</button>
+  <button data-v="soldi"><span>€</span>Soldi</button>
   <button data-v="chat"><span>✦</span>Chat</button>
 </nav>
 
@@ -477,6 +590,7 @@ details.fold[open]>summary{margin-bottom:8px}
       <div><label class="lbl">Avvisami</label>
         <select id="apAlert"><option value="-1">Mai</option><option value="0">All'ora esatta</option><option value="10">10 min prima</option><option value="30">30 min prima</option><option value="60">1 ora prima</option><option value="120">2 ore prima</option><option value="1440">1 giorno prima</option><option value="2880">2 giorni prima</option><option value="10080">1 settimana prima</option></select></div>
     </div>
+    <div class="lbl" style="margin-top:2px">＋ Altri avvisi <span class="sub">(facoltativi, con suono)</span></div><div class="chips" id="apMore" style="flex-wrap:wrap;margin-bottom:6px"></div>
     <label class="lbl">Note</label><textarea id="apNotes" rows="2" placeholder="facoltativo"></textarea>
     <div class="check" id="apCheck"></div>
     <label class="toggle"><input type="checkbox" id="apCal"> Aggiungi anche al Calendario iPhone</label>
@@ -496,6 +610,13 @@ details.fold[open]>summary{margin-bottom:8px}
     <div id="rmDaysBox"><label class="lbl">Quali giorni</label><div class="days" id="rmDays" style="margin-top:8px"></div></div>
     <div id="rmDomBox"><label class="lbl">Giorno del mese</label><select id="rmDom"></select></div>
     <label class="lbl">Avvisami</label><select id="rmAlert"><option value="0">All'ora esatta</option><option value="5">5 min prima</option><option value="10">10 min prima</option><option value="15">15 min prima</option><option value="30">30 min prima</option><option value="60">1 ora prima</option><option value="120">2 ore prima</option><option value="1440">1 giorno prima</option></select>
+    <div class="lbl" style="margin-top:2px">＋ Altri avvisi <span class="sub">(facoltativi, con suono)</span></div><div class="chips" id="rmMore" style="flex-wrap:wrap;margin-bottom:6px"></div>
+    <details id="rmWaBox"><summary class="muted">📲 Manda anche un WhatsApp a quell'ora</summary>
+      <div class="stack" style="margin-top:8px">
+        <input type="text" id="rmWaName" placeholder="A chi (es. Mamma, Gruppo famiglia)">
+        <input type="tel" id="rmWaPhone" placeholder="Numero (vuoto = scegli tu la chat o il gruppo)">
+        <input type="text" id="rmWaText" placeholder="Messaggio (es. Sono arrivato)">
+      </div></details>
     <div class="check" id="rmCheck"></div>
     <button class="btn full" id="rmOk">✓ Salva promemoria</button>
     <button class="btn ghost full" onclick="dlgRem.close()">Annulla</button>
@@ -517,6 +638,69 @@ details.fold[open]>summary{margin-bottom:8px}
     <button class="btn full" id="sgOk">✓ Salva</button>
     <button class="btn ghost full" onclick="dlgSug.close()">Annulla</button>
   </div>
+</dialog>
+
+<dialog id="dlgTripNew">
+  <h3>Nuovo viaggio</h3>
+  <div class="stack">
+    <label class="lbl">Dove vai</label><input type="text" id="tnDest" placeholder="Es. Milano, Roma, Courmayeur">
+    <div class="grid2"><div><label class="lbl">Parto il</label><input type="date" id="tnFrom"></div><div><label class="lbl">Torno il</label><input type="date" id="tnTo"></div></div>
+    <label class="lbl">Cosa farai (tocca tutto quello che vale)</label>
+    <div class="chips" id="tnActs" style="flex-wrap:wrap"></div>
+    <label class="lbl">Come ci vai</label>
+    <div class="seg" id="tnMode"><button data-tm="auto">🚗</button><button data-tm="treno">🚆</button><button data-tm="aereo">✈️</button><button data-tm="scooter">🛵</button></div>
+    <button class="btn full" id="tnOk">✦ Prepara la valigia</button>
+    <button class="btn ghost full" onclick="dlgTripNew.close()">Annulla</button>
+  </div>
+</dialog>
+
+<dialog id="dlgTrip">
+  <h3 id="tvTitle">Valigia</h3>
+  <div class="sub" id="tvSub" style="margin:-4px 0 8px"></div>
+  <div id="tvList"></div>
+  <div class="addrow" style="margin-top:10px"><input type="text" id="tvAdd" placeholder="Aggiungi (me lo ricordo per la prossima volta)" enterkeyhint="done"><button class="btn" id="tvAddBtn">+</button></div>
+  <div class="grid2" style="margin-top:10px"><button class="btn ghost" id="tvDel">Elimina viaggio</button><button class="btn" onclick="dlgTrip.close()">Fatto</button></div>
+</dialog>
+
+<dialog id="dlgDoc">
+  <h3 id="dcTitle">Documento</h3>
+  <div id="dcPhotos" class="grid2"></div>
+  <div class="sub" id="dcDeadline" style="margin-top:10px"></div>
+  <label class="btn ghost full" style="text-align:center;margin-top:10px">📷 Aggiungi foto (fronte/retro)<input type="file" id="dcFile" accept="image/*" multiple hidden></label>
+  <div class="grid2" style="margin-top:8px"><button class="btn ghost" id="dcDel">Elimina</button><button class="btn" onclick="dlgDoc.close()">Chiudi</button></div>
+</dialog>
+
+<dialog id="dlgMsg">
+  <h3>Messaggio automatico</h3>
+  <div class="stack">
+    <label class="lbl">Quando</label>
+    <div class="seg" id="msWhen"><button data-mw="orario">⏰ A un'ora</button><button data-mw="arrivo">📍 Arrivo</button><button data-mw="uscita">🚶 Esco da</button></div>
+    <div id="msTimeBox" class="stack"><div class="grid2"><input type="time" id="msTime" value="08:00"><input type="date" id="msDate"></div><div class="sub">Lascia vuota la data per ripeterlo nei giorni scelti:</div><div class="days" id="msDays"></div></div>
+    <div id="msPlaceBox"><input type="text" id="msPlace" placeholder="Luogo (es. Casa di Giada, Ufficio, Casa dei miei)"></div>
+    <label class="lbl">A chi</label>
+    <input type="text" id="msTo" placeholder="Nome (es. Mamma, Gruppo famiglia)">
+    <input type="tel" id="msPhone" placeholder="Numero WhatsApp (vuoto per un gruppo)">
+    <label class="lbl">Messaggio</label><input type="text" id="msText" placeholder="Es. Sono arrivato 👍">
+    <button class="btn full" id="msOk">✓ Salva</button>
+    <button class="btn ghost full" onclick="dlgMsg.close()">Annulla</button>
+  </div>
+</dialog>
+
+<dialog id="dlgMsgGuide">
+  <h3 id="mgTitle">Ultimo passo sull'iPhone</h3>
+  <div class="guide" id="mgBody"></div>
+  <button class="btn full" onclick="dlgMsgGuide.close()">Fatto</button>
+</dialog>
+
+<dialog id="dlgRec">
+  <h3 id="rcTitle">Cos'è questo movimento?</h3>
+  <div class="sub" id="rcSub" style="margin:-4px 0 10px"></div>
+  <label class="lbl">Nome (come lo chiami tu)</label><input type="text" id="rcName" placeholder="Es. Mutuo casa, Affitto, Paghetta ETF">
+  <label class="lbl" style="margin-top:10px">Che cos'è</label>
+  <div class="chips" id="rcKinds" style="flex-wrap:wrap"></div>
+  <button class="btn full" id="rcOk" style="margin-top:6px">✓ Salva</button>
+  <button class="btn ghost full" id="rcChat" style="margin-top:8px">💬 Spiegamelo in chat</button>
+  <button class="btn ghost full" onclick="dlgRec.close()" style="margin-top:8px">Annulla</button>
 </dialog>
 
 <dialog id="dlgNight">
@@ -584,9 +768,15 @@ details.fold[open]>summary{margin-bottom:8px}
 <dialog id="dlgFlyer">
   <h3>Volantini, coupon, scontrini</h3>
   <div class="stack">
-    <label class="lbl">Cosa carichi</label><select id="flType"><option value="volantino">Volantino (foto o screenshot delle pagine)</option><option value="coupon">Coupon dell'app (screenshot)</option><option value="scontrino">Scontrino (impara i prezzi)</option></select>
+    <label class="lbl">Cosa carichi</label><select id="flType"><option value="volantino">Volantino (link o screenshot)</option><option value="coupon">Coupon dell'app (screenshot)</option><option value="scontrino">Scontrino (impara i prezzi)</option></select>
     <label class="lbl">Supermercato</label><select id="flStore"></select>
-    <button class="btn full" id="flPick">📷 Scegli foto o screenshot</button>
+    <div id="flLinkBox">
+      <label class="lbl">Link del volantino</label>
+      <div class="addrow"><input type="url" id="flUrl" placeholder="Incolla il link" inputmode="url" autocapitalize="off" autocorrect="off" enterkeyhint="go"><button class="btn ghost" id="flPaste" title="Incolla">📋</button></div>
+      <button class="btn full" id="flLink" style="margin-top:8px">🔗 Leggi dal link</button>
+      <div class="sub" style="text-align:center;margin:8px 0 2px">oppure</div>
+    </div>
+    <button class="btn ghost full" id="flPick">📷 Scegli foto o screenshot</button>
     <input type="file" id="flFiles" accept="image/*" multiple hidden>
     <div class="status" id="flStatus"></div>
     <button class="btn ghost full" id="flOffers">Vedi offerte salvate</button>
@@ -644,7 +834,9 @@ const defaults = () => ({
   hiddenTips: {}, // suggerimenti nascosti
   remQueue: [],  // voci da togliere da Promemoria ('Lista|Voce')
   clothes: [], outfitLog: [], lastOutfit: null, weather: null,      // V2 outfit
-  offers: [], prices: {}, shopPlan: null,                           // V2 spesa
+  offers: [], prices: {}, shopPlan: null, menu: null, flyers: {},
+  trips: [], packMemory: [], docs: [], msgRules: [],
+  money: { tx: [], safe: {}, merch: {}, accounts: [], imports: [], ai: true, rules: [], goal: 0 },                           // V2 spesa
   tastes: { otto: { likes: [], dislikes: [] }, giada: { likes: [], dislikes: [] } },
   ext: { cal: [], calAt: '' }, // eventi letti dal Calendario iPhone (sola lettura)
   syncPending: false,
@@ -663,10 +855,13 @@ function hydrate(raw) {
   s.bag = Object.assign(defaults().bag, s.bag);
   s.ext = Object.assign(defaults().ext, s.ext);
   s.tastes = Object.assign(defaults().tastes, s.tastes);
+  s.money = Object.assign(defaults().money, s.money);
   // data di oggi calcolata qui: hydrate gira prima che le funzioni sulle date siano pronte
   const n0 = new Date(), td = `${n0.getFullYear()}-${String(n0.getMonth() + 1).padStart(2, '0')}-${String(n0.getDate()).padStart(2, '0')}`;
   try { (Array.isArray(s.clothes) ? s.clothes : []).forEach(c => { if (c && (c.wash === true || (typeof c.wash === 'string' && c.wash > td))) c.wash = td; if (c && c.pending) { delete c.pending; if (c.name === 'Riconosco…') c.name = 'Capo nuovo'; } }); } catch (e) { console.warn('wash', e); }
   if (!s.settings.gemAutoV3) { s.settings.geminiModel = ''; s.settings.gemAutoV3 = true; }
+  if (!s.lastExport && raw && !s.settings.morningV3) { const b = new Date(n0.getTime() - 25 * 864e5); s.lastExport = `${b.getFullYear()}-${String(b.getMonth() + 1).padStart(2, '0')}-${String(b.getDate()).padStart(2, '0')}`; }
+  if (!s.settings.morningV3) { if (s.settings.routine && s.settings.routine.morning === '08:00') s.settings.routine.morning = '07:30'; s.settings.morningV3 = true; }
   if (!s.settings.coopV5) { s.settings.stores = [...new Set([...(s.settings.stores || []), 'Coop'])]; s.settings.coopV5 = true; }
   if (!s.settings.name || s.settings.name === 'Ale') s.settings.name = 'Otto';
   return s;
@@ -674,7 +869,7 @@ function hydrate(raw) {
 /* PROTEZIONE DATI
    1) prima di usare una versione nuova dell'app, copia intatta dei dati com'erano (otto.v1.pre-<versione>)
    2) se i dati non si leggono, l'app NON salva nulla sopra: restano intatti e si possono esportare */
-const APP_VER = '2.6';
+const APP_VER = '3.4';
 let RAW = null, LOAD_FAIL = false;
 try { RAW = localStorage.getItem(KEY); } catch {}
 try {
@@ -837,7 +1032,14 @@ function remOn(r, d) {
   }
   return false;
 }
-const REM_ALERT = r => r.alert ? ' · avviso ' + (r.alert >= 60 ? (r.alert / 60 === 24 ? '1 giorno' : r.alert / 60 + ' h') : r.alert + ' min') + ' prima' : '';
+/* avvisi in più: oltre a quello principale (appuntamenti 1 ora prima, promemoria all'ora esatta) */
+const MORE_OPTS = [[0, 'Ora esatta'], [5, '5 min'], [10, '10 min'], [15, '15 min'], [30, '30 min'], [60, '1 ora'], [120, '2 ore'], [1440, '1 giorno'], [2880, '2 giorni'], [10080, '1 settimana']];
+let apMoreSet = new Set(), rmMoreSet = new Set();
+function drawMore(el, set, main) { el.innerHTML = MORE_OPTS.filter(([v]) => v !== +main).map(([v, l]) => `<button type="button" class="chip ${set.has(v) ? 'on' : ''}" data-more="${v}">${l}</button>`).join(''); }
+const alertsOf = x => [...new Set([x.alert, ...(x.more || [])].filter(v => v != null && v >= 0))].sort((a, b) => b - a);
+const REM_ALERT = r => (r.alert || (r.more || []).length) ? ' · avvisi: ' + alertsTxt({ alert: r.alert || 0, more: r.more }) : '';
+const alertsTxt = x => alertsOf(x).map(v => v === 0 ? "all'ora" : (MORE_OPTS.find(o => o[0] === v) || [0, v + ' min'])[1] + ' prima').join(', ');
+const REM_ALERT_OLD = r => r.alert ? ' · avviso ' + (r.alert >= 60 ? (r.alert / 60 === 24 ? '1 giorno' : r.alert / 60 + ' h') : r.alert + ' min') + ' prima' : '';
 const REP_TXT = r => ({ once: r.date ? 'il ' + shortDate(r.date) : 'una volta', daily: 'ogni giorno', weekly: daysText(r.days || []).replace('Ogni', 'ogni'), monthly: `ogni mese il ${r.dom}`, yearly: r.date ? `ogni anno il ${parse(r.date).getDate()} ${MON[parse(r.date).getMonth()]}` : 'ogni anno' }[r.rep] || '');
 const counterWeek = (c, d = today()) => { const ws = weekStart(d), we = shift(ws, 6); return c.log.filter(x => x >= ws && x <= we).length; };
 
@@ -859,6 +1061,10 @@ function tips(d = today(), inApp = false) {
   if (unset.length >= 3) t.push(`${unset.length} notti dei prossimi 7 giorni sono da segnare.`);
   const due = plantsDueBy(d);
   if (due.length) t.push(`Da annaffiare: ${due.map(p => p.name).join(', ')}${where(d) === 'giada' ? ' (quando torni a casa)' : ''}.`);
+  const away = awayPlants(d);
+  if (away && hour >= 12) t.push(`Prima di partire annaffia: ${away.due.map(p => p.name).join(', ')} (torni ${shortDate(away.back)}).`);
+  const nt = S.trips.find(x => x.from === tom);
+  if (nt && nt.items.some(i => !i.done)) t.push(`Domani parti per ${nt.dest}: in valigia mancano ${nt.items.filter(i => !i.done).length} cose.`);
   return t;
 }
 
@@ -910,7 +1116,7 @@ function SUG_ACT(k) {
 }
 let sgCur = null;
 function openSug(key) {
-  if (SUG_DL[key] || SUG_BD[key]) {
+  if (SUG_DL[key] || key in SUG_BD) {
     const dl = SUG_DL[key]; sgCur = { key, kind: dl ? 'dl' : 'bd' };
     $('sgHead').textContent = dl ? 'Nuova scadenza' : 'Nuova ricorrenza';
     $('sgTitle').value = dl ? dl[0] : SUG_BD[key]; $('sgDate').value = '';
@@ -958,6 +1164,7 @@ function go(v) {
   document.body.classList.toggle('chat', v === 'chat');
   document.body.classList.toggle('settings', v === 'settings');
   document.body.classList.toggle('outfit', v === 'outfit');
+  document.body.classList.toggle('liste', v === 'liste'); document.body.classList.toggle('soldi', v === 'soldi');
   render();
   if (v === 'settings') fillSettings();
   if (v === 'chat') setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 50);
@@ -977,7 +1184,7 @@ function render() {
   $('hTitle').textContent = (hr < 5 ? 'Buonanotte' : hr < 13 ? 'Buongiorno' : hr < 18 ? 'Buon pomeriggio' : 'Buonasera') + ', ' + NAME();
   $('hSub').textContent = longDate(t);
   $('motto').textContent = MOTTI[parse(t).getDate() % MOTTI.length];
-  for (const f of [renderOggi, renderAgenda, renderListe, renderVita, renderChat, renderOutfit, renderSpesa]) { try { f(); } catch (e) { logErr(f.name, e); } }
+  for (const f of [renderOggi, renderAgenda, renderListe, renderVita, renderChat, renderOutfit, renderSpesa, renderTrips, renderDocs, renderSoldi]) { try { f(); } catch (e) { logErr(f.name, e); } }
   $('wxOggi').textContent = wxDay(t) ? wxText(wxDay(t)) : (S.settings.city ? '' : 'Meteo: imposta la città in ⚙︎');
 }
 
@@ -1048,6 +1255,8 @@ function renderOggi() {
   const sg = suggestions();
   $('sugCardOggi').style.display = sg.length ? '' : 'none';
   $('suggOggi').innerHTML = suggHtml(sg.slice(0, 2));
+  // 2b. backup completo: se l'ultimo ha più di un mese
+  $('bkNag').style.display = !S.lastExport || daysBetween(S.lastExport, t) > 30 ? '' : 'none';
   // 3a. Outfit del mattino (fino alle 12, se l'armadio ha capi)
   const morn = new Date().getHours() < 12 && S.clothes.filter(c => !c.pending).length >= 2;
   const lo = S.lastOutfit && S.lastOutfit.date === t && S.lastOutfit.ids?.length ? S.lastOutfit : null;
@@ -1060,6 +1269,8 @@ function renderOggi() {
     $('mornWear').textContent = worn ? 'Indossato ✓' : '✓ Lo indosso'; $('mornWear').disabled = worn;
   }
   if (morn && !lo) ensureMorningOutfit();
+  // 3b. ogni sera: outfit di domani pronto per l'avviso del mattino
+  if (new Date().getHours() >= 17 && S.clothes.filter(c => !c.pending).length >= 2 && S.packOutfit?.day !== tom) ensurePackOutfit(tom);
   // 3c. Pianifica la settimana (domenica sera / lunedì mattina)
   const pk = planKey(); $('planCard').style.display = pk && S.weekPlanned !== pk ? '' : 'none';
   // 4. Borsa per Giada
@@ -1075,7 +1286,7 @@ function renderOggi() {
     if (S.clothes.length) {
       const po = S.packOutfit?.day === pd ? S.packOutfit : null, names = po ? po.ids.map(i => clothById(i)?.name).filter(Boolean) : [];
       $('bag').innerHTML += `<div class="item"><div style="font-size:20px;width:26px;text-align:center">👕</div><div class="grow"><b>Vestiti per ${esc(WDL[parse(pd).getDay()])}</b><div class="sub">${po ? esc(names.join(', ') || 'Armadio incompleto') : 'Scelgo l\'outfit…'}</div></div>${po ? '<button class="btn ghost small" data-pack-redo>Cambia</button>' : ''}</div>`;
-      if (!po) ensurePackOutfit(pd);
+      if (!po && pd === shift(t, 1)) ensurePackOutfit(pd);
     }
   }
   // 5. Dove dormo + settimana
@@ -1085,7 +1296,7 @@ function renderOggi() {
   let h = '';
   for (let i = 0; i < 7; i++) {
     const d = shift(t, i), dd = parse(d);
-    h += `<button class="day ${where(d)} ${canSolo(d) && !withG(d) ? 'solo' : ''} ${i === 0 ? 'today' : ''}" data-day="${d}">${WD[dd.getDay()]}<b>${dd.getDate()}</b>${apptsOn(d).length ? '<span class="dot"></span>' : ''}</button>`;
+    h += `<button class="day ${where(d)} ${canSolo(d) && !withG(d) ? 'solo' : ''} ${i === 0 ? 'today' : ''}" data-day="${d}">${gymOn(d) ? '<span class="gi">🏋️</span>' : ''}${WD[dd.getDay()]}<b>${dd.getDate()}</b>${apptsOn(d).length ? '<span class="dot"></span>' : ''}</button>`;
   }
   $('week').innerHTML = h;
   // 6. Palestra
@@ -1094,6 +1305,18 @@ function renderOggi() {
   $('gymDots').innerHTML = Array.from({ length: Math.max(S.gym.goal, g) }, (_, i) => `<i class="${i < g ? 'on' : ''}"></i>`).join('');
   $('gymToday').textContent = did ? 'Fatta oggi ✓' : '＋ Fatta oggi';
   $('gymToday').className = 'btn small ' + (did ? 'ghost' : '');
+  // settimana palestra: lun → dom di questa settimana (passati: fatta o no · oggi e futuri: in programma)
+  const ws = weekStart(t); let gh = '', planned = 0;
+  for (let i = 0; i < 7; i++) {
+    const d = shift(ws, i), dd = parse(d), done = S.gym.log.includes(d), plan = gymOn(d), past = d < t; if (plan && !done && !past) planned++;
+    gh += `<button class="day ${done ? 'done' : plan ? 'plan' : ''} ${past ? 'past' : ''} ${d === t ? 'today' : ''}" data-gymday="${d}">${WD[dd.getDay()]}<b>${dd.getDate()}</b><span class="ic">${done ? '✓' : plan ? '🏋️' : ''}</span></button>`;
+  }
+  $('gymWeek').innerHTML = gh;
+  const left = Math.max(0, S.gym.goal - g);
+  $('gymPlanTxt').textContent = left ? (planned >= left ? `in programma ${planned} ✓` : `in programma ${planned} di ${left}`) : 'obiettivo raggiunto ✓';
+  const wo = nextWorkout();
+  $('gymNext').innerHTML = wo ? `<details style="margin:-2px 0 10px"><summary><b>${did ? 'Fatta oggi' : 'Oggi tocca'}: ${esc(wo.name)}</b> <span class="sub">· ${wo.items.length} esercizi</span></summary><ul class="tips" style="margin-top:6px">${wo.items.map(x => `<li>${esc(x)}</li>`).join('')}</ul></details>`
+    : (S.gym.notes ? '' : '<div class="sub" style="margin:-2px 0 10px">Metti la scheda (📋) e ti dico ogni volta cosa tocca.</div>');
   // 6b. Contatori
   $('countersToday').innerHTML = S.counters.map(c => { const n = counterWeek(c), did = c.log.includes(t);
     return `<div class="card"><h2><span>${esc(c.name)} · settimana</span><span class="r">${n}/${c.goal}</span></h2><div class="addrow"><div class="dots grow">${Array.from({ length: Math.max(c.goal, n) }, (_, i) => `<i class="${i < n ? 'on' : ''}"></i>`).join('')}</div><button class="btn small ${did ? 'ghost' : ''}" data-count="${c.id}">${did ? 'Fatto oggi ✓' : '＋ Fatto oggi'}</button></div></div>`; }).join('');
@@ -1107,6 +1330,12 @@ function renderOggi() {
 }
 $('hero').onclick = e => { const t = today(); if (e.target.closest('[data-solo]')) setSolo(t, withG(t)); else setNight(t, cycle(where(t))); save(); render(); };
 $('planGo').onclick = () => openWeek('plan');
+$('gymWeek').onclick = e => {
+  const b = e.target.closest('[data-gymday]'); if (!b) return; const d = b.dataset.gymday;
+  if (d < today()) { toggleGym(d); toast(S.gym.log.includes(d) ? 'Palestra segnata come fatta' : 'Tolta'); return; }
+  toggleGymPlan(d); save(); render(); clearTimeout(syncT); syncServer();
+  toast(gymOn(d) ? `🏋️ Palestra ${d === today() ? 'oggi' : WDL[parse(d).getDay()]}` : 'Tolta dal programma');
+};
 $('week').onclick = e => { const b = e.target.closest('[data-day]'); if (!b) return; setNight(b.dataset.day, cycle(where(b.dataset.day))); save(); render(); };
 $('todayLists').onclick = e => { const b = e.target.closest('[data-open-list]'); if (b) { curList = b.dataset.openList; go('liste'); } };
 $('bag').onclick = e => {
@@ -1117,7 +1346,35 @@ $('bag').onclick = e => {
   for (const k in S.bag.checked) if (k < shift(today(), -3)) delete S.bag.checked[k];
   save(); render();
 };
-function toggleGym(d = today()) { const i = S.gym.log.indexOf(d); i >= 0 ? S.gym.log.splice(i, 1) : S.gym.log.push(d); S.gym.log.sort(); save(); render(); }
+function toggleGym(d = today()) {
+  const i = S.gym.log.indexOf(d);
+  if (i >= 0) { S.gym.log.splice(i, 1); if (S.gym.plan?.length && S.gym.doneOn?.[d] != null) { S.gym.next = S.gym.doneOn[d]; delete S.gym.doneOn[d]; } }
+  else { S.gym.log.push(d); if (S.gym.plan?.length) { S.gym.doneOn = S.gym.doneOn || {}; S.gym.doneOn[d] = S.gym.next || 0; S.gym.next = ((S.gym.next || 0) + 1) % S.gym.plan.length; } }
+  S.gym.log.sort(); save(); render();
+}
+/* Allenamento del giorno: la scheda divisa in giorni (A, B, C…) e si va a rotazione */
+function nextWorkout() {
+  const pl = S.gym.plan; if (!pl || !pl.length) return null;
+  const d = today(), idx = S.gym.doneOn?.[d] != null ? S.gym.doneOn[d] : (S.gym.next || 0) % pl.length;
+  return pl[idx] || pl[0];
+}
+function parsePlanLocal(txt) {
+  const blocks = [], lines = String(txt || '').split(/\r?\n/).map(l => l.trim());
+  let cur = null;
+  const isHead = l => /^(giorno|day|scheda|allenamento|seduta|workout)\b/i.test(l) || /^[A-E][).:\-\s]/.test(l) && l.length < 40 || /:$/.test(l) && l.length < 40;
+  lines.forEach(l => { if (!l) { cur = null; return; } if (isHead(l) || !cur) { cur = { name: l.replace(/:$/, ''), items: [] }; blocks.push(cur); if (isHead(l)) return; } cur.items.push(l.replace(/^[-•*]\s*/, '')); });
+  return blocks.filter(b => b.items.length);
+}
+async function parseGymPlan() {
+  const txt = S.gym.notes || ''; if (!txt.trim()) { S.gym.plan = []; return; }
+  let plan = null;
+  if (aiReady()) {
+    try { const j = parseJSON(await aiAsk({ json: true, maxTokens: 1500, system: 'Dividi questa scheda di palestra nei suoi giorni di allenamento (es. A/B/C o Petto/Schiena/Gambe). Rispondi SOLO JSON: {"schede":[{"nome":"breve, es. A · Petto e tricipiti","esercizi":["Panca piana 4x8", "..."]}]}. Se è un solo allenamento, una sola scheda.', text: txt }));
+      plan = (j.schede || []).filter(s => s.nome && (s.esercizi || []).length).map(s => ({ name: s.nome, items: s.esercizi.map(String) })); } catch (e) { console.warn('scheda', e); }
+  }
+  if (!plan || !plan.length) plan = parsePlanLocal(txt);
+  S.gym.plan = plan; S.gym.next = 0; S.gym.planOf = hashStr(txt); save(); render();
+}
 $('gymToday').onclick = () => toggleGym();
 document.addEventListener('click', e => { const b = e.target.closest('[data-count]'); if (!b) return; const c = S.counters.find(c => c.id === b.dataset.count); if (!c) return; const d = today(), i = c.log.indexOf(d); i >= 0 ? c.log.splice(i, 1) : c.log.push(d); save(); render(); });
 document.addEventListener('click', e => { const w = e.target.closest('[data-water]'); if (w) { const p = S.plants.find(p => p.id === w.dataset.water); if (p) { p.last = today(); save(); render(); toast(`${p.name}: annaffiata`); } } });
@@ -1135,7 +1392,7 @@ function renderAgenda() {
   const days = new Date(calMonth.getFullYear(), calMonth.getMonth() + 1, 0).getDate();
   for (let n = 1; n <= days; n++) {
     const d = ymd(new Date(calMonth.getFullYear(), calMonth.getMonth(), n));
-    h += `<button class="c ${where(d)} ${canSolo(d) && !withG(d) ? 'solo' : ''} ${d === selDay ? 'sel' : ''} ${d === today() ? 'today' : ''}" data-cal="${d}">${n}${apptsOn(d).length ? '<span class="dot"></span>' : ''}</button>`;
+    h += `<button class="c ${where(d)} ${canSolo(d) && !withG(d) ? 'solo' : ''} ${d === selDay ? 'sel' : ''} ${d === today() ? 'today' : ''}" data-cal="${d}">${gymOn(d) ? '<span class="gi">🏋️</span>' : ''}${n}${apptsOn(d).length ? '<span class="dot"></span>' : ''}</button>`;
   }
   $('cal').innerHTML = h;
   $('selTitle').textContent = longDate(selDay);
@@ -1165,6 +1422,7 @@ function confirmAppt(draft, editing = false) {
   $('apTitle').value = draft.title || ''; $('apDate').value = draft.date || today(); $('apTime').value = draft.time || '';
   $('apPlace').value = draft.place || ''; $('apNotes').value = draft.notes || ''; $('apRec').value = draft.rec || 'none'; $('apAlert').value = String(draft.alert ?? 60);
   $('apCal').checked = false;
+  apMoreSet = new Set(draft.more || []); drawMore($('apMore'), apMoreSet, $('apAlert').value);
   apCheck(); $('dlgAppt').showModal();
   return new Promise(res => apResolve = res);
 }
@@ -1186,8 +1444,11 @@ function apCheck() {
 ['apDate', 'apTime'].forEach(id => $(id).addEventListener('input', apCheck));
 $('apNo').onclick = () => { $('dlgAppt').close(); apResolve?.(null); apResolve = null; };
 $('dlgAppt').addEventListener('cancel', () => { apResolve?.(null); apResolve = null; });
+$('apMore').onclick = e => { const b = e.target.closest('[data-more]'); if (!b) return; const v = +b.dataset.more; apMoreSet.has(v) ? apMoreSet.delete(v) : apMoreSet.add(v); drawMore($('apMore'), apMoreSet, $('apAlert').value); };
+$('apAlert').addEventListener('change', () => { apMoreSet.delete(+$('apAlert').value); drawMore($('apMore'), apMoreSet, $('apAlert').value); });
 $('apOk').onclick = () => {
   const a = { ...apDraft, title: $('apTitle').value.trim(), date: $('apDate').value, time: $('apTime').value, place: $('apPlace').value.trim(), notes: $('apNotes').value.trim(), rec: $('apRec').value, alert: Number($('apAlert').value) };
+  a.more = [...apMoreSet].filter(v => v !== a.alert);
   if (!a.title || !a.date) return toast('Servono almeno cosa e giorno');
   if (apEditing) { const i = S.appts.findIndex(x => x.id === a.id); if (i >= 0) S.appts[i] = a; }
   else { a.id = uid(); S.appts.push(a); }
@@ -1390,7 +1651,7 @@ $('sgOk').onclick = () => {
   const title = $('sgTitle').value.trim(), date = $('sgDate').value;
   if (!title) return toast('Scrivi cosa');
   if (!date) { toast('Manca solo la data'); try { $('sgDate').focus(); } catch {} return; }
-  if (sgCur?.kind === 'bd') { S.birthdays.push({ id: uid(), name: title, date, gift: Number($('sgGift').value), added: {} }); housekeeping(); }
+  if (sgCur?.kind === 'bd') { S.birthdays.push({ id: uid(), name: sgCur.key === 'bd-new' && !/compleann|anniversar|onomastic/i.test(title) ? 'Compleanno ' + title : title, date, gift: Number($('sgGift').value), added: {} }); housekeeping(); }
   else S.deadlines.push({ id: uid(), title, date, rec: $('sgRec').value, remind: $('sgRemind').value.split(',').map(Number) });
   save(); render(); $('dlgSug').close(); clearTimeout(syncT); syncServer(); toast(title + ': salvato, ti avviso in anticipo');
 };
@@ -1479,16 +1740,35 @@ $('ntFiles').onclick = async ev => {
   const u = URL.createObjectURL(f.blob);
   if (f.type.startsWith('image/')) { $('vwImg').src = u; $('dlgView').showModal(); } else window.open(u, '_blank');
 };
-$('ntSave').onclick = () => { const e = ent(ntCur.kind, ntCur.id); if (e) e.notes = $('ntText').value.trim(); save(); $('dlgNotes').close(); render(); toast('Note salvate'); };
+$('ntSave').onclick = () => { const e = ent(ntCur.kind, ntCur.id); if (e) e.notes = $('ntText').value.trim(); save(); $('dlgNotes').close(); render(); toast('Note salvate');
+  if (ntCur.kind === 'gym' && hashStr(S.gym.notes || '') !== S.gym.planOf) parseGymPlan(); };
 $('ntClose').onclick = () => $('dlgNotes').close();
 document.addEventListener('click', e => { const n = e.target.closest('[data-note]'); if (!n) return; e.stopPropagation(); const [k, id, ...t] = n.dataset.note.split('|'); openNotes(k, id, t.join('|')); }, true);
 
 /* =====================================================================
    PROGRAMMA NOTIFICHE (calcolato qui, spedito al server)
    ===================================================================== */
+/* link WhatsApp: con il numero apre la chat giusta; senza numero (gruppo) apre la scelta della chat col testo pronto */
+const cleanPhone = s => { let n = String(s || '').replace(/[^\d+]/g, ''); if (n.startsWith('+')) n = n.slice(1); else if (n.startsWith('00')) n = n.slice(2); else if (n.length === 10 && n.startsWith('3')) n = '39' + n; return n; };
+const waURL = m => { const ph = cleanPhone(m.phone); return ph ? `https://wa.me/${ph}?text=${encodeURIComponent(m.text || '')}` : `whatsapp://send?text=${encodeURIComponent(m.text || '')}`; };
+/* outfit già scelto per il giorno d (la sera prima o al mattino) */
+function outfitFor(d) {
+  const o = S.packOutfit?.day === d ? S.packOutfit : S.lastOutfit?.date === d ? S.lastOutfit : null;
+  const n = o ? (o.ids || []).map(i => clothById(i)?.name).filter(Boolean) : [];
+  return n.length ? n : null;
+}
+/* scooter: pioggia all'andata / al ritorno */
+function scooterRain(d) {
+  const x = wxDay(d); if (!x || !scooterOn() || !isWorkday(d)) return null;
+  const am = x.am ?? null, pm = x.pm ?? null;
+  return { am, pm, wetAm: am != null && am >= 45, wetPm: pm != null && pm >= 45 };
+}
 function recapMorning(d) {
   const L = [], ap = apptsOn(d);
   L.push(ap.length ? ap.map(apptLine).join('\n') : 'Nessun appuntamento.');
+  const of = outfitFor(d); if (of) L.push('👕 ' + of.join(', ') + '.');
+  const sr = scooterRain(d);
+  if (sr && (sr.wetAm || sr.wetPm)) L.push(`🛵 Pioggia ${sr.wetAm ? 'all\'andata ' + sr.am + '%' : ''}${sr.wetAm && sr.wetPm ? ' e ' : ''}${sr.wetPm ? 'al ritorno ' + sr.pm + '%' : ''}: k-way o altro mezzo.`);
   L.push(`Stanotte: ${nightTxt(d)}.`);
   if (wxDay(d)) L.push('Meteo: ' + wxText(wxDay(d)) + '.');
   if (where(d) === 'giada') L.push('Borsa: ' + bagFor(d).map(i => i.t.toLowerCase()).join(', ') + '.');
@@ -1506,6 +1786,8 @@ function recapEvening(d) {
   if (where(tom) === 'giada') { L.push('Prepara: ' + bagFor(tom).map(i => i.t.toLowerCase()).join(', ') + '.'); if (packLine(shift(tom, 1))) L.push(packLine(shift(tom, 1))); }
   ap.filter(a => inWorkHours(tom, a.time)).forEach(a => L.push(`${a.time} ${a.title} è in orario d'ufficio.`));
   if (!['giada', 'altro'].includes(where(d))) { const due = plantsDueBy(tom); if (due.length) L.push('Annaffia: ' + due.map(p => p.name).join(', ') + '.'); }
+  const away = awayPlants(d); if (away) L.push(`Stai via fino al ${shortDate(away.back)}: annaffia stasera ${away.due.map(p => p.name).join(', ')}.`);
+  const nt = S.trips.find(x => x.from === tom); if (nt) L.push(`Valigia per ${nt.dest}: ${nt.items.filter(i => i.done).length}/${nt.items.length} pronte.`);
   return L.join('\n');
 }
 function recapSunday(d) {
@@ -1529,11 +1811,11 @@ function buildSchedule() {
   const Q = S.settings.quietOrg ? 'q-' : '';   // riepiloghi e automazioni: senza suono
   for (let i = 0; i < 14; i++) {
     const d = shift(t, i), dow = parse(d).getDay();
-    add(`${Q}m-${d}-${R().morning}`, at(d, R().morning), `Oggi · ${shortDate(d)}`, recapMorning(d));
-    add(`${Q}e-${d}-${R().evening}`, at(d, R().evening), `Domani · ${shortDate(shift(d, 1))}`, recapEvening(d));
-    if (dow === 0) add(`${Q}w-${d}-${R().sunday}`, at(d, R().sunday), `Settimana · da ${shortDate(shift(d, 1))}`, recapSunday(d) + '\nTocca per pianificare la settimana.');
-    apptsOn(d).forEach(a => { if (a.alert >= 0) { const st = a.time ? at(d, a.time) : at(d, '09:00');
-      add(`a-${a.id}-${d}-${a.time || ''}-${a.alert}`, st - a.alert * 6e4, a.title, `${d === t ? 'Oggi' : longDate(d)}${a.time ? ' alle ' + a.time : ''}${a.place ? ' · ' + a.place : ''}`); } });
+    add(`q-m-${d}-${R().morning}`, at(d, R().morning), `Oggi · ${shortDate(d)}`, recapMorning(d));
+    add(`q-e-${d}-${R().evening}`, at(d, R().evening), `Domani · ${shortDate(shift(d, 1))}`, recapEvening(d));
+    if (dow === 0) add(`q-w-${d}-${R().sunday}`, at(d, R().sunday), `Settimana · da ${shortDate(shift(d, 1))}`, recapSunday(d) + '\nTocca per pianificare la settimana.');
+    apptsOn(d).forEach(a => { const st = a.time ? at(d, a.time) : at(d, '09:00');
+      alertsOf(a).forEach(al => add(`a-${a.id}-${d}-${a.time || ''}-${al}`, st - al * 6e4, al ? a.title : '⏰ ' + a.title, `${al ? (d === t ? 'Oggi' : longDate(d)) + (a.time ? ' alle ' + a.time : '') : 'Adesso'}${a.place ? ' · ' + a.place : ''}`)); });
     S.rules.filter(r => r.on && r.days.includes(dow)).forEach(r => { const n = pending(r.list).length;
       if (!r.onlyPending || n) add(`${Q}r-${r.id}-${d}-${r.time}`, at(d, r.time), r.msg, n ? `${n} voci in ${r.list}` : r.list); });
   }
@@ -1542,7 +1824,17 @@ function buildSchedule() {
   S.birthdays.forEach(b => { const nb = nextBirthday(b);
     add(`b-${b.id}-${nb}`, at(nb, '09:00'), b.name, `Oggi, ${longDate(nb)}.`);
     if (b.gift) add(`bg-${b.id}-${nb}`, at(shift(nb, -b.gift), '09:00'), `${b.name} tra ${b.gift} giorni`, `Regalo aggiunto alla lista Regali.`); });
-  for (let i = 0; i < 14; i++) { const d = shift(t, i); S.reminders.forEach(r => { if (remOn(r, d)) add(`p-${r.id}-${d}-${r.time}-${r.alert || 0}`, at(d, r.time) - (r.alert || 0) * 6e4, r.title, r.alert ? `Alle ${r.time}${r.body ? ' · ' + r.body : ''}` : (r.body || '')); }); }
+  for (let i = 0; i < 14; i++) { const d = shift(t, i); S.reminders.forEach(r => { if (remOn(r, d)) alertsOf({ alert: r.alert || 0, more: r.more }).forEach(al => { const before = out.length; add(`p-${r.id}-${d}-${r.time}-${al}`, at(d, r.time) - al * 6e4, r.title, al ? `Alle ${r.time}${r.body ? ' · ' + r.body : ''}` : (r.body || '') + (r.wa ? (r.body ? ' · ' : '') + '📲 Tocca per mandare il WhatsApp' : ''));
+    if (r.wa && !al && out.length > before) out[out.length - 1].url = waURL(r.wa); }); }); }
+  // 💾 promemoria backup: prima domenica del mese alle 10, se l'ultimo backup ha più di 25 giorni
+  for (let i = 0; i < 14; i++) { const d = shift(t, i), x = parse(d); if (x.getDay() === 0 && x.getDate() <= 7 && (!S.lastExport || daysBetween(S.lastExport, d) > 25)) add(`q-bk-${d}`, at(d, '10:00'), '💾 Backup del mese', 'Apri Gestiotto e tocca “Salva”: un file con tutto, foto comprese.'); }
+  // 🛵 pioggia al ritorno: avviso un'ora prima dell'uscita dall'ufficio
+  for (let i = 0; i < 2; i++) { const d = shift(t, i), sr = scooterRain(d); if (sr && sr.wetPm) add(`sc-${d}`, at(d, R().workEnd) - 60 * 6e4, '🛵 Pioggia al ritorno', `${sr.pm}% verso le ${R().workEnd}: k-way o altro mezzo.`); }
+  // 📲 messaggi programmati (all'ora scelta arriva la notifica: un tocco apre WhatsApp col messaggio pronto)
+  for (let i = 0; i < 14; i++) { const d = shift(t, i), dow = parse(d).getDay();
+    (S.msgRules || []).filter(m => m.on !== false && m.when === 'orario' && (m.date ? m.date === d : (m.days || []).includes(dow))).forEach(m => {
+      const before = out.length; add(`msg-${m.id}-${d}-${m.time}`, at(d, m.time), `📲 Messaggio per ${m.toName || 'WhatsApp'}`, `“${m.text}” · tocca per inviare`);
+      if (out.length > before) out[out.length - 1].url = waURL(m); }); }
   return out.sort((a, b) => a.at - b.at).slice(0, 350);
 }
 
@@ -1550,7 +1842,7 @@ function buildSchedule() {
    SERVER NOTIFICHE
    ===================================================================== */
 let lastSync = '', lastHash = '', lastSchedAt = 0, lastBackupAt = 0, lastBackupHash = '', schedTimer = null;
-const backupPayload = () => ({ ...S, settings: { ...S.settings, apiKey: '', geminiKey: '', push: { ...P(), password: '' } }, chat: S.chat.slice(-30) });
+const backupPayload = () => ({ ...S, settings: { ...S.settings, apiKey: '', geminiKey: '', push: { ...P(), password: '' } }, chat: S.chat.slice(-20), prices: {}, offers: [], flyers: {}, money: undefined, shopPlan: null });
 const hashStr = s => { let x = 0; for (let i = 0; i < s.length; i++) x = (x * 31 + s.charCodeAt(i)) | 0; return x + ':' + s.length; };
 const P = () => S.settings.push;
 const api = (path, body) => fetch(P().url.replace(/\/$/, '') + path, { method: body ? 'POST' : 'GET', headers: { authorization: 'Bearer ' + P().password, 'content-type': 'application/json' }, body: body ? JSON.stringify(body) : undefined })
@@ -1595,14 +1887,32 @@ function handleDeviceData(m) {
   }
   save(); render();
 }
+/* Cosa portare quando esci di casa (lo legge l'automazione dell'iPhone dal server) */
+function carryText(d) {
+  const L = [], ap = apptsOn(d);
+  if (ap.some(isGymAppt)) L.push('borsa palestra');
+  if (where(d) === 'giada') L.push(...bagFor(d).map(i => i.t.toLowerCase()));
+  if (scooterOn()) L.push('casco e guanti');
+  const sr = scooterRain(d), x = wxDay(d);
+  if ((sr && (sr.wetAm || sr.wetPm)) || (x && x.rain >= 50)) L.push('k-way o ombrello');
+  const tr = S.trips.find(t => t.from === d); if (tr) L.push(`valigia per ${tr.dest}`);
+  ap.filter(a => a.place).slice(0, 2).forEach(a => L.push(`(${a.time ? a.time + ' ' : ''}${a.title} @ ${a.place})`));
+  const u = [...new Set(L)];
+  return u.length ? 'Porta: ' + u.join(', ') + '.' : '';
+}
+function schedPayload() {
+  const items = buildSchedule(), carry = {};
+  for (let i = 0; i < 3; i++) { const d = shift(today(), i), c = carryText(d); if (c) carry[d] = c; }
+  return { items, carry, hash: JSON.stringify([items.map(i => [i.id, i.at, i.body, i.url || '']), carry]) };
+}
 let nextNotif = null;
 function pushScheduleNow() {
   // all'uscita dall'app: invio "keepalive", arriva anche se l'iPhone sospende Gestiotto
   if (!P().on || !P().url) return;
   try {
-    const items = buildSchedule(), hash = JSON.stringify(items.map(i => [i.id, i.at, i.body]));
+    const { items, carry, hash } = schedPayload();
     const H = { authorization: 'Bearer ' + P().password, 'content-type': 'application/json' }, base = P().url.replace(/\/$/, '');
-    if (hash !== lastHash) fetch(base + '/schedule', { method: 'POST', keepalive: true, headers: H, body: JSON.stringify({ items }) })
+    if (hash !== lastHash) fetch(base + '/schedule', { method: 'POST', keepalive: true, headers: H, body: JSON.stringify({ items, carry }) })
       .then(r => { if (r.ok) { lastHash = hash; lastSchedAt = Date.now(); } }).catch(() => {});
     // backup all'uscita, solo se è cambiato e se sta nel limite delle richieste "keepalive" (64 KB)
     const bp = JSON.stringify(backupPayload()), bh = hashStr(bp);
@@ -1613,13 +1923,13 @@ function pushScheduleNow() {
 async function syncServer() {
   if (!P().on || !P().url || !navigator.onLine) return;
   try {
-    const items = buildSchedule(), hash = JSON.stringify(items.map(i => [i.id, i.at, i.body]));
+    const { items, carry, hash } = schedPayload();
     nextNotif = items[0] || null;
     if (hash !== lastHash) {
       // al massimo un invio ogni 20 secondi (le modifiche a raffica, es. spunte al supermercato, si raggruppano)
       const wait = 20e3 - (Date.now() - lastSchedAt);
       if (wait > 0) { clearTimeout(schedTimer); schedTimer = setTimeout(syncServer, wait); }
-      else { await api('/schedule', { items }); lastHash = hash; lastSchedAt = Date.now(); lastSync = new Date().toTimeString().slice(0, 5); }
+      else { await api('/schedule', { items, carry }); lastHash = hash; lastSchedAt = Date.now(); lastSync = new Date().toTimeString().slice(0, 5); }
     }
     // backup: solo se cambiato e al massimo ogni 15 minuti (più quello all'uscita dall'app)
     const bp = backupPayload(), bh = hashStr(JSON.stringify(bp));
@@ -1665,19 +1975,82 @@ function renderChat() {
 $('suggest').onclick = e => { const b = e.target.closest('button'); if (b) { $('chatIn').value = b.textContent; send(); } };
 $('chatSend').onclick = () => send();
 /* Chat vocale: microfono (riconoscimento italiano) + risposta letta ad alta voce */
+/* V3 · Microfono: TIENI PREMUTO per parlare, LASCIA per inviare (come i vocali di WhatsApp).
+   Se iOS smette di ascoltare durante una pausa, riparte da solo finché tieni premuto.
+   Trascina il dito via dal tasto per annullare. Un tocco breve = ascolta finché non tocchi di nuovo. */
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 let voiceTurn = false, recog = null;
-if (!SR) $('micBtn').style.display = 'none';
-$('micBtn').onclick = () => {
-  if (recog) { recog.stop(); return; }
-  try { speechSynthesis.cancel(); } catch {}
-  recog = new SR(); recog.lang = 'it-IT'; recog.interimResults = true; recog.continuous = false;
-  let finalText = '';
-  recog.onresult = e => { finalText = Array.from(e.results).map(r => r[0].transcript).join(''); $('chatIn').value = finalText; };
-  recog.onerror = e => { toast('Microfono: ' + (e.error === 'not-allowed' ? 'permesso negato' : e.error)); };
-  recog.onend = () => { $('micBtn').classList.remove('rec'); recog = null; if (finalText.trim()) { voiceTurn = true; send(); } };
-  $('micBtn').classList.add('rec'); recog.start();
+const VX = { on: false, held: false, toggle: false, cancel: false, base: '', live: '', t0: 0, x0: 0, y0: 0 };
+const voxShow = () => {
+  const txt = (VX.base + ' ' + VX.live).trim();
+  $('voxText').textContent = txt || 'Parla pure…';
+  $('voxHint').textContent = VX.cancel ? 'Lascia per annullare' : VX.toggle ? 'Tocca 🎙︎ quando hai finito' : 'Lascia per inviare · trascina via per annullare';
+  $('vox').classList.toggle('on', VX.on); $('vox').classList.toggle('cancel', VX.cancel);
+  $('micBtn').classList.toggle('rec', VX.on); $('micBtn').classList.toggle('cancel', VX.cancel);
 };
+function voxStartRecog() {
+  try { recog = new SR(); } catch { recog = null; return; }
+  recog.lang = 'it-IT'; recog.interimResults = true; recog.continuous = true;
+  recog.onresult = e => {
+    let fin = '', live = '';
+    for (const r of e.results) (r.isFinal ? (fin += r[0].transcript) : (live += r[0].transcript));
+    VX.live = (fin + ' ' + live).trim(); voxShow();
+  };
+  recog.onerror = e => {
+    if (e.error === 'not-allowed' || e.error === 'service-not-allowed') { toast('Microfono: permesso negato (Impostazioni › Safari › Microfono)'); VX.held = VX.toggle = false; voxStop(true); }
+    else if (e.error !== 'no-speech' && e.error !== 'aborted') console.warn('mic', e.error);
+  };
+  recog.onend = () => {
+    VX.base = (VX.base + ' ' + VX.live).trim(); VX.live = '';
+    if (VX.on && (VX.held || VX.toggle) && !VX.cancel) { setTimeout(() => { if (VX.on && (VX.held || VX.toggle)) voxStartRecog(); }, 120); return; }  // pausa: riparte da solo
+    voxFinish();
+  };
+  try { recog.start(); } catch (e) { console.warn('start', e); }
+}
+function voxBegin() {
+  if (VX.on) return;
+  try { speechSynthesis.cancel(); } catch {}
+  Object.assign(VX, { on: true, cancel: false, base: '', live: '', t0: Date.now() });
+  try { navigator.vibrate && navigator.vibrate(15); } catch {}
+  voxShow(); voxStartRecog();
+}
+function voxStop(cancel) {
+  VX.cancel = !!cancel; VX.held = false; VX.toggle = false;
+  if (recog) { try { recog.stop(); } catch { voxFinish(); } } else voxFinish();
+}
+function voxFinish() {
+  if (!VX.on) return;
+  const text = (VX.base + ' ' + VX.live).trim(), cancel = VX.cancel;
+  Object.assign(VX, { on: false, held: false, toggle: false }); recog = null; voxShow();
+  if (cancel) return toast('Annullato');
+  if (text) { $('chatIn').value = text; voiceTurn = true; send(); }
+  else toast('Non ho sentito niente');
+}
+if (!SR) $('micBtn').onclick = () => { $('chatIn').focus(); toast('Usa il 🎤 della tastiera per dettare'); };
+else {
+  const mb = $('micBtn');
+  mb.addEventListener('contextmenu', e => e.preventDefault());
+  mb.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    if (VX.on && VX.toggle) return voxStop(false);          // modalità tocco: secondo tocco = invia
+    try { mb.setPointerCapture(e.pointerId); } catch {}
+    VX.x0 = e.clientX; VX.y0 = e.clientY; VX.held = true; voxBegin();
+  });
+  mb.addEventListener('pointermove', e => {
+    if (!VX.on || !VX.held) return;
+    const far = Math.hypot(e.clientX - VX.x0, e.clientY - VX.y0) > 70;
+    if (far !== VX.cancel) { VX.cancel = far; voxShow(); }
+  });
+  const up = () => {
+    if (!VX.on || !VX.held) return;
+    if (!VX.cancel && Date.now() - VX.t0 < 350) { VX.held = false; VX.toggle = true; voxShow(); return; }  // tocco breve
+    voxStop(VX.cancel);
+  };
+  mb.addEventListener('pointerup', up);
+  mb.addEventListener('pointercancel', () => { if (VX.on && VX.held) voxStop(true); });
+  mb.addEventListener('click', e => e.preventDefault());
+}
+document.addEventListener('visibilitychange', () => { if (document.hidden && VX.on) voxStop(true); });
 function speak(text) {
   try { const u = new SpeechSynthesisUtterance(text.replace(/[✓✕↶⚠︎📝🔔•]/g, '')); u.lang = 'it-IT';
     const v = speechSynthesis.getVoices().find(v => v.lang && v.lang.startsWith('it')); if (v) u.voice = v;
@@ -1703,12 +2076,20 @@ const TOOLS = [
     input_schema: { type: 'object', properties: { nome_attuale: { type: 'string' }, nuovo_nome: { type: 'string' } }, required: ['nome_attuale', 'nuovo_nome'] } },
   { name: 'elimina_lista', description: 'Elimina una lista con le sue voci. Solo dopo conferma di Otto in chat.',
     input_schema: { type: 'object', properties: { nome: { type: 'string' } }, required: ['nome'] } },
-  { name: 'proponi_appuntamento', description: "Mostra a Otto la schermata di conferma per un nuovo appuntamento. Otto controlla, corregge, conferma o annulla. Restituisce l'esito.",
-    input_schema: { type: 'object', properties: { titolo: { type: 'string' }, data: { type: 'string', description: 'YYYY-MM-DD' }, ora: { type: 'string', description: 'HH:MM, vuoto se tutto il giorno' }, luogo: { type: 'string' },
+  { name: 'proponi_appuntamento', description: "Mostra a Otto la schermata di conferma per un nuovo appuntamento. Otto controlla, corregge, conferma o annulla. Restituisce l'esito. Di base avvisa 1 ora prima; altri_preavvisi aggiunge avvisi in più (minuti prima).",
+    input_schema: { type: 'object', properties: { altri_preavvisi: { type: 'array', items: { type: 'integer' } }, titolo: { type: 'string' }, data: { type: 'string', description: 'YYYY-MM-DD' }, ora: { type: 'string', description: 'HH:MM, vuoto se tutto il giorno' }, luogo: { type: 'string' },
       ricorrenza: { type: 'string', enum: ['none', 'daily', 'weekly', 'biweekly', 'monthly', 'yearly'] },
       preavviso_minuti: { type: 'integer', description: "-1 nessuno, 0 all'ora, 10, 30, 60, 120, 1440, 2880, 10080" }, note: { type: 'string' } }, required: ['titolo', 'data', 'ricorrenza', 'preavviso_minuti'] } },
   { name: 'elimina_appuntamento', description: 'Elimina un appuntamento (tutte le ripetizioni) tramite id. Solo dopo conferma in chat.',
     input_schema: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] } },
+  { name: 'programma_whatsapp', description: "Programma un messaggio WhatsApp: all'ora scelta arriva una notifica che apre WhatsApp col testo pronto (un tocco per inviare). Per l'arrivo/uscita da un luogo spiega che va creata l'automazione in ⚙︎ › Automazioni.",
+    input_schema: { type: 'object', properties: { a_chi: { type: 'string' }, numero: { type: 'string', description: 'vuoto per un gruppo' }, testo: { type: 'string' }, ora: { type: 'string' }, data: { type: 'string', description: 'YYYY-MM-DD, vuota se ripetuto' }, giorni: { type: 'array', items: { type: 'integer' } } }, required: ['testo', 'ora'] } },
+  { name: 'riepilogo_soldi', description: "Riepilogo dei soldi di Otto dalla sezione Soldi: entrate, spese, risparmio degli ultimi mesi e movimenti ricorrenti (mutuo, bonifici, abbonamenti). Usalo quando Otto chiede dei suoi soldi o vuole spiegare un movimento ricorrente.",
+    input_schema: { type: 'object', properties: {} } },
+  { name: 'spiega_ricorrente', description: "Otto spiega cos'è un movimento ricorrente (es. 'il bonifico a Mario è l'affitto', 'Directa è il mio PAC sugli ETF', 'il giroconto verso Poste è il mio risparmio'). tipo: fisso (mutuo, affitto, bollette), spesa, abbonamento, risparmio (deposito, ETF, PAC), trasferimento (tra suoi conti), entrata.",
+    input_schema: { type: 'object', properties: { cerca: { type: 'string', description: 'parte del nome del movimento come appare' }, nome: { type: 'string', description: 'come lo chiama Otto' }, tipo: { type: 'string', enum: ['fisso', 'spesa', 'abbonamento', 'risparmio', 'trasferimento', 'entrata'] } }, required: ['cerca', 'tipo'] } },
+  { name: 'aggiorna_patrimonio', description: "Aggiorna il valore di un conto nella sezione Soldi (es. ETF, conto deposito Poste, conto corrente). Solo numeri, nessun consiglio d'investimento.",
+    input_schema: { type: 'object', properties: { conto: { type: 'string' }, valore: { type: 'number' } }, required: ['conto', 'valore'] } },
   { name: 'imposta_scooter', description: "Attiva o disattiva 'vado in scooter' per gli outfit (se attivo propone capi più coprenti).",
     input_schema: { type: 'object', properties: { attivo: { type: 'boolean' } }, required: ['attivo'] } },
   { name: 'imposta_notti', description: 'Imposta dove dorme Otto in certe notti: casa (sua), giada (casa di Giada), altro (trasferta o altrove) o nessuno. con_giada: se dorme con Giada (di base sì; false = da solo).',
@@ -1741,8 +2122,8 @@ const TOOLS = [
     input_schema: { type: 'object', properties: { cosa: { type: 'string' }, condizione: { type: 'string', enum: ['sempre', 'lavoro', 'palestra'] } }, required: ['cosa'] } },
   { name: 'imposta_routine', description: 'Cambia routine e impostazioni: giorni e orari ufficio, orari dei riepiloghi, nome con cui chiamarlo.',
     input_schema: { type: 'object', properties: { giorni_ufficio: { type: 'array', items: { type: 'integer', description: '0=dom … 6=sab' } }, entrata: { type: 'string' }, uscita: { type: 'string' }, recap_mattina: { type: 'string' }, recap_sera: { type: 'string' }, recap_domenica: { type: 'string' }, nome: { type: 'string' } } } },
-  { name: 'crea_promemoria', description: "Crea un promemoria su misura con notifica, per qualsiasi cosa (affitto, medicine, chiamare la nonna, buttare la plastica…). ripetizione: once (serve data) | daily | weekly (serve giorni) | monthly (serve giorno_mese) | yearly (serve data).",
-    input_schema: { type: 'object', properties: { titolo: { type: 'string' }, testo: { type: 'string' }, ripetizione: { type: 'string', enum: ['once', 'daily', 'weekly', 'monthly', 'yearly'] }, giorni: { type: 'array', items: { type: 'integer' } }, giorno_mese: { type: 'integer' }, data: { type: 'string' }, ora: { type: 'string' }, preavviso_minuti: { type: 'integer', description: '0 = all\'ora esatta; es. 10, 30, 60, 1440' } }, required: ['titolo', 'ripetizione', 'ora'] } },
+  { name: 'crea_promemoria', description: "Crea un promemoria su misura con notifica, per qualsiasi cosa (affitto, medicine, chiamare la nonna, buttare la plastica…). Di base avvisa all'ora esatta; altri_preavvisi (minuti prima) aggiunge avvisi in più. ripetizione: once (serve data) | daily | weekly (serve giorni) | monthly (serve giorno_mese) | yearly (serve data).",
+    input_schema: { type: 'object', properties: { altri_preavvisi: { type: 'array', items: { type: 'integer' } }, titolo: { type: 'string' }, testo: { type: 'string' }, ripetizione: { type: 'string', enum: ['once', 'daily', 'weekly', 'monthly', 'yearly'] }, giorni: { type: 'array', items: { type: 'integer' } }, giorno_mese: { type: 'integer' }, data: { type: 'string' }, ora: { type: 'string' }, preavviso_minuti: { type: 'integer', description: '0 = all\'ora esatta; es. 10, 30, 60, 1440' } }, required: ['titolo', 'ripetizione', 'ora'] } },
   { name: 'crea_contatore', description: "Crea un contatore settimanale per un'abitudine (es. Lettura 5 volte, Corsa 2 volte). Compare in Oggi con il tasto Fatto.",
     input_schema: { type: 'object', properties: { nome: { type: 'string' }, obiettivo: { type: 'integer' } }, required: ['nome', 'obiettivo'] } },
   { name: 'registra_contatore', description: 'Segna (o annulla) un contatore in un giorno.',
@@ -1757,8 +2138,10 @@ const TOOLS = [
     input_schema: { type: 'object', properties: { id: { type: 'string' }, voto: { type: 'integer' }, a_lavare: { type: 'boolean' }, marca: { type: 'string' }, nome: { type: 'string' }, colore: { type: 'string' }, elimina: { type: 'boolean' } }, required: ['id'] } },
   { name: 'aggiorna_gusti', description: 'Aggiorna i gusti alimentari di Otto o di Giada (aggiungi a piace / non piace, o rimuovi).',
     input_schema: { type: 'object', properties: { persona: { type: 'string', enum: ['otto', 'giada'] }, piace: { type: 'array', items: { type: 'string' } }, non_piace: { type: 'array', items: { type: 'string' } }, rimuovi: { type: 'array', items: { type: 'string' } } }, required: ['persona'] } },
-  { name: 'prepara_spesa', description: "Prepara la spesa economica usando offerte, coupon, prezzi noti e gusti di Otto e Giada. Il risultato completo è nella sezione Spesa.",
-    input_schema: { type: 'object', properties: { modalita: { type: 'string', enum: ['risparmio', 'bene', 'leggero', 'normale', 'sgarro'] }, giorni: { type: 'integer' }, note: { type: 'string' } } } },
+  { name: 'prepara_spesa', description: "Prepara il menu della settimana (cene + pranzi del weekend) e la lista della spesa divisa per piatti, usando offerte, prezzi noti e gusti di Otto e Giada. Il risultato completo è nella sezione Spesa.",
+    input_schema: { type: 'object', properties: { stile: { type: 'string', enum: ['normale', 'leggero', 'risparmio', 'sgarro'] }, note: { type: 'string' }, cene: { type: 'integer' }, pranzi: { type: 'integer' }, pranzi_ufficio: { type: 'boolean', description: 'pranzi da portare in ufficio, da scaldare al microonde' } } } },
+  { name: 'cambia_piatto', description: 'Cambia un piatto del menu della settimana (indica il nome attuale del piatto o giorno e pasto).',
+    input_schema: { type: 'object', properties: { piatto: { type: 'string' } }, required: ['piatto'] } },
   { name: 'segna_annaffiata', description: 'Segna una pianta come annaffiata oggi.',
     input_schema: { type: 'object', properties: { nome: { type: 'string' } }, required: ['nome'] } }
 ];
@@ -1812,13 +2195,41 @@ async function runTool(name, x) {
       return `Lista “${old}” eliminata`;
     }
     case 'proponi_appuntamento': {
-      const a = await confirmAppt({ title: x.titolo, date: x.data, time: x.ora || '', place: x.luogo || '', rec: x.ricorrenza || 'none', alert: x.preavviso_minuti ?? 60, notes: x.note || '' });
+      const a = await confirmAppt({ more: x.altri_preavvisi || [], title: x.titolo, date: x.data, time: x.ora || '', place: x.luogo || '', rec: x.ricorrenza || 'none', alert: x.preavviso_minuti ?? 60, notes: x.note || '' });
       if (!a) return 'ANNULLATO da Otto: non è stato salvato nulla.';
       return `CONFERMATO: “${a.title}” ${longDate(a.date)}${a.time ? ' alle ' + a.time : ''}${REC[a.rec] ? ', ' + REC[a.rec] : ''}, ${ALERT[a.alert]}`;
     }
     case 'elimina_appuntamento': {
       const a = S.appts.find(a => a.id === x.id); if (!a) throw new Error('appuntamento non trovato');
       S.appts = S.appts.filter(b => b.id !== x.id); return `Eliminato “${a.title}”`;
+    }
+    case 'programma_whatsapp': {
+      const m = { id: uid(), when: 'orario', toName: x.a_chi || '', phone: x.numero || '', text: x.testo, time: normTime(x.ora), date: normDate(x.data) || '', days: x.giorni || [], on: true };
+      if (!m.time) throw new Error('ora non valida'); if (!m.date && !m.days.length) m.date = at(today(), m.time) > Date.now() ? today() : shift(today(), 1);
+      (S.msgRules = S.msgRules || []).push(m);
+      return `Messaggio programmato per ${m.toName || 'WhatsApp'} alle ${m.time}${m.date ? ' del ' + shortDate(m.date) : ' (' + daysText(m.days) + ')'}: arriva una notifica, un tocco apre WhatsApp col testo pronto.`;
+    }
+    case 'riepilogo_soldi': {
+      const m = M(); if (!m.tx.length) return 'Nessun estratto conto caricato: va caricato nella sezione Soldi (icona € in basso).';
+      const months = [...new Set(m.tx.map(t => monthOf(t.date)))].sort().slice(-3);
+      return months.map(k => { const s = monthStats(k); return `${monthLbl(k)}: entrate ${eur(s.inc)}, spese ${eur(s.out)} (fisse ${eur(s.fixed)}), messi da parte ${eur(s.invested)}, risparmio ${eur(s.save)}`; }).join('\n')
+        + '\nRicorrenti: ' + (recurring().map(r => `${r.name} ${r.sign > 0 ? '+' : '-'}${eur(r.amount)} [${r.kind}${r.explained ? ', spiegato' : ', da spiegare'}]`).join('; ') || 'nessuno');
+    }
+    case 'spiega_ricorrente': {
+      const q = normKey(x.cerca), list = recurring();
+      const r = list.find(z => normKey(z.name).includes(q) || normKey(z.merchant).includes(q) || q.includes(normKey(z.merchant)))
+        || (() => { const t = M().tx.find(t => normKey(t.merchant + ' ' + t.desc + ' ' + (t.name || '')).includes(q)); return t && { merchant: t.merchant, name: t.name || t.merchant }; })();
+      if (!r) throw new Error('movimento non trovato: prova con un\'altra parola della descrizione');
+      setRule(r.merchant, x.tipo, x.nome || '');
+      return `Capito: "${x.nome || r.name}" è ${MKINDS[x.tipo]}. Da ora lo conto così (anche per i mesi passati).`;
+    }
+    case 'aggiorna_patrimonio': {
+      const m = M(); if (!m.accounts.length) renderSoldi();
+      const q = normKey(x.conto); let a = m.accounts.find(z => normKey(z.name).includes(q) || q.includes(normKey(z.name)) || (q.includes('etf') && z.type === 'etf') || (/poste|deposit/.test(q) && z.type === 'deposito') || (/corrente|banca/.test(q) && z.type === 'conto'));
+      if (!a) { a = { id: uid(), name: x.conto, type: /etf/i.test(x.conto) ? 'etf' : 'altro', snaps: [] }; m.accounts.push(a); }
+      a.snaps = a.snaps.filter(s => s.date !== today()); a.snaps.push({ date: today(), value: +x.valore });
+      const tot = m.accounts.reduce((s, z) => s + (z.snaps.length ? z.snaps[z.snaps.length - 1].value : 0), 0);
+      return `${a.name}: ${eur(x.valore)} (oggi). Patrimonio totale: ${eur(tot)}.`;
     }
     case 'imposta_scooter': { S.settings.scooter = !!x.attivo; S.packOutfit = null; return x.attivo ? 'Scooter attivo: outfit più coprenti' : 'Scooter disattivato'; }
     case 'imposta_notti': {
@@ -1896,7 +2307,7 @@ async function runTool(name, x) {
       return `Routine aggiornata: ufficio ${r.workDays.map(d => WD[d]).join(', ')} ${r.workStart}–${r.workEnd}; recap ${r.morning} / ${r.evening} / dom ${r.sunday}`;
     }
     case 'crea_promemoria': {
-      const r = { id: uid(), title: x.titolo, body: x.testo || '', rep: x.ripetizione, days: x.giorni || [], dom: x.giorno_mese || 1, date: x.data || '', time: x.ora, alert: Math.max(0, x.preavviso_minuti || 0), on: true };
+      const r = { id: uid(), title: x.titolo, body: x.testo || '', rep: x.ripetizione, days: x.giorni || [], dom: x.giorno_mese || 1, date: x.data || '', time: x.ora, alert: Math.max(0, x.preavviso_minuti || 0), more: (x.altri_preavvisi || []).filter(v => v >= 0), on: true };
       if ((r.rep === 'once' || r.rep === 'yearly') && !r.date) throw new Error('serve la data');
       if (!r.time) throw new Error('serve l\'orario (HH:MM)');
       if (r.rep === 'once' && at(r.date, r.time) <= Date.now()) throw new Error(`orario già passato: adesso sono le ${nowHM()} del ${today()}`);
@@ -1934,8 +2345,14 @@ async function runTool(name, x) {
       return `Gusti di ${x.persona === 'otto' ? 'Otto' : 'Giada'} — piace: ${t.likes.join(', ') || '-'}; non piace: ${t.dislikes.join(', ') || '-'}`;
     }
     case 'prepara_spesa': {
-      const pl = await planShopping({ mode: x.modalita || 'normale', days: x.giorni || 7, note: x.note || '' });
-      return `Spesa pronta: totale circa ${eur(pl.total)} — ` + pl.stores.map(s => `${s.store}: ${s.items.length} voci`).join(', ') + '. Dettaglio e coupon da attivare nella sezione Spesa.';
+      if (x.cene != null || x.pranzi != null || x.pranzi_ufficio != null) { const c = menuCfg(); if (x.cene != null) c.cene = Math.max(0, Math.min(7, x.cene)); if (x.pranzi != null) c.pranzi = Math.max(0, Math.min(7, x.pranzi)); if (x.pranzi_ufficio != null) c.ufficio = !!x.pranzi_ufficio; S.settings.menuCfg = c; }
+      const m = await planMenu({ style: x.stile || S.settings.menuStyle || 'normale', note: x.note || '' });
+      return `Menu pronto (${m.dishes.length} piatti, spesa circa ${eur(menuTotal())}): ` + m.dishes.map(d => `${WD[parse(d.day).getDay()]} ${d.meal}: ${d.name}`).join('; ') + '. Lista divisa per piatti nella sezione Spesa.';
+    }
+    case 'cambia_piatto': {
+      const q = normKey(x.piatto), d = S.menu?.dishes.find(d => normKey(d.name).includes(q) || q.includes(normKey(d.name)) || normKey(slotLbl(d)).includes(q));
+      if (!d) throw new Error('piatto non trovato nel menu');
+      const old = d.name; await swapDish(d.id); return `Cambiato: ${old} → ${d.name}`;
     }
     case 'segna_annaffiata': {
       const p = S.plants.find(p => p.name.toLowerCase() === x.nome.trim().toLowerCase()); if (!p) throw new Error('pianta non trovata');
@@ -2215,9 +2632,11 @@ async function getWeather(force) {
     try {
       const g = await fetch('https://geocoding-api.open-meteo.com/v1/search?count=1&language=it&name=' + encodeURIComponent(city)).then(r => r.json());
       const p = g.results?.[0]; if (!p) throw new Error('città non trovata');
-      const f = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${p.latitude}&longitude=${p.longitude}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode&timezone=Europe%2FRome&forecast_days=7`).then(r => r.json());
+      const f = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${p.latitude}&longitude=${p.longitude}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode&timezone=Europe%2FRome&forecast_days=7&hourly=precipitation_probability`).then(r => r.json());
       const d = f.daily; if (!d) throw new Error('meteo non disponibile');
-      S.weather = { city, place: p.name, at: Date.now(), days: d.time.map((t, i) => ({ date: t, tmax: Math.round(d.temperature_2m_max[i]), tmin: Math.round(d.temperature_2m_min[i]), rain: d.precipitation_probability_max?.[i] ?? 0, code: d.weathercode?.[i] ?? 0 })) };
+      const hr = f.hourly || {}, hp = (day, h1, h2) => { let m = null; (hr.time || []).forEach((t, i) => { if (t.slice(0, 10) === day) { const hh = +t.slice(11, 13); if (hh >= h1 && hh <= h2) m = Math.max(m ?? 0, hr.precipitation_probability?.[i] ?? 0); } }); return m; };
+      const ws = Math.floor(toMin(R().workStart) / 60), we = Math.floor(toMin(R().workEnd) / 60);
+      S.weather = { city, place: p.name, at: Date.now(), days: d.time.map((t, i) => ({ date: t, tmax: Math.round(d.temperature_2m_max[i]), tmin: Math.round(d.temperature_2m_min[i]), rain: d.precipitation_probability_max?.[i] ?? 0, code: d.weathercode?.[i] ?? 0, am: hp(t, ws - 1, ws), pm: hp(t, we, we + 1) })) };
       save(); return S.weather;
     } catch (e) { console.warn('meteo', e); if (force) toast('Meteo: ' + e.message); return S.weather || null; }
     finally { wxLoading = null; }
@@ -2252,7 +2671,7 @@ async function aiAsk({ system, text, images = [], maxTokens = 1500, json = false
     const parts = [...images.map(im => ({ inlineData: { mimeType: im.mime, data: im.b64 } })), { text }];
     return (await AI.gemini.call([{ role: 'user', parts }], system, null, maxTokens, json)).said;
   }
-  const content = [...images.map(im => ({ type: 'image', source: { type: 'base64', media_type: im.mime, data: im.b64 } })), { type: 'text', text }];
+  const content = [...images.map(im => im.mime === 'application/pdf' ? { type: 'document', source: { type: 'base64', media_type: im.mime, data: im.b64 } } : ({ type: 'image', source: { type: 'base64', media_type: im.mime, data: im.b64 } })), { type: 'text', text }];
   return (await AI.anthropic.call([{ role: 'user', content }], system, null, maxTokens)).said;
 }
 
@@ -2270,6 +2689,10 @@ const isWash = c => !!c && typeof c.wash === 'string' && c.wash >= today();   //
 const setWash = (c, on) => { if (c) c.wash = on ? shift(today(), WASH_DAYS) : false; };
 const stars = n => '★'.repeat(n || 0) + '☆'.repeat(5 - (n || 0));
 let ofFilter = 'all', ofCurrent = null;
+/* data in cui il capo è stato aggiunto: è scritta dentro il suo id */
+const clothAdded = c => { const ms = parseInt(String(c.id).slice(0, 8), 36); return ms > 1.6e12 && ms < 2.2e12 ? ymd(new Date(ms)) : today(); };
+const oldClothes = () => { const lim = shift(today(), -60); return S.clothes.filter(c => !c.pending && (c.worn || clothAdded(c)) < lim); };
+document.addEventListener('click', e => { if (e.target.closest('#ofLaundry')) { S.laundry = { n: 0, ids: [] }; save(); renderOutfit(); toast('Bucato fatto ✓'); } });
 
 /* Scooter: col vento si sente circa 6° in meno e la pioggia pesa di più → ci si copre di più */
 const scooterOn = () => !!S.settings.scooter;
@@ -2328,7 +2751,7 @@ async function suggestOutfit({ baseId = null, date = today(), silent = false, ke
 }
 function replacePiece(id, wash) {
   const c = clothById(id); if (!c || !ofCurrent) return;
-  if (wash) { setWash(c, true); toast(`${c.name}: a lavare, ecco un'alternativa`); }
+  if (wash) { setWash(c, true); S.laundry = S.laundry || { n: 0, ids: [] }; if (!S.laundry.ids.includes(c.id)) { S.laundry.ids.push(c.id); S.laundry.n = S.laundry.ids.length; } toast(`${c.name}: a lavare, ecco un'alternativa`); }
   ofCurrent.rejected.push(id);
   const alt = localPick(c.cat, { ...dayContext(ofCurrent.date), wx: effWx(ofCurrent.date) }, [...ofCurrent.ids, ...ofCurrent.rejected]);
   ofCurrent.ids = ofCurrent.ids.map(x => x === id ? (alt ? alt.id : null) : x).filter(Boolean);
@@ -2372,9 +2795,14 @@ function renderOutfit() {
   } else $('ofResult').style.display = 'none';
   $('ofCount').textContent = S.clothes.length ? `${S.clothes.length} capi` : '';
   const cats = [['all', 'Tutti'], ...CAT_ORDER.filter(k => S.clothes.some(c => c.cat === k)).map(k => [k, CATS[k]])];
-  if (!cats.some(c => c[0] === ofFilter)) ofFilter = 'all';
+  if (!cats.some(c => c[0] === ofFilter) && ofFilter !== 'old') ofFilter = 'all';
+  // capi che non metti da 2 mesi + bucato
+  const old = oldClothes(), ln = (S.laundry?.ids || []).length;
+  $('ofSmart').innerHTML = (old.length ? `<button class="chip ${ofFilter === 'old' ? 'on' : ''}" data-ofcat="old">🗂 ${old.length} non li metti da 2 mesi</button>` : '')
+    + (ln >= 4 ? `<button class="chip" id="ofLaundry">🧺 ${ln} a lavare · Bucato fatto ✓</button>` : '');
   $('ofCats').innerHTML = cats.map(([k, l]) => `<button class="chip ${k === ofFilter ? 'on' : ''}" data-ofcat="${k}">${esc(l)}</button>`).join('');
-  const list = S.clothes.filter(c => ofFilter === 'all' || c.cat === ofFilter || c.pending).sort((a, b) => (b.pending ? 1 : 0) - (a.pending ? 1 : 0) || (b.rating || 0) - (a.rating || 0));
+  const oldIds = ofFilter === 'old' ? old.map(c => c.id) : null;
+  const list = S.clothes.filter(c => ofFilter === 'all' || (oldIds ? oldIds.includes(c.id) : c.cat === ofFilter) || c.pending).sort((a, b) => (b.pending ? 1 : 0) - (a.pending ? 1 : 0) || (b.rating || 0) - (a.rating || 0));
   $('ofGrid').innerHTML = (list.length ? list.map(c => `<button class="wcell ${isWash(c) ? 'wash' : ''} ${c.pending ? 'pending' : ''}" data-cloth="${c.id}"><div class="ph" data-ph="${c.photo || ''}">${c.photo ? '' : '👕'}</div><div class="wname">${isWash(c) ? '🧺 ' : ''}${esc(c.name)}</div><div class="sub">${esc(c.brand || '')}${c.brand ? ' · ' : ''}${'★'.repeat(c.rating || 0) || '–'}</div></button>`).join('')
       : '<div class="empty" style="grid-column:1/-1">Armadio vuoto. Tocca “Aggiungi capi” e scatta o scegli le foto.</div>');
   document.querySelectorAll('#v-outfit [data-ph]').forEach(async el => { const u = await thumbURL(el.dataset.ph); if (u) el.innerHTML = `<img src="${u}" alt="">`; });
@@ -2482,100 +2910,333 @@ const normKey = s => String(s).toLowerCase().replace(/[^a-z0-9àèéìòù ]/g, 
 const eur = n => (Math.round((+n || 0) * 100) / 100).toFixed(2).replace('.', ',') + ' €';
 const validOffers = () => { const t = today(); return S.offers.filter(o => !o.until || o.until >= t); };
 const storesList = () => (S.settings.stores || []).filter(Boolean);
-function renderSpesa() {
-  if (!$('spCard')) return;
-  renderFlyerChips();
-  $('spSummary').textContent = S.shopPlan && S.shopPlan.stores ? `✦ Spesa economica · piano pronto ${eur(S.shopPlan.total)}` : '✦ Spesa economica';
-  const nO = validOffers().length, nP = Object.keys(S.prices).length;
-  $('spInfo').textContent = `${nO} ${nO === 1 ? 'offerta' : 'offerte'} · ${nP} ${nP === 1 ? 'prezzo' : 'prezzi'}`;
-  const p = S.shopPlan;
-  if (!p || !p.stores) { $('spResult').innerHTML = ''; return; }
-  $('spResult').innerHTML = `<div class="sub" style="margin:12px 0 0">${esc(MODES[p.mode] || '')} · ${p.days} giorni · preparata ${shortDate(p.date)}</div>`
-    + p.stores.map(s => `<div class="planstore"><b>${esc(s.store)}</b><span>${eur(s.items.reduce((a, i) => a + i.price, 0))}</span></div>`
-      + s.items.map(i => `<div class="item"><div class="grow">${esc(i.name)}${i.qty ? ' <span class="sub">· ' + esc(i.qty) + '</span>' : ''}<div class="sub">${[i.coupon ? '🎟 attiva il coupon nell\'app' : '', i.deal ? esc(i.deal) : '', i.per && i.per !== 'entrambi' ? 'per ' + (i.per === 'otto' ? esc(NAME()) : 'Giada') : ''].filter(Boolean).join(' · ')}</div></div><div class="price">${i.est ? '~' : ''}${eur(i.price)}</div></div>`).join('')).join('')
-    + `<div class="planstore"><b>Totale</b><span>${eur(p.total)}</span></div><div class="sub">~ = prezzo stimato (non preso da volantini o scontrini)</div>`
-    + (p.tips.length ? `<ul class="tips">${p.tips.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : '')
-    + (p.meals.length ? `<details><summary class="muted">Pasti suggeriti</summary><ul class="tips">${p.meals.map(t => `<li>${esc(t)}</li>`).join('')}</ul></details>` : '')
-    + '<button class="btn full" id="spToLists">Aggiungi alle liste dei negozi</button>';
+/* ====== V3 · MENU DELLA SETTIMANA → LISTA DELLA SPESA PER PIATTI ======
+   Cene di tutta la settimana + pranzi di sabato e domenica, per Otto e Giada.
+   Ogni piatto ha "↻ cambia" e "✕ salta"; la lista si vede per piatto o per negozio. */
+const MSTYLE = { normale: 'Normale', leggero: 'Leggero', risparmio: 'Risparmio', sgarro: 'Sgarro' };
+const MSTYLE_TXT = { normale: 'equilibrato e vario', leggero: 'leggero e sano', risparmio: 'spendere il meno possibile', sgarro: 'qualche sfizio e piatti golosi' };
+let mnView = 'dish', mnBusy = false;
+const menuCfg = () => Object.assign({ cene: 7, pranzi: 2, ufficio: false }, S.settings.menuCfg || {});
+function menuSlots() {
+  const c = menuCfg(), now = new Date(), start = now.getHours() < 17 ? today() : shift(today(), 1), days = [];
+  for (let i = 0; i < 7; i++) days.push(shift(start, i));
+  const dinners = days.filter(d => where(d) !== 'altro').slice(0, c.cene).map(d => ({ day: d, meal: 'cena' }));   // notte fuori casa: niente cena
+  const weekend = d => [0, 6].includes(parse(d).getDay());
+  // pranzi per l'ufficio: nei giorni di lavoro; altrimenti prima il weekend
+  const offDays = days.filter(d => isWorkday(d) && d !== today());
+  const order = c.ufficio ? [...offDays, ...days.filter(d => !offDays.includes(d) && d !== today())] : [...days.filter(weekend), ...days.filter(d => !weekend(d))];
+  const lunches = order.slice(0, c.pranzi).map(d => ({ day: d, meal: 'pranzo', office: c.ufficio && isWorkday(d) }));
+  return [...lunches, ...dinners].sort((a, b) => (a.day + (a.meal === 'pranzo' ? 0 : 1)).localeCompare(b.day + (b.meal === 'pranzo' ? 0 : 1)));
 }
-async function planShopping({ mode = 'normale', days = 7, note = '' } = {}) {
-  if (!aiReady()) throw new Error('serve la chiave della chat (⚙︎)');
+const slotKey = s => `${s.day} ${s.meal}`;
+const slotDesc = s => slotKey(s) + (s.office ? ' [UFFICIO]' : '');
+const OFFICE_RULE = ' I pasti segnati [UFFICIO] sono pranzi da portare in ufficio: si preparano la sera prima, stanno in un contenitore e si scaldano solo al microonde (niente fornelli in ufficio); evita fritti, cose che diventano molli, pesce crudo e uova da cuocere al momento; vanno bene piatti unici come pasta fredda o al forno, riso, cous cous, legumi, polpette, verdure al forno.';
+const slotLbl = s => `${WD[parse(s.day).getDay()]} ${parse(s.day).getDate()} ${s.meal}`;
+function menuContext() {
   const T = S.tastes;
-  const offers = validOffers().slice(-220).map(o => `${o.store}|${o.product}|${o.price ?? '?'}€${o.was ? ' (prima ' + o.was + '€)' : ''}|${o.deal || ''}|${o.unit || ''}|${o.coupon ? 'COUPON da attivare in app' : 'volantino'}|fino ${o.until}`).join('\n') || '(nessuna)';
-  const prices = Object.values(S.prices).sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 200).map(p => `${p.product}|${p.price}€|${p.unit || ''}|${p.store}|${p.date}`).join('\n') || '(nessuno)';
-  const already = S.items.filter(i => !i.done && (/supermercato/i.test(i.list) || storesList().includes(i.list))).map(i => i.title);
-  const txt = await aiAsk({ json: true, maxTokens: 3000,
-    system: `Sei l'assistente spesa di Otto e Giada: mangiano sempre insieme. Prepara la spesa per ${days} giorni per 2 persone. Modalità: ${MODES[mode] || mode}. OBIETTIVO: spendere poco. Regole: 1) usa prima offerte e coupon validi; 2) dividi tra i negozi (${storesList().join(', ') || 'supermercato'}) solo se conviene davvero; 3) prezzi: usa quelli noti, altrimenti stima un prezzo realistico italiano e metti "stima": true; 4) gusti: evita i cibi che non piacciono a NESSUNO dei due; un cibo che non piace solo a uno va bene se piace all'altro (indica "per": "otto" o "giada"); preferisci cose che piacciono a entrambi; 5) includi le voci già in lista; 6) quantità realistiche. Rispondi SOLO JSON: {"negozi":[{"negozio":"","voci":[{"prodotto":"","quantita":"","prezzo":1.99,"stima":false,"offerta":"testo breve o vuoto","coupon":false,"per":"entrambi"}]}],"pasti":["Lun pranzo: ..."],"consigli":["frase breve"]}`,
-    text: `Oggi: ${today()}.\nGusti di Otto — piace: ${T.otto.likes.join(', ') || '-'}; non piace: ${T.otto.dislikes.join(', ') || '-'}.\nGusti di Giada — piace: ${T.giada.likes.join(', ') || '-'}; non piace: ${T.giada.dislikes.join(', ') || '-'}.\nGià in lista: ${already.join(', ') || '-'}.\nNote: ${note || '-'}.\nDa ricordare: ${S.memory.map(m => m.text).join('; ') || '-'}.\nOFFERTE (negozio|prodotto|prezzo|sconto|unità|tipo|validità):\n${offers}\nPREZZI NOTI (prodotto|prezzo|unità|negozio|data):\n${prices}` });
-  const j = parseJSON(txt);
-  const stores = (j.negozi || []).map(s => ({ store: s.negozio || 'Supermercato', items: (s.voci || []).filter(v => v.prodotto).map(v => ({ name: v.prodotto, qty: v.quantita || '', price: +v.prezzo || 0, est: !!v.stima, deal: v.offerta || '', coupon: !!v.coupon, per: v.per || 'entrambi' })) })).filter(s => s.items.length);
-  if (!stores.length) throw new Error('nessuna voce proposta, riprova');
-  const total = stores.reduce((a, s) => a + s.items.reduce((b, i) => b + i.price, 0), 0);
-  S.shopPlan = { date: today(), mode, days, stores, total: Math.round(total * 100) / 100, meals: j.pasti || [], tips: j.consigli || [] };
-  save(); render(); return S.shopPlan;
+  const offers = validOffers().slice(-250).map(o => `${o.store}|${o.product}|${o.price ?? '?'}€${o.was ? ' (prima ' + o.was + '€)' : ''}|${o.deal || ''}|${o.unit || ''}|${o.coupon ? 'COUPON' : 'volantino'}|fino ${o.until}`).join('\n') || '(nessuna)';
+  const prices = Object.values(S.prices).sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 150).map(p => `${p.product}|${p.price}€|${p.unit || ''}|${p.store}`).join('\n') || '(nessuno)';
+  return `Gusti di Otto — piace: ${T.otto.likes.join(', ') || '-'}; NON piace: ${T.otto.dislikes.join(', ') || '-'}.
+Gusti di Giada — piace: ${T.giada.likes.join(', ') || '-'}; NON piace: ${T.giada.dislikes.join(', ') || '-'}.
+Da ricordare: ${S.memory.map(m => m.text).join('; ') || '-'}.
+Supermercati di Otto: ${storesList().join(', ') || 'supermercato'}.
+OFFERTE VALIDE (negozio|prodotto|prezzo|sconto|unità|tipo|validità):
+${offers}
+PREZZI NOTI (prodotto|prezzo|unità|negozio):
+${prices}`;
 }
-$('spPlan').onclick = async () => {
+const MENU_RULES = `Regole: piatti per 2 persone (Otto e Giada mangiano insieme); nei giorni feriali la cena si prepara in massimo 30-35 minuti; varia le proteine (carne, pesce, legumi, uova) e non ripetere lo stesso piatto; evita i cibi che non piacciono a NESSUNO dei due; un cibo che non piace solo a uno va bene se piace all'altro (indica "per": "otto" o "giada"); preferisci ingredienti in offerta e riusa gli stessi ingredienti in più piatti per non sprecare; per ogni ingrediente scegli il negozio più conveniente tra quelli di Otto; prezzi: usa offerte e prezzi noti, altrimenti stima un prezzo realistico italiano e metti "stima": true; segna "dispensa": true per sale, olio, spezie, aceto e simili che di solito si hanno già.`;
+const ING_SCHEMA = `{"prodotto":"nome semplice","quantita":"es. 400 g","prezzo":2.49,"stima":false,"negozio":"Lidl","offerta":"es. -30% o vuoto","coupon":false,"dispensa":false}`;
+const mkIngs = list => (list || []).filter(i => i && i.prodotto).map(i => ({ id: uid(), name: String(i.prodotto), qty: i.quantita || '', price: +i.prezzo || 0, est: !!i.stima, store: i.negozio || storesList()[0] || 'Supermercato', deal: i.offerta || '', coupon: !!i.coupon, pantry: !!i.dispensa, done: false }));
+async function planMenu({ style = S.settings.menuStyle || 'normale', note = '' } = {}) {
+  if (!aiReady()) throw new Error('serve la chiave della chat (⚙︎)');
+  const slots = menuSlots(); if (!slots.length) throw new Error('nessun pasto da preparare: sei fuori tutta la settimana');
+  const txt = await aiAsk({ json: true, maxTokens: 7000,
+    system: `Sei il cuoco di casa di Otto e Giada. Prepara il menu per questi pasti, uno per riga: ${slots.map(slotDesc).join('; ')}. Stile: ${MSTYLE_TXT[style] || style}. ${MENU_RULES}${slots.some(s => s.office) ? OFFICE_RULE : ''} Rispondi SOLO JSON: {"piatti":[{"pasto":"YYYY-MM-DD cena","nome":"nome del piatto","tempo":"es. 25 min","per":"entrambi","ingredienti":[${ING_SCHEMA}]}],"consigli":["frase breve e pratica"]}`,
+    text: `Oggi: ${today()}.\nNote di Otto: ${note || '-'}.\n${menuContext()}` });
+  const j = parseJSON(txt), by = {};
+  (j.piatti || []).forEach(p => { if (p && p.nome) by[String(p.pasto || '').replace(/\[.*?\]/g, '').trim()] = p; });
+  const list = j.piatti || [];
+  const dishes = slots.map((s, i) => { const p = by[slotKey(s)] || list[i]; return p && p.nome ? { id: uid(), day: s.day, meal: s.meal, office: !!s.office, name: p.nome, time: p.tempo || '', per: p.per || 'entrambi', ings: mkIngs(p.ingredienti) } : null; }).filter(Boolean);
+  if (!dishes.length) throw new Error('il menu è arrivato vuoto, riprova');
+  S.menu = { created: today(), start: slots[0].day, end: slots[slots.length - 1].day, style, note, dishes, tips: (j.consigli || []).slice(0, 3) };
+  save(); render(); return S.menu;
+}
+async function swapDish(id) {
+  const m = S.menu, d = m && m.dishes.find(x => x.id === id); if (!d || mnBusy) return;
   if (!aiReady()) return toast('Serve la chiave della chat (⚙︎)');
-  const b = $('spPlan'); b.disabled = true; b.textContent = 'Preparo la spesa…';
-  try { await planShopping({ mode: $('spMode').value, days: +$('spDays').value, note: $('spNote').value.trim() }); $('spFold').open = true; toast('Spesa pronta'); }
-  catch (e) { toast('Errore: ' + e.message.slice(0, 90)); }
-  b.disabled = false; b.textContent = '✦ Prepara la spesa economica';
-};
-$('spResult').addEventListener('click', e => {
-  if (!e.target.closest('#spToLists') || !S.shopPlan) return;
-  let n = 0;
-  S.shopPlan.stores.forEach(s => { const l = ensureList(s.store); s.items.forEach(i => { const title = i.name + (i.qty ? ` (${i.qty})` : '') + (i.coupon ? ' 🎟' : '');
-    if (!S.items.some(x => !x.done && x.list === l && x.title.toLowerCase() === title.toLowerCase())) { S.items.push({ id: uid(), title, list: l, done: false, synced: false }); n++; } }); });
-  save(); render(); toast(`${n} voci aggiunte alle liste`);
+  mnBusy = true; d.busy = true; renderSpesa();
+  try {
+    const others = m.dishes.filter(x => x.id !== id).map(x => x.name).join(', ');
+    const txt = await aiAsk({ json: true, maxTokens: 1800,
+      system: `Sei il cuoco di casa di Otto e Giada. Otto non vuole "${d.name}" per ${slotLbl(d)}${d.office ? ' [UFFICIO]' : ''}: proponi UN piatto diverso, adatto a quel pasto, diverso anche da questi già in menu: ${others || '-'}. Stile: ${MSTYLE_TXT[m.style] || 'normale'}. ${MENU_RULES}${d.office ? OFFICE_RULE : ''} Rispondi SOLO JSON: {"nome":"","tempo":"","per":"entrambi","ingredienti":[${ING_SCHEMA}]}`,
+      text: `Oggi: ${today()}.\n${menuContext()}` });
+    const j = parseJSON(txt); if (!j.nome) throw new Error('nessuna proposta');
+    (m.rejected = m.rejected || []).push(d.name);
+    Object.assign(d, { name: j.nome, time: j.tempo || '', per: j.per || 'entrambi', ings: mkIngs(j.ingredienti) });
+    toast('Nuovo piatto: ' + j.nome);
+  } catch (e) { toast('Non riesco a cambiarlo: ' + e.message.slice(0, 70)); }
+  delete d.busy; mnBusy = false; save(); render();
+}
+const menuIngs = () => (S.menu ? S.menu.dishes.flatMap(d => d.ings.map(i => ({ ...i, dish: d }))) : []);
+const menuTotal = () => menuIngs().filter(i => !i.pantry).reduce((a, i) => a + (i.price || 0), 0);
+function sumQty(qs) {
+  const parsed = qs.map(q => { const m = String(q).trim().replace(',', '.').match(/^(\d+(?:\.\d+)?)\s*(g|kg|ml|l|pz|pezzi|confezion[ei]|vasett[oi]|bottigli[ae]|uova)?\b/i); return m ? { n: +m[1], u: (m[2] || '').toLowerCase() } : null; });
+  if (!parsed.length || parsed.some(x => !x)) return qs.join(' + ');
+  const toBase = x => x.u === 'kg' ? { n: x.n * 1000, u: 'g' } : x.u === 'l' ? { n: x.n * 1000, u: 'ml' } : x;
+  const b = parsed.map(toBase); if (b.some(x => x.u !== b[0].u)) return qs.join(' + ');
+  let n = b.reduce((a, x) => a + x.n, 0), u = b[0].u;
+  if (u === 'g' && n >= 1000) { n = n / 1000; u = 'kg'; } else if (u === 'ml' && n >= 1000) { n = n / 1000; u = 'l'; }
+  return `${String(Math.round(n * 100) / 100).replace('.', ',')}${u ? ' ' + u : ''}`;
+}
+function mergedByStore() {
+  const stores = {};
+  menuIngs().filter(i => !i.pantry).forEach(i => {
+    const st = stores[i.store] = stores[i.store] || {}, k = normKey(i.name);
+    const it = st[k] = st[k] || { name: i.name, qtys: [], price: 0, est: false, deal: '', coupon: false, ids: [], done: true, dishes: [] };
+    if (i.qty) it.qtys.push(i.qty); it.price += i.price || 0; it.est = it.est || i.est; it.deal = it.deal || i.deal; it.coupon = it.coupon || i.coupon;
+    it.ids.push(i.id); it.done = it.done && i.done; it.dishes.push(i.dish.name);
+  });
+  return stores;
+}
+const ingRow = (i, extra = '') => `<div class="ing ${i.done ? 'done' : ''}" data-ing="${i.ids ? i.ids.join(',') : i.id}"><button class="chk">${i.done ? '✓' : ''}</button><div class="grow">${esc(i.name)}${(i.qtys ? i.qtys.length : i.qty) ? ' <span class="sub">· ' + esc(i.qtys ? sumQty(i.qtys) : i.qty) + '</span>' : ''}${i.deal ? `<span class="tag">🏷 ${esc(i.deal)}</span>` : ''}${i.coupon ? '<span class="tag">🎟 coupon</span>' : ''}${extra}</div><div class="price">${i.price ? (i.est ? '~' : '') + eur(i.price) : ''}</div></div>`;
+function renderSpesa() {
+  if (!$('mnCard')) return;
+  const nO = validOffers().length;
+  $('spInfo').textContent = `${nO} ${nO === 1 ? 'valida' : 'valide'}`;
+  renderOffStatus();
+  const m = S.menu;
+  if (!m || !m.dishes?.length || m.end < today()) {
+    const st = S.settings.menuStyle || 'normale';
+    $('mnTot').textContent = '';
+    const c = menuCfg();
+    $('mnBody').innerHTML = `<p class="muted" style="margin:0 0 10px">Per te e Giada, con offerte, gusti e prezzi che conosco. Ogni piatto si cambia con un tocco.</p>
+      <div class="stepper"><span class="grow"><b>🍝 Cene</b></span><button class="iconb" data-mstep="cene|-1">−</button><b class="n">${c.cene}</b><button class="iconb" data-mstep="cene|1">＋</button></div>
+      <div class="stepper"><span class="grow"><b>🥪 Pranzi</b></span><button class="iconb" data-mstep="pranzi|-1">−</button><b class="n">${c.pranzi}</b><button class="iconb" data-mstep="pranzi|1">＋</button></div>
+      <label class="toggle" style="margin:4px 0 10px"><input type="checkbox" id="mnOffice" ${c.ufficio ? 'checked' : ''}> Pranzi per l'ufficio: da scaldare al microonde, senza fornelli</label>
+      <div class="chips" id="mnStyle" style="flex-wrap:wrap">${Object.entries(MSTYLE).map(([k, v]) => `<button class="chip ${k === st ? 'on' : ''}" data-mstyle="${k}">${v}</button>`).join('')}</div>
+      <input type="text" id="mnNote" placeholder="Nota facoltativa: es. ho già pasta e riso, budget 60 €">
+      <button class="btn full" id="mnGo" style="margin-top:10px">${mnBusy ? 'Preparo il menu…' : '✦ Prepara menu e spesa'}</button>`;
+    return;
+  }
+  const todo = menuIngs().filter(i => !i.pantry && !i.done).length;
+  $('mnTot').textContent = `~${eur(menuTotal())}`;
+  const dishes = [...m.dishes].sort((a, b) => (a.day + (a.meal === 'pranzo' ? 0 : 1)).localeCompare(b.day + (b.meal === 'pranzo' ? 0 : 1)));
+  let list = '';
+  if (mnView === 'dish') {
+    list = dishes.map(d => { const ings = d.ings.filter(i => !i.pantry); return ings.length ? `<div class="grp">${esc(d.name)}<span>${WD[parse(d.day).getDay()]} ${d.meal}</span></div>` + ings.map(i => ingRow(i)).join('') : ''; }).join('');
+  } else {
+    const by = mergedByStore();
+    list = Object.entries(by).map(([s, items]) => { const arr = Object.values(items); return `<div class="grp">${esc(s)}<span>${eur(arr.reduce((a, i) => a + i.price, 0))}</span></div>` + arr.map(i => ingRow(i, i.dishes.length > 1 ? ` <span class="sub">· in ${i.dishes.length} piatti</span>` : '')).join(''); }).join('');
+  }
+  const pantry = [...new Set(menuIngs().filter(i => i.pantry).map(i => i.name))];
+  $('mnBody').innerHTML = `<div class="sub">${shortDate(m.start)} → ${shortDate(m.end)} · ${MSTYLE[m.style] || ''} · ${m.dishes.length} piatti · da prendere ${todo}</div>
+    <div style="margin-top:6px">${dishes.map(d => `<div class="dish ${d.busy ? 'busy' : ''}"><div class="dday">${WD[parse(d.day).getDay()]}<small>${d.office ? '🏢 pranzo' : d.meal}</small></div><div class="grow"><b>${esc(d.name)}</b><div class="sub">${esc([d.time, d.per && d.per !== 'entrambi' ? 'per ' + (d.per === 'otto' ? NAME() : 'Giada') : '', d.ings.filter(i => i.deal).length ? '🏷 ' + d.ings.filter(i => i.deal).length + ' in offerta' : ''].filter(Boolean).join(' · '))}</div></div><button class="iconb dswap" data-dswap="${d.id}" aria-label="Cambia piatto">↻</button><button class="iconb" data-ddel="${d.id}" aria-label="Salta">✕</button></div>`).join('')}</div>
+    <div class="seg" style="margin-top:14px" id="mnSeg"><button class="${mnView === 'dish' ? 'on none' : ''}" data-mview="dish">🍽 Per piatto</button><button class="${mnView === 'store' ? 'on none' : ''}" data-mview="store">🛒 Per negozio</button></div>
+    ${list || '<div class="empty">Niente da comprare.</div>'}
+    ${pantry.length ? `<details style="margin-top:10px"><summary class="muted">Probabilmente hai già (${pantry.length})</summary><div class="sub" style="margin-top:6px">${esc(pantry.join(', '))}</div></details>` : ''}
+    ${m.tips?.length ? `<ul class="tips" style="margin-top:10px">${m.tips.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}
+    <div class="sub" style="margin-top:8px">~ = prezzo stimato</div>
+    <div class="grid2" style="margin-top:10px"><button class="btn ghost" id="mnToLists">Copia nelle liste</button><button class="btn ghost" id="mnNew">↻ Nuovo menu</button></div>`;
+}
+$('mnBody').addEventListener('click', async e => {
+  const t = e.target;
+  const st = t.closest('[data-mstyle]'); if (st) { S.settings.menuStyle = st.dataset.mstyle; save(); return renderSpesa(); }
+  const sp = t.closest('[data-mstep]'); if (sp) { const [k, dlt] = sp.dataset.mstep.split('|'), c = menuCfg(); c[k] = Math.max(0, Math.min(7, c[k] + +dlt)); S.settings.menuCfg = c; save(); return renderSpesa(); }
+  if (t.closest('#mnOffice')) { const c = menuCfg(); c.ufficio = t.closest('#mnOffice').checked; if (c.ufficio && c.pranzi < 5) c.pranzi = 5; S.settings.menuCfg = c; save(); return renderSpesa(); }
+  if (t.closest('#mnGo')) {
+    if (!aiReady()) return toast('Serve la chiave della chat (⚙︎)');
+    if (!menuCfg().cene && !menuCfg().pranzi) return toast('Scegli almeno una cena o un pranzo');
+    if (mnBusy) return; mnBusy = true; const note = $('mnNote')?.value.trim() || ''; renderSpesa();
+    $('mnBody').insertAdjacentHTML('beforeend', '<div class="prog"><b>Preparo menu e lista…</b><div class="bar ind"><i></i></div></div>');
+    try { await planMenu({ note }); toast('Menu pronto'); } catch (err) { toast('Errore: ' + err.message.slice(0, 90)); }
+    mnBusy = false; return render();
+  }
+  const sw = t.closest('[data-dswap]'); if (sw) return swapDish(sw.dataset.dswap);
+  const dl = t.closest('[data-ddel]'); if (dl) { const d = S.menu.dishes.find(x => x.id === dl.dataset.ddel); if (d && confirm(`Togliere “${d.name}” (${slotLbl(d)})?`)) { S.menu.dishes = S.menu.dishes.filter(x => x !== d); save(); render(); } return; }
+  const mv = t.closest('[data-mview]'); if (mv) { mnView = mv.dataset.mview; return renderSpesa(); }
+  const ing = t.closest('[data-ing]'); if (ing) { const ids = ing.dataset.ing.split(','), all = menuIngs().filter(i => ids.includes(i.id)), to = !all.every(i => i.done); S.menu.dishes.forEach(d => d.ings.forEach(i => { if (ids.includes(i.id)) i.done = to; })); save(); return renderSpesa(); }
+  if (t.closest('#mnNew')) { if (confirm('Rifare il menu da capo?')) { S.menu = null; save(); render(); } return; }
+  if (t.closest('#mnToLists')) {
+    let n = 0; const by = mergedByStore();
+    Object.entries(by).forEach(([s, items]) => { const l = ensureList(s); Object.values(items).filter(i => !i.done).forEach(i => { const title = i.name + (i.qtys.length ? ` (${sumQty(i.qtys)})` : '') + (i.coupon ? ' 🎟' : '');
+      if (!S.items.some(x => !x.done && x.list === l && normKey(x.title) === normKey(title))) { S.items.push({ id: uid(), title, list: l, done: false, synced: false }); n++; } }); });
+    save(); render(); return toast(`${n} voci copiate nelle liste dei negozi`);
+  }
 });
 
 /* --- Caricamento volantini, coupon, scontrini --- */
 function openFlyerDlg(store, type) {
-  $('flStore').innerHTML = [...storesList(), 'Altro'].map(s => `<option ${s === store ? 'selected' : ''}>${esc(s)}</option>`).join('');
-  if (type) $('flType').value = type; $('flStatus').textContent = store ? `Carica gli screenshot del volantino ${store}.` : ''; $('dlgFlyer').showModal();
+  $('flStore').innerHTML = '<option value="">Riconosci da solo</option>' + [...new Set([...storesList(), 'Altro'])].map(s => `<option ${s === store ? 'selected' : ''}>${esc(s)}</option>`).join('');
+  $('flType').value = type || 'volantino'; flTypeUI();
+  $('flStatus').textContent = store ? `Incolla il link o carica gli screenshot del volantino ${store}.` : '';
+  $('dlgFlyer').showModal();
 }
-$('spFlyer').onclick = () => openFlyerDlg();
-/* Tasti volantino: Lidl ha il link ufficiale; per gli altri una ricerca già pronta (le Coop cambiano per zona) */
-const FLYER_LINKS = { lidl: 'https://www.lidl.it/c/volantino-lidl/s10018048' };
-const flyerURL = s => FLYER_LINKS[s.toLowerCase()] || 'https://www.google.com/search?q=' + encodeURIComponent(`volantino ${s} ${S.settings.city || ''} offerte settimana`.trim());
-let flyerPending = null;
-function renderFlyerChips() {
-  if (!$('flChips')) return;
-  $('flChips').innerHTML = storesList().map(s => `<button class="chip" data-flyer="${esc(s)}">📄 ${esc(s)}</button>`).join('') + '<button class="chip" id="flAddStore">＋ Altro supermercato</button>';
-}
-$('flChips').onclick = e => {
-  if (e.target.closest('#flAddStore')) {
-    const n = prompt('Nome del supermercato (es. Esselunga, Eurospin, Carrefour):'); if (!n || !n.trim()) return;
-    S.settings.stores = [...new Set([...storesList(), n.trim()])]; save(); render(); return toast(n.trim() + ' aggiunto');
-  }
-  const b = e.target.closest('[data-flyer]'); if (!b) return;
-  flyerPending = { store: b.dataset.flyer, at: Date.now() };
-  window.open(flyerURL(b.dataset.flyer), '_blank');
+/* il link vale solo per i volantini (coupon e scontrini restano a foto) */
+function flTypeUI() { $('flLinkBox').style.display = $('flType').value === 'volantino' ? '' : 'none'; }
+$('flType').onchange = flTypeUI;
+$('flStore').onchange = () => { const l = S.flyers && S.flyers.links && S.flyers.links[$('flStore').value]; if (l && !/^https?:/i.test($('flUrl').value.trim())) $('flUrl').value = l.url; };
+$('flPaste').onclick = async () => {
+  try { const t = (await navigator.clipboard.readText() || '').trim(); const m = t.match(/https?:\/\/\S+/); if (m) { $('flUrl').value = m[0]; $('flStatus').textContent = ''; } else toast('Negli appunti non c\'è un link'); }
+  catch { $('flUrl').focus(); toast('Tieni premuto nel campo e scegli Incolla'); }
 };
-// tornando in Gestiotto dopo aver aperto un volantino: finestra di caricamento già pronta su quel negozio
+$('flUrl').onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); $('flLink').click(); } };
+/* nome del supermercato dal titolo della pagina o dall'indirizzo */
+function guessStore(...txt) {
+  const t = txt.join(' ').toLowerCase();
+  const known = [...storesList(), 'Lidl', 'Esselunga', 'Coop', 'Conad', 'Carrefour', 'Eurospin', 'Aldi', 'Penny', 'MD', 'Pam', 'Despar', 'Tigros', 'Iper', 'Bennet', 'Famila', 'Crai', 'Sigma', 'Basko', 'Ekom', 'In\'s', 'Todis', 'Prix', 'Dok', 'Tuodì', 'Kaufland', 'Unes', 'Il Gigante', 'Ipercoop', 'Esselunga'];
+  return known.find(k => new RegExp('(^|[^a-z])' + k.toLowerCase().replace(/[^a-z0-9]+/g, '[^a-z0-9]*') + '([^a-z]|$)').test(t)) || '';
+}
+const FLYER_RULE = `Estrai SOLO le offerte di alimentari, bevande, prodotti per la casa e per l'igiene (ignora vestiti, attrezzi, elettronica, giardino, viaggi).`;
+const flyerJSON = `Rispondi SOLO JSON: {"negozio":"nome del supermercato o null","valido_dal":"YYYY-MM-DD o null","valido_al":"YYYY-MM-DD o null","offerte":[{"prodotto":"nome e marca","prezzo":1.99,"prezzo_prima":2.49,"sconto":"es. -30% o 1+1","unita":"es. 500 g o al kg","dal":"YYYY-MM-DD o null"}]}. Prezzi in euro come numeri. Oggi è `;
+/* Volantino da link: il server apre la pagina e ne tira fuori le pagine (immagini), il PDF o il testo; l'IA legge le offerte */
+let linkBusy = false;
+async function readFlyerLink(url, chosen) {
+  if (linkBusy) return; const st = m => $('flStatus').textContent = m;
+  url = String(url || '').trim(); if (!/^https?:\/\//i.test(url)) { const m = url.match(/https?:\/\/\S+/); if (!m) return st('Incolla il link completo (inizia con https://).'); url = m[0]; }
+  if (!aiReady()) return st('Serve la chiave della chat (⚙︎ › Chat).');
+  if (!P().url) return st('Per leggere un link serve il server (⚙︎ › Notifiche). Intanto puoi caricare gli screenshot.');
+  linkBusy = true; $('flLink').disabled = true;
+  try {
+    st('Apro la pagina del volantino…');
+    let info; try { info = await api('/page?u=' + encodeURIComponent(url)); } catch (e) { throw new Error(/^non trovato$/i.test(e.message) ? 'aggiorna il server (guida 3.4)' : e.message); }
+    let store = chosen || info.store || guessStore(info.title, url) || '';
+    let from = normDate(info.start) || '', until = normDate(info.end) || '', found = 0;
+    const ctxTxt = `Pagina: ${info.title || url}${store ? '. Supermercato: ' + store : ''}${until ? `. Valido dal ${from} al ${until}` : ''}.`;
+    const add = j => {
+      if (!store && j.negozio) store = guessStore(j.negozio) || String(j.negozio).trim().slice(0, 30);
+      from = from || normDate(j.valido_dal) || ''; until = until || normDate(j.valido_al) || '';
+      return (j.offerte || []).filter(o => o.prodotto && +o.prezzo > 0);
+    };
+    const got = [];
+    const ask = async (images, text) => got.push(...add(parseJSON(await aiAsk({ json: true, maxTokens: 4000, images,
+      system: `${images.length ? 'Queste sono pagine di un volantino di supermercato.' : 'Questo è il testo di una pagina web di offerte di un supermercato.'} ${ctxTxt} ${FLYER_RULE} ${flyerJSON}${today()}.`, text }))));
+    if (info.kind === 'pages' && info.images?.length) {
+      const pages = info.images.slice(0, 40);
+      for (let i = 0; i < pages.length; i += 3) {
+        st(`Leggo le pagine ${i + 1}–${Math.min(i + 3, pages.length)} di ${pages.length}…`);
+        const imgs = [];
+        for (const u of pages.slice(i, i + 3)) { try { const b = await srvImage(u); if (b.size > 8000) imgs.push(await imgB64(b, 1400, 0.8)); } catch (e) { console.warn('pagina', e); } }
+        if (imgs.length) try { await ask(imgs, 'Estrai le offerte.'); } catch (e) { if (/limite|sovraccarico|non risponde|connessione|chiave/i.test(e.message)) throw e; console.warn(e); }
+      }
+    } else if (info.kind === 'pdf' && info.pdf) {
+      st('Scarico il PDF del volantino…');
+      const b = await srvImage(info.pdf);
+      if (b.size > 15e6) throw new Error('PDF troppo grande: carica gli screenshot delle pagine');
+      st('Leggo il PDF…'); await ask([{ mime: 'application/pdf', b64: await blobB64(b) }], 'Estrai le offerte da tutte le pagine.');
+    }
+    if (!got.length && (info.text || '').length > 80) { st('Leggo il testo della pagina…'); await ask([], info.text.slice(0, 15000)); }
+    if (!got.length) throw new Error(info.kind === 'text' || !info.images?.length ? 'la pagina non mostra le offerte al server: apri il volantino e carica gli screenshot' : 'nessuna offerta letta');
+    store = store || 'Altro'; until = until || shift(today(), 7);
+    got.forEach(o => {
+      const k = normKey(o.prodotto);
+      S.offers = S.offers.filter(x => !(x.store === store && normKey(x.product) === k));
+      S.offers.push({ id: uid(), store, product: o.prodotto, price: +o.prezzo, was: +o.prezzo_prima || null, deal: o.sconto || '', unit: o.unita || '', coupon: false, from: normDate(o.dal) || '', until, added: today(), src: 'link' });
+      S.prices[k] = { product: o.prodotto, store, price: +o.prezzo, unit: o.unita || '', date: today(), offer: true };
+      found++;
+    });
+    S.flyers = S.flyers || {}; S.flyers.links = S.flyers.links || {}; S.flyers.links[store] = { url, read: today(), until };
+    save(); render();
+    st(`Fatto: ${found} offerte ${store} salvate, valide fino al ${shortDate(until)}.`); toast(`${store}: ${found} offerte dal link`);
+    $('flUrl').value = '';
+  } catch (e) { st('Non riesco a leggere il link: ' + e.message.slice(0, 120)); }
+  linkBusy = false; $('flLink').disabled = false;
+}
+$('flLink').onclick = () => readFlyerLink($('flUrl').value, $('flStore').value);
+$('spFlyer').onclick = () => openFlyerDlg();
+/* Un solo tasto "Cerca volantini": tutti i volantini della tua città in una pagina; al ritorno, caricamento già pronto */
+const citySlug = () => (S.settings.city || 'genova').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+let flyerPending = null;
+$('offSearch').onclick = () => { flyerPending = { at: Date.now() }; window.open('https://www.doveconviene.it/' + citySlug(), '_blank'); };
+$('offSeeAll').onclick = () => { renderOffers(); $('dlgOffers').showModal(); };
 document.addEventListener('visibilitychange', () => {
   if (document.hidden || !flyerPending) return;
   const f = flyerPending; flyerPending = null;
-  if (Date.now() - f.at < 30 * 60e3) setTimeout(() => { go('liste'); openFlyerDlg(f.store, 'volantino'); }, 300);
+  if (Date.now() - f.at < 30 * 60e3) setTimeout(() => { go('liste'); openFlyerDlg('', 'volantino'); $('flStatus').textContent = 'Copia il link del volantino che ti interessa e incollalo qui, oppure carica gli screenshot.'; }, 300);
 });
+/* Volantino Lidl automatico: il server prende le pagine, l'IA le legge (una volta per volantino) */
+let offBusy = false;
+function renderOffStatus() {
+  if (!$('offStatus')) return;
+  const f = S.flyers && S.flyers.lidl, by = {};
+  validOffers().forEach(o => by[o.store] = (by[o.store] || 0) + 1);
+  const parts = Object.entries(by).map(([s, n]) => `${s} ${n}`);
+  let line = parts.length ? parts.join(' · ') : 'Nessuna offerta salvata.';
+  if (f && f.err) line += ` · Lidl: ${f.err}`;
+  else if (f && f.id) line += ` · Lidl ${f.done >= f.pages ? 'letto' : 'in lettura'} (${shortDate(f.start)}–${shortDate(f.end)})`;
+  else if (!P().url) line += ' · volantino Lidl automatico: serve il server (⚙︎ › Notifiche)';
+  $('offStatus').textContent = line;
+}
+function offProgress(txt, done, n) {
+  const el = $('offProg'); if (!el) return;
+  if (!txt) { el.style.display = 'none'; return; }
+  el.style.display = ''; el.innerHTML = `<div class="addrow"><b class="grow">${esc(txt)}</b><span class="sub">${n ? done + '/' + n : ''}</span></div><div class="bar ${n ? '' : 'ind'}"><i style="width:${n ? Math.max(6, done / n * 100) : 30}%"></i></div>`;
+}
+async function srvImage(u) {
+  const r = await fetchT(P().url.replace(/\/$/, '') + '/img?u=' + encodeURIComponent(u), { headers: { authorization: 'Bearer ' + P().password } }, 20000, 'immagine lenta');
+  if (!r.ok) throw new Error('immagine ' + r.status); return r.blob();
+}
+async function autoFlyers(force = false) {
+  if (offBusy || !P().url || !aiReady() || LOAD_FAIL) return;
+  S.flyers = S.flyers || {};
+  const cur = S.flyers.lidl || {};
+  if (!force && cur.checked === today() && (!cur.id || cur.done >= cur.pages)) return;
+  offBusy = true;
+  try {
+    offProgress('Cerco il volantino Lidl…');
+    let info;
+    try { info = await api('/flyers'); } catch (e) { throw new Error(/404|non trovato|not found/i.test(e.message) ? 'aggiorna il server (guida V3)' : e.message); }
+    const fl = info && info.lidl; if (!fl || !fl.pages?.length) throw new Error('volantino non trovato');
+    let st = S.flyers.lidl;
+    if (!st || st.id !== fl.id) {   // volantino nuovo: via le vecchie offerte Lidl da volantino (i coupon restano)
+      S.offers = S.offers.filter(o => !(o.store === 'Lidl' && !o.coupon && o.src === 'auto'));
+      st = S.flyers.lidl = { id: fl.id, name: fl.name, start: fl.start || today(), end: fl.end || shift(today(), 7), pages: fl.pages.length, done: 0 };
+    }
+    st.checked = today(); delete st.err; save();
+    const until = st.end, pages = fl.pages; let nOff = 0;
+    for (let i = st.done; i < pages.length; i += 3) {
+      offProgress('Leggo il volantino Lidl', i, pages.length);
+      const imgs = [];
+      for (const pg of pages.slice(i, i + 3)) { try { imgs.push(await imgB64(await srvImage(pg.img), 1100, 0.78)); } catch (e) { console.warn('pagina', e); } }
+      if (imgs.length) {
+        try {
+          const j = parseJSON(await aiAsk({ json: true, maxTokens: 4000, images: imgs,
+            system: `Queste sono pagine del volantino Lidl valido dal ${st.start} al ${until}. Estrai SOLO le offerte di alimentari, bevande, prodotti per la casa e per l'igiene (ignora vestiti, attrezzi, elettronica, giardino, viaggi). Rispondi SOLO JSON: {"offerte":[{"prodotto":"nome e marca","prezzo":1.99,"prezzo_prima":2.49,"sconto":"es. -30% o 1+1","unita":"es. 500 g o al kg","dal":"YYYY-MM-DD o null"}]}. Prezzi in euro come numeri; se un'offerta vale solo da un certo giorno indica "dal".`,
+            text: 'Estrai le offerte.' }));
+          (j.offerte || []).forEach(o => {
+            if (!o.prodotto || !(+o.prezzo > 0)) return; const k = normKey(o.prodotto);
+            S.offers = S.offers.filter(x => !(x.store === 'Lidl' && normKey(x.product) === k));
+            S.offers.push({ id: uid(), store: 'Lidl', product: o.prodotto, price: +o.prezzo, was: +o.prezzo_prima || null, deal: o.sconto || '', unit: o.unita || '', coupon: false, from: normDate(o.dal) || '', until, added: today(), src: 'auto' });
+            S.prices[k] = { product: o.prodotto, store: 'Lidl', price: +o.prezzo, unit: o.unita || '', date: today(), offer: true };
+            nOff++;
+          });
+        } catch (e) { if (/limite|sovraccarico|non risponde|connessione/i.test(e.message)) { save(); throw e; } console.warn('lettura', e); }
+      }
+      st.done = Math.min(pages.length, i + 3); save(); renderOffStatus();
+    }
+    if (nOff) toast(`Volantino Lidl: ${nOff} offerte salvate`);
+  } catch (e) { S.flyers.lidl = { ...(S.flyers.lidl || {}), err: e.message.slice(0, 60), checked: today() }; save(); }
+  offBusy = false; offProgress(''); renderSpesa();
+}
 $('flPick').onclick = () => $('flFiles').click();
 $('flFiles').onchange = async ev => {
   const files = [...ev.target.files]; ev.target.value = ''; if (!files.length) return;
   if (!aiReady()) return toast('Serve la chiave della chat (⚙︎)');
-  const type = $('flType').value, store = $('flStore').value; let nOff = 0, nPr = 0;
+  const type = $('flType').value, chosen = $('flStore').value; let nOff = 0, nPr = 0, store = chosen;
   for (const [i, f] of files.entries()) {
     $('flStatus').textContent = `Leggo ${i + 1} di ${files.length}…`;
     try {
       const im = await imgB64(f, 1600, 0.85);
       if (type === 'scontrino') {
         const j = parseJSON(await aiAsk({ json: true, maxTokens: 2500, images: [im], system: 'Leggi lo scontrino. Rispondi SOLO JSON: {"negozio":"","data":"YYYY-MM-DD","righe":[{"prodotto":"nome leggibile in italiano","prezzo":1.23,"quantita":"es. 500 g"}]}. Prezzi in euro come numeri. Ignora totale, resto e sconti generici.', text: 'Estrai le righe.' }));
-        const st = j.negozio || store;
+        const st = j.negozio || store || 'Altro';
         (j.righe || []).forEach(r => { if (!r.prodotto || !(+r.prezzo > 0)) return; S.prices[normKey(r.prodotto)] = { product: r.prodotto, store: st, price: +r.prezzo, unit: r.quantita || '', date: normDate(j.data) || today() }; nPr++; });
       } else {
         const j = parseJSON(await aiAsk({ json: true, maxTokens: 4000, images: [im],
-          system: `Estrai TUTTE le offerte leggibili da ${type === 'coupon' ? "uno screenshot dell'app" : 'una pagina di volantino'} del supermercato ${store}. Oggi è ${today()}. Rispondi SOLO JSON: {"scadenza":"YYYY-MM-DD o null","offerte":[{"prodotto":"nome e marca se presente","prezzo":1.99,"prezzo_prima":2.49,"sconto":"es. -30% o 1+1","unita":"es. 500 g o al kg","coupon":${type === 'coupon'},"scadenza":"YYYY-MM-DD o null"}]}. Prezzi in euro come numeri, null se assenti.`,
+          system: `Estrai TUTTE le offerte leggibili da ${type === 'coupon' ? "uno screenshot dell'app" : 'una pagina di volantino'}${store ? ' del supermercato ' + store : ''}. Oggi è ${today()}. Rispondi SOLO JSON: {"negozio":"nome del supermercato se si vede, altrimenti null","scadenza":"YYYY-MM-DD o null","offerte":[{"prodotto":"nome e marca se presente","prezzo":1.99,"prezzo_prima":2.49,"sconto":"es. -30% o 1+1","unita":"es. 500 g o al kg","coupon":${type === 'coupon'},"scadenza":"YYYY-MM-DD o null"}]}. Prezzi in euro come numeri, null se assenti.`,
           text: 'Estrai le offerte.' }));
         const until = normDate(j.scadenza) || '';
+        if (!chosen) store = store || guessStore(j.negozio || '') || (j.negozio ? String(j.negozio).trim().slice(0, 30) : '') || 'Altro';
         (j.offerte || []).forEach(o => {
           if (!o.prodotto) return; const k = normKey(o.prodotto);
           S.offers = S.offers.filter(x => !(x.store === store && normKey(x.product) === k));
@@ -2633,6 +3294,8 @@ function rmUpdate() {
 }
 function openRem() {
   $('rmTitle').value = ''; $('rmRep').value = 'once'; $('rmDate').value = today();
+  $('rmWaName').value = $('rmWaPhone').value = $('rmWaText').value = ''; $('rmWaBox').open = false;
+  rmMoreSet = new Set(); drawMore($('rmMore'), rmMoreSet, '0');
   const n = new Date(Date.now() + 60 * 60e3); $('rmTime').value = pad(n.getHours()) + ':00'; $('rmAlert').value = '0';
   $('rmDom').innerHTML = Array.from({ length: 31 }, (_, i) => `<option value="${i + 1}">${i + 1}</option>`).join('');
   $('rmDom').value = String(parse(today()).getDate());
@@ -2640,21 +3303,25 @@ function openRem() {
   rmUpdate(); $('dlgRem').showModal(); setTimeout(() => $('rmTitle').focus(), 50);
 }
 ['rmRep', 'rmDate', 'rmTime', 'rmAlert', 'rmDom'].forEach(id => $(id).addEventListener('input', rmUpdate));
+$('rmMore').onclick = e => { const b = e.target.closest('[data-more]'); if (!b) return; const v = +b.dataset.more; rmMoreSet.has(v) ? rmMoreSet.delete(v) : rmMoreSet.add(v); drawMore($('rmMore'), rmMoreSet, $('rmAlert').value); rmUpdate(); };
+$('rmAlert').addEventListener('change', () => { rmMoreSet.delete(+$('rmAlert').value); drawMore($('rmMore'), rmMoreSet, $('rmAlert').value); });
 $('rmDays').onclick = e => { const b = e.target.closest('[data-d]'); if (!b) return; const d = +b.dataset.d; rmDaysSet.has(d) ? rmDaysSet.delete(d) : rmDaysSet.add(d); drawDays($('rmDays'), rmDaysSet); rmUpdate(); };
 $('rmOk').onclick = () => {
   const title = $('rmTitle').value.trim(), rep = $('rmRep').value, time = normTime($('rmTime').value), alert = +$('rmAlert').value;
   if (!title) return toast('Scrivi cosa ricordarti');
   if (!time) return toast("Scegli l'ora");
-  const r = { id: uid(), title, body: '', rep, days: [...rmDaysSet], dom: +$('rmDom').value || 1, date: $('rmDate').value, time, alert, on: true };
+  const r = { id: uid(), title, body: '', rep, days: [...rmDaysSet], dom: +$('rmDom').value || 1, date: $('rmDate').value, time, alert, more: [...rmMoreSet].filter(v => v !== alert), on: true };
+  if ($('rmWaText').value.trim()) r.wa = { toName: $('rmWaName').value.trim(), phone: $('rmWaPhone').value.trim(), text: $('rmWaText').value.trim() };
   if ((rep === 'once' || rep === 'yearly') && !r.date) return toast('Scegli il giorno');
   if (rep === 'weekly' && !r.days.length) return toast('Scegli almeno un giorno');
   if (rep === 'once' && at(r.date, time) - alert * 6e4 <= Date.now()) return toast('Orario già passato');
   S.reminders.push(r); save(); render(); $('dlgRem').close(); clearTimeout(syncT); syncServer();
-  S.chat.push({ role: 'tool', text: `✓ Promemoria: ${title}, ${REP_TXT(r)} alle ${time}${alert ? ' · ' + (ALERT[alert] || alert + ' min prima') : ''}` }); save(); renderChat();
+  S.chat.push({ role: 'tool', text: `✓ Promemoria: ${title}, ${REP_TXT(r)} alle ${time} · avvisi: ${alertsTxt(r)}` }); save(); renderChat();
   toast('Promemoria salvato');
 };
 /* Settimana: notti (dove + con Giada), palestra e impegni in una sola schermata */
 const isGymAppt = a => /palestra|gym/i.test(a.title || '');
+const gymOn = d => apptsOn(d).some(isGymAppt);
 function planKey() {
   const n = new Date(), dow = n.getDay();
   if (dow === 0 && n.getHours() >= 17) return weekStart(shift(today(), 1));
@@ -2699,6 +3366,548 @@ $('ntDone').onclick = () => {
   save(); render(); $('dlgNight').close(); clearTimeout(syncT); syncServer();
 };
 $('ntAppt').onclick = async () => { $('dlgNight').close(); await confirmAppt({ title: '', date: wkStart, time: '', place: '', rec: 'none', alert: 60 }); openWeek('plan'); };
+/* ====== V3 · VALIGIA INTELLIGENTE ====== */
+const ACTS = { lavoro: '💼 Lavoro', palestra: '💪 Palestra', elegante: '🍷 Cena elegante', mare: '🏖 Mare', montagna: '🏔 Montagna', sport: '🏃 Sport', serata: '🎉 Serata', relax: '🛋 Relax' };
+const SECS = ['Vestiti', 'Igiene', 'Documenti', 'Tecnologia', 'Per le attività', 'Ricordati dalle volte scorse', 'Aggiunti da te'];
+let tnActs = new Set(), tnMode = 'auto', tvCur = null;
+const tripNights = t => Math.max(1, daysBetween(t.from, t.to));
+const nextTrip = () => S.trips.filter(t => t.to >= today()).sort((a, b) => a.from.localeCompare(b.from))[0];
+async function tripWeather(t) {
+  try {
+    const g = await fetchT('https://geocoding-api.open-meteo.com/v1/search?count=1&language=it&name=' + encodeURIComponent(t.dest), {}, 8000).then(r => r.json());
+    const pl = g.results?.[0]; if (!pl) return null;
+    const f = await fetchT(`https://api.open-meteo.com/v1/forecast?latitude=${pl.latitude}&longitude=${pl.longitude}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Europe%2FRome&forecast_days=16`, {}, 8000).then(r => r.json());
+    const d = f.daily; if (!d) return null;
+    const idx = d.time.map((x, i) => x >= t.from && x <= t.to ? i : -1).filter(i => i >= 0);
+    if (!idx.length) return null;
+    return { tmin: Math.round(Math.min(...idx.map(i => d.temperature_2m_min[i]))), tmax: Math.round(Math.max(...idx.map(i => d.temperature_2m_max[i]))), rain: Math.max(...idx.map(i => d.precipitation_probability_max?.[i] ?? 0)), place: pl.name };
+  } catch { return null; }
+}
+function packList(t) {
+  const n = tripNights(t), days = n + 1, w = t.wx, cold = !w || w.tmin < 12, cool = !w || w.tmin < 18, rain = !w || w.rain >= 40, A = new Set(t.acts), out = [];
+  const add = (sec, txt) => { if (!out.some(i => normKey(i.t) === normKey(txt))) out.push({ id: uid(), t: txt, sec, done: false }); };
+  add('Vestiti', `Mutande ×${n + 1}`); add('Vestiti', `Calzini ×${n + 1}`); add('Vestiti', `Magliette ×${days}`);
+  add('Vestiti', `Pantaloni ×${Math.max(1, Math.ceil(days / 3))}`); add('Vestiti', 'Pigiama');
+  if (cool) add('Vestiti', `Felpa o maglione${days > 4 ? ' ×2' : ''}`);
+  if (cold || rain) add('Vestiti', cold ? 'Giacca pesante' : 'Giacca leggera');
+  if (rain) add('Vestiti', 'Ombrello o k-way');
+  if (w && w.tmax >= 24) add('Vestiti', 'Pantaloncini');
+  add('Vestiti', 'Scarpe comode'); add('Vestiti', 'Ciabatte');
+  ['Spazzolino', 'Dentifricio', 'Deodorante', 'Shampoo e bagnoschiuma', 'Rasoio', 'Medicine personali'].forEach(x => add('Igiene', x));
+  add('Documenti', "Carta d'identità"); add('Documenti', 'Tessera sanitaria'); add('Documenti', 'Carte e un po\' di contanti');
+  if (t.mode === 'auto' || t.mode === 'scooter') add('Documenti', 'Patente');
+  if (t.mode === 'treno' || t.mode === 'aereo') add('Documenti', 'Biglietti (anche sul telefono)');
+  add('Tecnologia', 'Caricabatterie telefono'); add('Tecnologia', 'Cuffie');
+  if (t.mode === 'treno' || t.mode === 'aereo' || n >= 3) add('Tecnologia', 'Powerbank');
+  if (t.mode === 'aereo') add('Igiene', 'Liquidi in busta trasparente (max 100 ml)');
+  if (t.mode === 'scooter') { add('Per le attività', 'Casco e guanti'); add('Per le attività', 'Antipioggia'); }
+  if (A.has('lavoro')) ['PC', 'Caricatore PC', 'Badge', 'Camicia ×' + Math.max(1, Math.min(days, 5))].forEach(x => add('Per le attività', x));
+  if (A.has('palestra')) ['Scarpe da palestra', 'Abbigliamento sportivo', 'Borraccia', 'Asciugamano'].forEach(x => add('Per le attività', x));
+  if (A.has('elegante')) ['Camicia elegante', 'Pantaloni eleganti', 'Scarpe eleganti', 'Profumo'].forEach(x => add('Per le attività', x));
+  if (A.has('mare')) ['Costume ×2', 'Telo mare', 'Crema solare', 'Occhiali da sole', 'Infradito'].forEach(x => add('Per le attività', x));
+  if (A.has('montagna')) ['Scarponi', 'Giacca pesante', 'Cappello e guanti', 'Zaino'].forEach(x => add('Per le attività', x));
+  if (A.has('sport')) ['Abbigliamento sportivo', 'Scarpe da ginnastica'].forEach(x => add('Per le attività', x));
+  if (A.has('serata')) add('Per le attività', 'Outfit per la serata');
+  // extra aggiunti nei viaggi passati: tornano se valgono per tutti i viaggi o per un'attività di questo
+  S.packMemory.filter(m => !m.acts.length || m.acts.some(a => A.has(a))).forEach(m => add('Ricordati dalle volte scorse', m.t));
+  return out;
+}
+function openTripNew() {
+  $('tnDest').value = ''; $('tnFrom').value = shift(today(), 1); $('tnTo').value = shift(today(), 3);
+  tnActs = new Set(); tnMode = 'auto'; drawTripNew(); $('dlgTripNew').showModal();
+}
+function drawTripNew() {
+  $('tnActs').innerHTML = Object.entries(ACTS).map(([k, v]) => `<button class="chip ${tnActs.has(k) ? 'on' : ''}" data-act="${k}">${v}</button>`).join('');
+  document.querySelectorAll('#tnMode button').forEach(b => b.classList.toggle('on', b.dataset.tm === tnMode));
+  document.querySelectorAll('#tnMode button').forEach(b => b.classList.toggle('none', b.dataset.tm === tnMode));
+}
+$('tnActs').onclick = e => { const b = e.target.closest('[data-act]'); if (!b) return; const k = b.dataset.act; tnActs.has(k) ? tnActs.delete(k) : tnActs.add(k); drawTripNew(); };
+$('tnMode').onclick = e => { const b = e.target.closest('[data-tm]'); if (b) { tnMode = b.dataset.tm; drawTripNew(); } };
+$('tripNew').onclick = openTripNew;
+$('tnOk').onclick = async () => {
+  const dest = $('tnDest').value.trim(), from = $('tnFrom').value, to = $('tnTo').value;
+  if (!dest) return toast('Scrivi dove vai'); if (!from || !to || to < from) return toast('Controlla le date');
+  const b = $('tnOk'); b.disabled = true; b.textContent = 'Guardo il meteo e preparo…';
+  const t = { id: uid(), dest, from, to, acts: [...tnActs], mode: tnMode, wx: null, items: [] };
+  t.wx = await tripWeather(t); t.items = packList(t);
+  S.trips.push(t);
+  for (let d = from; d < to; d = shift(d, 1)) if (where(d) === 'none' || where(d) === 'casa') setNight(d, 'altro');   // notti fuori segnate da sole
+  save(); render(); clearTimeout(syncT); syncServer();
+  b.disabled = false; b.textContent = '✦ Prepara la valigia'; $('dlgTripNew').close(); openTrip(t.id);
+};
+function openTrip(id) {
+  const t = S.trips.find(x => x.id === id); if (!t) return; tvCur = id;
+  const done = t.items.filter(i => i.done).length, n = tripNights(t);
+  $('tvTitle').textContent = `Valigia · ${t.dest}`;
+  $('tvSub').textContent = `${shortDate(t.from)} → ${shortDate(t.to)} · ${n} ${n === 1 ? 'notte' : 'notti'}` + (t.wx ? ` · ${t.wx.tmin}–${t.wx.tmax}°${t.wx.rain >= 40 ? ' · pioggia ' + t.wx.rain + '%' : ''}` : ' · meteo non ancora disponibile') + ` · pronti ${done}/${t.items.length}`;
+  $('tvList').innerHTML = SECS.map(sec => { const its = t.items.filter(i => i.sec === sec); return its.length ? `<div class="grp">${sec}<span>${its.filter(i => i.done).length}/${its.length}</span></div>` + its.map(i => `<div class="ing ${i.done ? 'done' : ''}" data-ti="${i.id}"><button class="chk">${i.done ? '✓' : ''}</button><div class="grow">${esc(i.t)}</div><button class="btn ghost small" data-tdel="${i.id}" aria-label="Togli">✕</button></div>`).join('') : ''; }).join('');
+  if (!$('dlgTrip').open) $('dlgTrip').showModal();
+}
+$('tvList').onclick = e => {
+  const t = S.trips.find(x => x.id === tvCur); if (!t) return;
+  const del = e.target.closest('[data-tdel]');
+  if (del) { const it = t.items.find(i => i.id === del.dataset.tdel); t.items = t.items.filter(i => i !== it);
+    if (it && it.sec === 'Ricordati dalle volte scorse' && confirm(`Non proporre più “${it.t}” nei prossimi viaggi?`)) S.packMemory = S.packMemory.filter(m => normKey(m.t) !== normKey(it.t));
+    save(); return openTrip(t.id); }
+  const r = e.target.closest('[data-ti]'); if (r) { const it = t.items.find(i => i.id === r.dataset.ti); if (it) it.done = !it.done; save(); openTrip(t.id); renderAgenda(); renderOggi(); }
+};
+function tripAdd() {
+  const t = S.trips.find(x => x.id === tvCur), v = $('tvAdd').value.trim(); if (!t || !v) return;
+  t.items.push({ id: uid(), t: v, sec: 'Aggiunti da te', done: false, extra: true });
+  if (!S.packMemory.some(m => normKey(m.t) === normKey(v))) S.packMemory.push({ t: v, acts: t.acts.slice() });   // la prossima volta te lo ripropongo
+  $('tvAdd').value = ''; save(); openTrip(t.id); toast('Aggiunto: me lo ricordo per i prossimi viaggi');
+}
+$('tvAddBtn').onclick = tripAdd;
+$('tvAdd').onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); tripAdd(); } };
+$('tvDel').onclick = () => { const t = S.trips.find(x => x.id === tvCur); if (!t || !confirm(`Eliminare il viaggio a ${t.dest}?`)) return; S.trips = S.trips.filter(x => x !== t); save(); render(); $('dlgTrip').close(); };
+function renderTrips() {
+  if (!$('trips')) return;
+  S.trips = S.trips.filter(t => t.to >= shift(today(), -14));    // i viaggi finiti da 2 settimane spariscono (gli extra restano ricordati)
+  const list = [...S.trips].sort((a, b) => a.from.localeCompare(b.from));
+  $('trips').innerHTML = list.length ? list.map(t => `<button class="trip" data-trip="${t.id}"><div style="font-size:22px">🧳</div><div class="grow"><b>${esc(t.dest)}</b><div class="sub">${shortDate(t.from)} → ${shortDate(t.to)}${t.wx ? ' · ' + t.wx.tmin + '–' + t.wx.tmax + '°' : ''} · ${t.acts.map(a => ACTS[a]?.split(' ')[0]).join(' ')}</div></div><span class="badge">${t.items.filter(i => i.done).length}/${t.items.length}</span></button>`).join('')
+    : '<div class="empty">Nessun viaggio. Quando parti, ti preparo la valigia in base a giorni, meteo e attività.</div>';
+  // in Oggi: valigia per un viaggio che parte entro 2 giorni
+  const nt = nextTrip(), el = $('tripToday');
+  if (el) {
+    const show = nt && daysBetween(today(), nt.from) <= 2 && nt.items.some(i => !i.done);
+    el.style.display = show ? '' : 'none';
+    if (show) { const left = nt.items.filter(i => !i.done).length, d = daysBetween(today(), nt.from);
+      el.innerHTML = `<button class="trip" data-trip="${nt.id}" style="border:0;padding:0"><div style="font-size:24px">🧳</div><div class="grow"><b>Valigia per ${esc(nt.dest)}</b><div class="sub">${d <= 0 ? 'parti oggi' : d === 1 ? 'parti domani' : 'parti tra 2 giorni'} · ${left === 1 ? 'manca 1 cosa' : 'mancano ' + left + ' cose'}</div></div><span class="btn small">Apri</span></button>`; }
+  }
+}
+document.addEventListener('click', e => { const b = e.target.closest('[data-trip]'); if (b) openTrip(b.dataset.trip); });
+
+/* ====== V3 · DOCUMENTI: foto solo sul telefono, collegate alle scadenze ====== */
+const DOC_PRESET = ["Carta d'identità", 'Patente', 'Tessera sanitaria', 'Codice fiscale', 'Libretto scooter'];
+let dcCur = null;
+function renderDocs() {
+  if (!$('docChips')) return;
+  const names = [...new Set([...DOC_PRESET, ...S.docs.map(d => d.name)])];
+  $('docChips').innerHTML = names.map(n => { const d = S.docs.find(x => x.name === n), has = d && d.files.length; return `<button class="chip ${has ? 'on' : ''}" data-doc="${esc(n)}">${has ? '🪪' : '＋'} ${esc(n)}</button>`; }).join('') + '<button class="chip" data-doc="__new">＋ Altro</button>';
+}
+const docDeadline = name => S.deadlines.find(dl => normKey(dl.title).includes(normKey(name).split(' ')[0]) || normKey(name).includes(normKey(dl.title)));
+async function openDoc(name) {
+  if (name === '__new') { name = (prompt('Nome del documento (es. Passaporto):') || '').trim(); if (!name) return; }
+  let d = S.docs.find(x => x.name === name); if (!d) { d = { id: uid(), name, files: [] }; S.docs.push(d); }
+  dcCur = d.id; $('dcTitle').textContent = name;
+  const dl = docDeadline(name);
+  $('dcDeadline').innerHTML = dl ? `⏳ Scade il <b>${esc(longDate(nextDeadline(dl)))}</b>` : `<button class="btn ghost small" id="dcAddDl">＋ Aggiungi la scadenza</button>`;
+  $('dcPhotos').innerHTML = d.files.length ? d.files.map(f => `<div class="docph" data-docimg="${f}"><img alt=""><button class="x" data-docx="${f}">✕</button></div>`).join('') : '<div class="empty" style="grid-column:1/-1">Nessuna foto. Aggiungi fronte e retro: le vedi anche senza internet.</div>';
+  if (!$('dlgDoc').open) $('dlgDoc').showModal();
+  for (const el of document.querySelectorAll('#dcPhotos [data-docimg]')) { const u = await thumbURL(el.dataset.docimg); if (u) el.querySelector('img').src = u; }
+}
+document.addEventListener('click', e => { const b = e.target.closest('[data-doc]'); if (b) openDoc(b.dataset.doc); });
+$('dcFile').onchange = async ev => {
+  const d = S.docs.find(x => x.id === dcCur), files = [...ev.target.files]; ev.target.value = ''; if (!d) return;
+  for (const f of files) { const blob = await shrink(f), fid = uid(); try { await filePut(fid, { blob, name: f.name || 'documento.jpg', type: blob.type || 'image/jpeg' }); d.files.push(fid); } catch (e) { logErr('documento', e); } }
+  save(); renderDocs(); openDoc(d.name);
+};
+$('dcPhotos').onclick = async e => {
+  const d = S.docs.find(x => x.id === dcCur); if (!d) return;
+  const x = e.target.closest('[data-docx]'); if (x) { e.stopPropagation(); if (!confirm('Togliere questa foto?')) return; d.files = d.files.filter(f => f !== x.dataset.docx); fileDel(x.dataset.docx).catch(() => {}); save(); renderDocs(); return openDoc(d.name); }
+  const im = e.target.closest('[data-docimg]'); if (im) { const u = await thumbURL(im.dataset.docimg); if (u) { $('vwImg').src = u; $('dlgView').showModal(); } }
+};
+$('dcDeadline').onclick = e => { if (!e.target.closest('#dcAddDl')) return; const d = S.docs.find(x => x.id === dcCur); $('dlgDoc').close(); SUG_DL['doc-x'] = [d.name, 'none', '60,30,7']; openSug('doc-x'); };
+$('dcDel').onclick = () => { const d = S.docs.find(x => x.id === dcCur); if (!d || !confirm(`Eliminare ${d.name} e le sue foto?`)) return; d.files.forEach(f => fileDel(f).catch(() => {})); S.docs = S.docs.filter(x => x !== d); save(); renderDocs(); $('dlgDoc').close(); };
+
+/* ====== V3 · PIANTE PRIMA DI PARTIRE ====== */
+function awayPlants(d = today()) {
+  // stasera sei a casa e dalle prossime notti stai via almeno 2 notti → annaffia prima di partire
+  if (['giada', 'altro'].includes(where(d)) || !S.plants.length) return null;
+  let back = null; for (let i = 1; i <= 14; i++) { const x = shift(d, i); if (!['giada', 'altro'].includes(where(x))) { back = x; break; } }
+  if (!back || daysBetween(d, back) < 3) return null;
+  const due = plantsDueBy(back); return due.length ? { back, due } : null;
+}
+
+/* ====== V3 · AUTOMAZIONI iPHONE E MESSAGGI ====== */
+let msWhen = 'orario', msDaysSet = new Set([1, 2, 3, 4, 5]);
+const srvURL = () => (P().url || 'https://gestiotto.….workers.dev').replace(/\/$/, '');
+function fillGuides() {
+  $('gNight').innerHTML = `<ol>
+    <li>App <b>Comandi</b> › <b>Automazione</b> › <b>+</b> › <b>Arrivo</b>.</li>
+    <li>Posizione: <b>casa di Giada</b>. Orario: <b>Intervallo di tempo</b> 20:00 – 03:00. Scegli <b>Esegui immediatamente</b>.</li>
+    <li>Azione: <b>Testo</b> con scritto <code>#NOTTE giada</code> → <b>Esegui comando rapido</b> › <b>Gestiotto Invia</b>.</li>
+    <li>Rifai lo stesso per <b>casa tua</b> con <code>#NOTTE casa</code>.</li></ol>
+    <div class="sub">Se dormi da solo lo cambi con un tocco in Oggi (💑/👤).</div>`;
+  $('gCarry').innerHTML = `<ol>
+    <li>App <b>Comandi</b> › <b>Automazione</b> › <b>+</b> › <b>Uscita</b> (o "Partenza").</li>
+    <li>Posizione: <b>casa tua</b> (e se vuoi una seconda per casa di Giada). Orario: 6:00 – 11:00. <b>Esegui immediatamente</b>.</li>
+    <li>Azione 1: <b>Ottieni contenuti dell'URL</b>: <code>${esc(srvURL())}/carry</code>, intestazione <code>Authorization</code> = <code>Bearer</code> + spazio + la tua password del server.</li>
+    <li>Azione 2: <b>Mostra notifica</b> con <i>Contenuti dell'URL</i>.</li></ol>
+    <div class="sub">Oggi ti direbbe: ${esc(carryText(today()) || 'niente di particolare')}</div>`;
+}
+function renderMsgs() {
+  if (!$('msgList')) return;
+  const L = S.msgRules || [];
+  $('msgCount').textContent = L.length ? String(L.length) : '';
+  $('msgList').innerHTML = L.length ? L.map(m => `<div class="item"><div class="grow"><b>${esc(m.toName || 'WhatsApp')}</b> · “${esc(m.text)}”<div class="sub">${m.when === 'orario' ? '⏰ ' + m.time + (m.date ? ' · ' + shortDate(m.date) : ' · ' + daysText(m.days)) : (m.when === 'arrivo' ? '📍 arrivo a ' : '🚶 uscita da ') + esc(m.place)}</div></div>${m.when !== 'orario' ? `<button class="btn ghost small" data-msgguide="${m.id}">Guida</button>` : ''}<button class="btn ghost small" data-msgdel="${m.id}">✕</button></div>`).join('')
+    : '<div class="empty">Es. "quando arrivo da Giada scrivi a mamma: sono arrivato", oppure un messaggio a un\'ora precisa.</div>';
+}
+function msDraw() {
+  document.querySelectorAll('#msWhen button').forEach(b => { b.classList.toggle('on', b.dataset.mw === msWhen); b.classList.toggle('none', b.dataset.mw === msWhen); });
+  $('msTimeBox').style.display = msWhen === 'orario' ? '' : 'none'; $('msPlaceBox').style.display = msWhen === 'orario' ? 'none' : '';
+  drawDays($('msDays'), msDaysSet);
+}
+$('msgNew').onclick = () => { msWhen = 'orario'; msDaysSet = new Set([1, 2, 3, 4, 5]); ['msTo', 'msPhone', 'msText', 'msPlace', 'msDate'].forEach(i => $(i).value = ''); $('msTime').value = '08:00'; msDraw(); $('dlgMsg').showModal(); };
+$('msWhen').onclick = e => { const b = e.target.closest('[data-mw]'); if (b) { msWhen = b.dataset.mw; msDraw(); } };
+$('msDays').onclick = e => { const b = e.target.closest('[data-d]'); if (!b) return; const d = +b.dataset.d; msDaysSet.has(d) ? msDaysSet.delete(d) : msDaysSet.add(d); msDraw(); };
+function msgGuide(m) {
+  const group = !cleanPhone(m.phone), trig = m.when === 'arrivo' ? 'Arrivo' : 'Uscita';
+  $('mgTitle').textContent = `Ultimo passo: ${trig.toLowerCase()} ${m.when === 'arrivo' ? 'a' : 'da'} ${m.place}`;
+  $('mgBody').innerHTML = `<ol>
+    <li>App <b>Comandi</b> › <b>Automazione</b> › <b>+</b> › <b>${trig}</b> › posizione <b>${esc(m.place)}</b> › <b>Esegui immediatamente</b>.</li>
+    ${group ? `<li>Azione: <b>Apri URL</b> con <code>${esc(waURL(m))}</code></li><li>All'arrivo si apre WhatsApp con il messaggio pronto: scegli <b>${esc(m.toName || 'il gruppo')}</b> e tocca Invia.</li>
+      <li class="sub">WhatsApp non permette l'invio automatico nei gruppi. Se sono tutti su iPhone, puoi usare invece l'azione <b>Messaggi › Invia messaggio</b> al gruppo iMessage: parte da solo.</li>`
+    : `<li>Azione: <b>Invia messaggio con WhatsApp</b> (cerca "WhatsApp" nelle azioni) › destinatario <b>${esc(m.toName || m.phone)}</b> › messaggio <code>${esc(m.text)}</code>.</li><li>Apri l'azione e spegni <b>Mostra durante l'esecuzione</b>: così parte senza chiederti niente.</li>`}
+  </ol><button class="btn ghost full" id="mgCopy">Copia il messaggio</button>`;
+  $('mgCopy').onclick = () => { try { navigator.clipboard.writeText(m.text); toast('Messaggio copiato'); } catch { toast(m.text); } };
+  $('dlgMsgGuide').showModal();
+}
+$('msOk').onclick = () => {
+  const text = $('msText').value.trim(); if (!text) return toast('Scrivi il messaggio');
+  const m = { id: uid(), when: msWhen, toName: $('msTo').value.trim(), phone: $('msPhone').value.trim(), text, on: true };
+  if (msWhen === 'orario') { m.time = normTime($('msTime').value); m.date = $('msDate').value || ''; m.days = [...msDaysSet]; if (!m.time) return toast("Scegli l'ora"); if (!m.date && !m.days.length) return toast('Scegli una data o dei giorni'); }
+  else { m.place = $('msPlace').value.trim(); if (!m.place) return toast('Scrivi il luogo'); }
+  (S.msgRules = S.msgRules || []).push(m); save(); renderMsgs(); $('dlgMsg').close(); clearTimeout(syncT); syncServer();
+  if (m.when !== 'orario') msgGuide(m); else toast(`Alle ${m.time} ti arriva la notifica: un tocco e WhatsApp è pronto`);
+};
+$('msgList').onclick = e => {
+  const g = e.target.closest('[data-msgguide]'); if (g) return msgGuide(S.msgRules.find(m => m.id === g.dataset.msgguide));
+  const d = e.target.closest('[data-msgdel]'); if (d && confirm('Eliminare questo messaggio?')) { S.msgRules = S.msgRules.filter(m => m.id !== d.dataset.msgdel); save(); renderMsgs(); }
+};
+
+/* ====== V3 · SOLDI ======
+   Estratto conto (CSV / Excel) → movimenti con negozio e categoria, spese strane, mese, abbonamenti, patrimonio.
+   Restano sul telefono: non vanno nel backup del server. All'IA (se attiva) arriva solo il nome del negozio. */
+const M = () => S.money;
+const MCATS = ['Spesa', 'Mutuo e affitto', 'Risparmi e investimenti', 'Ristoranti e bar', 'Carburante', 'Trasporti', 'Casa e bollette', 'Abbonamenti', 'Shopping', 'Salute', 'Sport e svago', 'Viaggi', 'Prelievi', 'Bonifici', 'Tasse e commissioni', 'Entrate', 'Stipendio', 'Altro'];
+const MRULES = [
+  ['Mutuo e affitto', /mutuo|rata mutuo|affitto|locazione|canone casa/],
+  ['Risparmi e investimenti', /\betf\b|directa|fineco|degiro|scalable|trade ?republic|moneyfarm|buono fruttifero|libretto|conto deposito|investiment|piano di accumulo|\bpac\b|fondo pension/],
+  ['Spesa', /lidl|esselunga|\bcoop\b|conad|penny|carrefour|eurospin|\bin'?s\b|in s mercato|\bpam\b|basko|ipercoop|despar|\bcrai\b|\bmd\b|aldi|famila|tigre|supermerc|alimentari|panific|macelleria|ortofrutta/],
+  ['Ristoranti e bar', /\bbar\b|caff[eè]|ristorant|pizzer|trattoria|osteria|mcdonald|burger|sushi|kebab|\bpub\b|gelater|pasticc|glovo|deliveroo|just ?eat|focacc|bistrot|starbucks|autogrill/],
+  ['Carburante', /\beni\b|enilive|\bq8\b|\bip\b|tamoil|esso|agip|\bapi\b|carburant|benzin|distributor/],
+  ['Trasporti', /trenitalia|italo|\bamt\b|autostrad|telepass|parchegg|\buber\b|taxi|\bfs\b|bus|metro|freenow|bolt/],
+  ['Casa e bollette', /enel|iren|a2a|edison|hera|\btim\b|vodafone|wind ?tre|iliad|fastweb|acqua|bolletta|condomin|affitto|sky ?wifi|ho\.? mobile|very mobile/],
+  ['Abbonamenti', /netflix|spotify|prime video|amazon prime|disney|dazn|apple\.com|icloud|google (one|play|storage)|youtube|now tv|paramount|chatgpt|openai|claude|patreon|audible/],
+  ['Shopping', /amazon|zalando|decathlon|ikea|h ?& ?m|\bzara\b|mediaworld|unieuro|euronics|primark|ovs|shein|temu|ebay|leroy|brico/],
+  ['Salute', /farmac|medic|ospedal|dentist|clinic|ottic|analisi|parafarm/],
+  ['Sport e svago', /palestra|fitness|gym|cinema|teatro|concert|ticket|steam|playstation|xbox|nintendo|museo/],
+  ['Viaggi', /booking|airbnb|ryanair|easyjet|wizz|ita airways|hotel|expedia|trivago/],
+  ['Prelievi', /prelievo|\batm\b|bancomat/],
+  ['Tasse e commissioni', /\bf24\b|agenzia entrate|commission|canone|imposta di bollo|bollo conto|interessi passivi/],
+  ['Stipendio', /stipendio|emolument|competenze|retribuz|busta paga/],
+  ['Bonifici', /bonifico|giroconto|satispay|paypal|postepay|ricarica/]
+];
+const NOISE = /\b(accredito|giroconto verso|bonifico|istantaneo|sepa|favore|a favore di|causale|ordinante|disposto|pagamento|pagam|pos|carta|card|n\.?|nr|num|operazione|op\.|del|ore|eur|euro|addebito|acquisto|presso|contactless|debit|mastercard|visa|maestro|vpay|sdd|sepa|disposizione|cred|deb|data|valuta|loc|it|ita|italy|spa|s\.?p\.?a\.?|srl|s\.?r\.?l\.?|sas|snc)\b/gi;
+function merchantOf(desc) {
+  const fav = String(desc || '').match(/(?:a favore di|favore|beneficiario|a:|ordinante|da:)\s*:?\s*([A-Za-zÀ-ÿ'.\s]{3,40}?)(?:\s+(?:causale|iban|cro|trn|rif|per|-|\d)|$)/i);
+  if (fav && fav[1].trim().split(' ').length <= 5) return ('Bonifico ' + fav[1].trim()).toLowerCase().replace(/(^|\s)\S/g, c => c.toUpperCase()).slice(0, 40);
+  let s = String(desc || '').replace(/\*+\d+|\d{2}[\/.-]\d{2}([\/.-]\d{2,4})?|\d{1,2}[:.]\d{2}|\b\d+[.,]?\d*\b/g, ' ').replace(NOISE, ' ').replace(/[^A-Za-zÀ-ÿ'&.\s-]/g, ' ').replace(/\s+/g, ' ').trim();
+  const w = s.split(' ').filter(x => x.length > 1).slice(0, 3).join(' ');
+  return (w || String(desc || '').slice(0, 24)).toLowerCase().replace(/(^|\s)\S/g, c => c.toUpperCase());
+}
+const catRule = (desc, amt) => { const d = String(desc || '').toLowerCase(); for (const [c, re] of MRULES) if (re.test(d)) return c; return amt > 0 ? 'Entrate' : null; };
+const parseAmt = v => {
+  if (typeof v === 'number') return v; let s = String(v || '').replace(/[€\s]/g, ''); if (!s) return null;
+  const neg = /^-|-$|^\(.*\)$/.test(s); s = s.replace(/[()+-]/g, '');
+  if (/,\d{1,2}$/.test(s)) s = s.replace(/\./g, '').replace(',', '.'); else s = s.replace(/,/g, '');
+  const n = parseFloat(s); return isNaN(n) ? null : (neg ? -n : n);
+};
+function parseDateAny(v) {
+  if (typeof v === 'number' && v > 20000 && v < 80000) { const d = new Date(Math.round((v - 25569) * 864e5)); return ymd(new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())); }
+  const s = String(v || '').trim(); let m;
+  if ((m = s.match(/^(\d{4})-(\d{2})-(\d{2})/))) return `${m[1]}-${m[2]}-${m[3]}`;
+  if ((m = s.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{2,4})/))) { const y = m[3].length === 2 ? '20' + m[3] : m[3]; return `${y}-${pad(+m[2])}-${pad(+m[1])}`; }
+  return null;
+}
+function splitCSV(text) {
+  const first = text.split(/\r?\n/).slice(0, 15).join('\n');
+  const delim = [';', '\t', ',', '|'].map(d => [d, (first.match(new RegExp(d === '|' ? '\\|' : d, 'g')) || []).length]).sort((a, b) => b[1] - a[1])[0][0];
+  const rows = []; let row = [], cur = '', q = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) { if (c === '"') { if (text[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += c; }
+    else if (c === '"') q = true;
+    else if (c === delim) { row.push(cur); cur = ''; }
+    else if (c === '\n' || c === '\r') { if (c === '\r' && text[i + 1] === '\n') i++; row.push(cur); rows.push(row); row = []; cur = ''; }
+    else cur += c;
+  }
+  if (cur || row.length) { row.push(cur); rows.push(row); }
+  return rows.filter(r => r.some(x => String(x).trim()));
+}
+/* trova da sola le colonne: data, descrizione, importo (oppure dare/avere, entrate/uscite), saldo */
+function rowsToTx(rows) {
+  const norm = x => String(x || '').toLowerCase().trim();
+  let hi = -1, col = null;
+  for (let r = 0; r < Math.min(rows.length, 40); r++) {
+    const H = rows[r].map(norm), find = re => H.findIndex(x => re.test(x));
+    const c = { date: find(/^data( (operazione|contabile|op\.?))?$|^data$|^date|data contab|data oper/), date2: find(/valuta/), desc: find(/descri|dettagl/), desc2: find(/causale/), amt: find(/^importo|^amount|^ammontare|importo \(?eur/), out: find(/^dare$|uscite|addebit|^debit/), inn: find(/^avere$|entrate|accredit|^credit/), bal: find(/^saldo/) };
+    if (c.desc < 0) { c.desc = c.desc2; c.desc2 = -1; }
+    if (c.desc < 0) c.desc = H.findIndex((x, i) => /beneficiario|esercente|movimento|operazione|controparte/.test(x) && !/^data/.test(x) && i !== c.date);
+    if (c.date < 0 && c.date2 >= 0) c.date = c.date2;
+    if (c.date >= 0 && (c.amt >= 0 || c.out >= 0 || c.inn >= 0)) { hi = r; col = c; break; }
+  }
+  if (hi < 0) throw new Error('non trovo le colonne data e importo');
+  if (col.desc < 0) col.desc = rows[hi].findIndex((x, i) => ![col.date, col.date2, col.amt, col.out, col.inn, col.bal].includes(i));
+  const out = []; let lastBal = null;
+  for (const r of rows.slice(hi + 1)) {
+    const date = parseDateAny(r[col.date]); if (!date) continue;
+    let amt = col.amt >= 0 ? parseAmt(r[col.amt]) : null;
+    if (amt == null) { const o = col.out >= 0 ? parseAmt(r[col.out]) : null, i = col.inn >= 0 ? parseAmt(r[col.inn]) : null; amt = (i ? Math.abs(i) : 0) - (o ? Math.abs(o) : 0); if (!o && !i) amt = null; }
+    if (amt == null || amt === 0) continue;
+    const desc = ((col.desc2 >= 0 ? String(r[col.desc2] ?? '') + ' ' : '') + String(r[col.desc] ?? '')).replace(/\s+/g, ' ').trim();
+    if (col.bal >= 0) { const b = parseAmt(r[col.bal]); if (b != null && (!lastBal || date >= lastBal.date)) lastBal = { date, value: b }; }
+    out.push({ date, desc, amount: Math.round(amt * 100) / 100 });
+  }
+  return { tx: out, balance: lastBal };
+}
+async function readBankFile(f) {
+  if (/\.xlsx?$/i.test(f.name) || /sheet|excel/.test(f.type)) {
+    if (!window.XLSX) await new Promise((res, rej) => { const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'; s.onload = res; s.onerror = () => rej(new Error('serve internet per leggere i file Excel')); document.head.appendChild(s); });
+    const wb = XLSX.read(await f.arrayBuffer(), { type: 'array' });
+    let best = null; for (const n of wb.SheetNames) { try { const r = rowsToTx(XLSX.utils.sheet_to_json(wb.Sheets[n], { header: 1, raw: true, defval: '' })); if (!best || r.tx.length > best.tx.length) best = r; } catch {} }
+    if (!best) throw new Error('non trovo i movimenti nel file Excel'); return best;
+  }
+  let text = await f.text(); if (/�/.test(text)) { try { text = new TextDecoder('windows-1252').decode(await f.arrayBuffer()); } catch {} }
+  return rowsToTx(splitCSV(text));
+}
+function mnyProgress(t) { const el = $('mnyProg'); if (!el) return; el.style.display = t ? '' : 'none'; if (t) el.innerHTML = `<b>${esc(t)}</b><div class="bar ind"><i></i></div>`; }
+async function categorize(list) {
+  const m = M(), unknown = [...new Set(list.filter(t => !m.merch[t.merchant] && !catRule(t.desc, t.amount)).map(t => t.merchant))];
+  if (unknown.length && m.ai !== false && aiReady()) {
+    for (let i = 0; i < unknown.length; i += 60) {
+      try {
+        const j = parseJSON(await aiAsk({ json: true, maxTokens: 2500, system: `Classifica questi esercenti italiani da un estratto conto. Categorie possibili: ${MCATS.join(', ')}. Rispondi SOLO JSON: {"r":[{"e":"esercente come scritto","nome":"nome leggibile del negozio o servizio","cat":"una categoria"}]}`, text: unknown.slice(i, i + 60).join('\n') }));
+        (j.r || []).forEach(x => { if (x.e && MCATS.includes(x.cat)) m.merch[x.e] = { name: x.nome || x.e, cat: x.cat }; });
+      } catch (e) { console.warn('categorie', e); break; }
+    }
+  }
+  list.forEach(t => { const k = m.merch[t.merchant]; t.cat = (k && k.cat) || catRule(t.desc, t.amount) || 'Altro'; if (k && k.name) t.name = k.name; });
+}
+function flagStrange(newTx) {
+  const m = M(), old = m.tx, first = !old.length, cnt = {}, firstSub = {};
+  const TRUST = ['Spesa', 'Carburante', 'Stipendio', 'Bonifici', 'Casa e bollette', 'Tasse e commissioni', 'Entrate', 'Prelievi'];
+  newTx.forEach(t => { cnt[t.merchant] = (cnt[t.merchant] || 0) + 1; if (!firstSub[t.merchant] || t.date < firstSub[t.merchant].date) firstSub[t.merchant] = t; });
+  const seen = new Set(old.map(t => t.merchant)), byM = {};
+  old.filter(t => t.amount < 0).forEach(t => (byM[t.merchant] = byM[t.merchant] || []).push(-t.amount));
+  const med = a => { const s = [...a].sort((x, y) => x - y); return s[Math.floor(s.length / 2)]; };
+  newTx.forEach(t => {
+    if (t.amount >= 0 || m.safe[t.merchant]) return;
+    const a = -t.amount, prev = byM[t.merchant] || [];
+    if (prev.length >= 3 && a > Math.max(20, med(prev) * 3)) t.flag = `Molto più alto del solito (di solito ~${eur(med(prev))})`;
+    else if (!seen.has(t.merchant) && cnt[t.merchant] === 1 && !TRUST.includes(t.cat) && a >= (first ? 150 : 60)) t.flag = first ? 'Spesa alta da un negozio poco usato' : 'Negozio mai visto prima';
+    const dup = [...old, ...newTx].find(x => x !== t && x.merchant === t.merchant && x.amount === t.amount && Math.abs(daysBetween(x.date, t.date)) <= 1);
+    if (dup && a >= 5) t.flag = 'Possibile addebito doppio';
+    if (!first && t.cat === 'Abbonamenti' && !seen.has(t.merchant) && firstSub[t.merchant] === t) t.flag = 'Nuovo abbonamento';
+  });
+}
+$('mnyImport').onclick = () => $('mnyFile').click();
+$('mnyFile').onchange = async ev => {
+  const f = ev.target.files[0]; ev.target.value = ''; if (!f) return;
+  const m = M();
+  try {
+    mnyProgress('Leggo ' + f.name + '…');
+    const { tx, balance } = await readBankFile(f);
+    if (!tx.length) throw new Error('nessun movimento trovato');
+    const key = t => `${t.date}|${t.amount}|${normKey(t.desc)}`, have = new Set(m.tx.map(key));
+    const fresh = tx.filter(t => !have.has(key(t))).map(t => ({ id: uid(), ...t, merchant: merchantOf(t.desc) }));
+    mnyProgress(`Riconosco negozi e categorie (${fresh.length} movimenti nuovi)…`);
+    await categorize(fresh); flagStrange(fresh);
+    m.tx = [...m.tx, ...fresh].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 6000);
+    m.imports.push({ date: today(), file: f.name, n: fresh.length });
+    if (balance) { let a = m.accounts.find(x => x.type === 'conto'); if (!a) { a = { id: uid(), name: 'Conto corrente', type: 'conto', snaps: [] }; m.accounts.unshift(a); } a.snaps = a.snaps.filter(s => s.date !== balance.date); a.snaps.push(balance); a.snaps.sort((x, y) => x.date.localeCompare(y.date)); }
+    save(); const nf = fresh.filter(t => t.flag).length;
+    toast(`${fresh.length} movimenti nuovi${tx.length - fresh.length ? ' (' + (tx.length - fresh.length) + ' già presenti)' : ''}${nf ? ' · ' + nf + ' da controllare' : ''}`);
+  } catch (e) { toast('Estratto conto: ' + e.message); logErr('estratto conto', e); }
+  mnyProgress(''); renderSoldi();
+};
+$('mnyPrivacy').onclick = () => { const m = M(); m.ai = m.ai === false; save(); renderSoldi(); toast(m.ai ? 'Negozi riconosciuti con l\'IA (solo il nome del negozio)' : 'Solo sul telefono: niente viene inviato'); };
+let mnyMonth = '', mnyAll = false;
+document.addEventListener('click', e => { if (e.target.closest('#mnyMore')) { mnyAll = true; renderSoldi(); } });
+const monthOf = d => d.slice(0, 7);
+const MESI = ['gen', 'feb', 'mar', 'apr', 'mag', 'giu', 'lug', 'ago', 'set', 'ott', 'nov', 'dic'];
+const monthLbl = k => MESI[+k.slice(5) - 1] + ' ' + k.slice(2, 4);
+const MKINDS = { fisso: '🏠 Spesa fissa (mutuo, affitto, bollette)', spesa: '🛍 Spesa normale', abbonamento: '🔁 Abbonamento', risparmio: '🐷 Risparmio / investimento', trasferimento: '↔︎ Tra miei conti', entrata: '💶 Entrata (stipendio, rimborso)' };
+const ruleFor = t => (M().rules || []).find(r => r.merchant === t.merchant);
+function kindOf(t) {
+  const r = ruleFor(t); if (r && r.kind) return r.kind;
+  if (t.amount > 0) return /giroconto|trasferimento tra|da conto/i.test(t.desc) ? 'trasferimento' : 'entrata';
+  if (t.cat === 'Risparmi e investimenti') return 'risparmio';
+  if (/giroconto|trasferimento tra/i.test(t.desc)) return 'trasferimento';
+  if (['Mutuo e affitto', 'Casa e bollette', 'Tasse e commissioni'].includes(t.cat)) return 'fisso';
+  if (t.cat === 'Abbonamenti') return 'abbonamento';
+  return 'spesa';
+}
+const isTransfer = t => kindOf(t) === 'trasferimento';
+function monthStats(k) {
+  const tx = M().tx.filter(t => monthOf(t.date) === k && !isTransfer(t));
+  const inc = tx.filter(t => t.amount > 0).reduce((a, t) => a + t.amount, 0), spend = tx.filter(t => t.amount < 0 && kindOf(t) !== 'risparmio');
+  const out = spend.reduce((a, t) => a - t.amount, 0), invested = tx.filter(t => t.amount < 0 && kindOf(t) === 'risparmio').reduce((a, t) => a - t.amount, 0), cats = {};
+  spend.forEach(t => cats[t.cat] = (cats[t.cat] || 0) - t.amount);
+  const fixed = spend.filter(t => ['fisso', 'abbonamento'].includes(kindOf(t))).reduce((a, t) => a - t.amount, 0);
+  const small = spend.filter(t => -t.amount < 10), smallTot = small.reduce((a, t) => a - t.amount, 0);
+  return { inc, out, invested, save: inc - out, cats, fixed, variable: out - fixed, small: small.length, smallTot, n: tx.length };
+}
+function recurring() {
+  const by = {}; M().tx.forEach(t => (by[t.merchant + (t.amount > 0 ? '+' : '')] = by[t.merchant + (t.amount > 0 ? '+' : '')] || []).push(t));
+  const out = [];
+  Object.values(by).forEach(list => {
+    list.sort((a, b) => b.date.localeCompare(a.date));
+    const months = [...new Set(list.map(t => monthOf(t.date)))], last = list[0], avg = list.slice(0, 3).reduce((a, t) => a + Math.abs(t.amount), 0) / Math.min(3, list.length);
+    const similar = list.slice(0, 3).every(t => Math.abs(Math.abs(t.amount) - avg) <= Math.max(3, avg * 0.2));
+    const r = ruleFor(last);
+    if ((r || last.cat === 'Abbonamenti' || (months.length >= 2 && similar && list.length <= months.length + 1)) && monthOf(last.date) >= monthOf(shift(today(), -50)) && !(['Spesa', 'Carburante', 'Ristoranti e bar', 'Prelievi'].includes(last.cat) && !r))
+      out.push({ merchant: last.merchant, name: (r && r.name) || last.name || last.merchant, amount: Math.round(avg * 100) / 100, sign: last.amount > 0 ? 1 : -1, last: last.date, n: list.length, kind: kindOf(last), cat: last.cat, explained: !!r });
+  });
+  return out.sort((a, b) => (b.sign < 0) - (a.sign < 0) || b.amount - a.amount);
+}
+function subscriptions() {
+  const by = {}; M().tx.filter(t => t.amount < 0).forEach(t => (by[t.merchant] = by[t.merchant] || []).push(t));
+  const out = [];
+  Object.entries(by).forEach(([mr, list]) => {
+    const months = [...new Set(list.map(t => monthOf(t.date)))].sort(), last = list[0];
+    const avg = list.slice(0, 3).reduce((a, t) => a - t.amount, 0) / Math.min(3, list.length);
+    const similar = list.slice(0, 3).every(t => Math.abs(-t.amount - avg) <= Math.max(2, avg * 0.15));
+    if ((last.cat === 'Abbonamenti' || (months.length >= 2 && similar && list.length <= months.length + 1)) && monthOf(last.date) >= monthOf(shift(today(), -45)) && !['Spesa', 'Carburante', 'Prelievi', 'Ristoranti e bar'].includes(last.cat))
+      out.push({ name: last.name || mr, amount: Math.round(avg * 100) / 100, last: last.date, cat: last.cat });
+  });
+  return out.sort((a, b) => b.amount - a.amount);
+}
+const eur0 = n => Math.round(+n || 0).toLocaleString('it-IT') + ' €';
+const MESI_L = ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'];
+function saveTips(k) {
+  const months = [...new Set(M().tx.map(t => monthOf(t.date)))].sort().reverse(), prevK = months.filter(x => x < k).slice(0, 3), st = monthStats(k), prev = prevK.map(monthStats), tips = [];
+  const avg = c => prev.length ? prev.reduce((a, s) => a + (s.cats[c] || 0), 0) / prev.length : null;
+  Object.entries(st.cats).forEach(([c, v]) => { const a = avg(c); if (a && v > a * 1.3 && v - a >= 25 && !['Mutuo e affitto', 'Tasse e commissioni'].includes(c)) tips.push({ ic: '📈', t: `${c}: ${eur(v)} questo mese`, d: `${Math.round((v - a) / a * 100)}% in più del solito (${eur(a)}). Tornando nella media risparmi`, gain: (v - a) * 12 }); });
+  const subs = recurring().filter(r => r.kind === 'abbonamento' && r.sign < 0), subTot = subs.reduce((a, s) => a + s.amount, 0);
+  if (subs.length) tips.push({ ic: '🔁', t: `${subs.length} abbonament${subs.length === 1 ? 'o' : 'i'}: ${eur(subTot)} al mese`, d: `${subs.map(s => s.name).slice(0, 4).join(', ')}. Ne togli uno che usi poco e risparmi`, gain: (subs[subs.length - 1] || {}).amount * 12 || 0 });
+  if (st.small >= 8) tips.push({ ic: '☕', t: `${st.small} spese piccole sotto 10 €: ${eur(st.smallTot)}`, d: 'Bar, snack, piccoli acquisti: dimezzandole risparmi', gain: st.smallTot / 2 * 12 });
+  const top = Object.entries(st.cats).filter(([c]) => ['Ristoranti e bar', 'Shopping', 'Sport e svago', 'Viaggi'].includes(c)).sort((a, b) => b[1] - a[1])[0];
+  if (top && top[1] >= 60 && !tips.some(x => x.t.startsWith(top[0] + ':'))) tips.push({ ic: '✂︎', t: `${top[0]}: ${eur(top[1])} questo mese`, d: 'È la spesa "a scelta" più alta. Con il 20% in meno risparmi', gain: top[1] * 0.2 * 12 });
+  if (st.inc > 0 && st.save > 0 && st.invested < st.save * 0.3 && st.save >= 150) tips.push({ ic: '🐷', t: `${eur(st.save - st.invested)} rimasti sul conto`, d: 'Risparmio che non hai spostato su deposito o ETF. Decidi tu quanto lasciare per le emergenze', gain: 0 });
+  return tips.filter(x => x.gain >= 0).sort((a, b) => b.gain - a.gain).slice(0, 4);
+}
+function netSeries() {
+  const accs = M().accounts, months = []; for (let i = 11; i >= 0; i--) { const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - i); months.push(ymd(d).slice(0, 7)); }
+  return months.map(k => { const end = k + '-31'; let tot = 0, any = false; accs.forEach(a => { const s = a.snaps.filter(x => x.date <= end).pop(); if (s) { tot += s.value; any = true; } }); return { k, tot: any ? tot : null }; });
+}
+function renderSoldi() {
+  if (!$('v-soldi')) return;
+  const m = M(), tx = m.tx;
+  // riquadro in Oggi
+  const ck = monthOf(today()), cs = monthStats(ck);
+  if ($('moneyLine')) $('moneyLine').textContent = tx.length ? `${monthLbl(ck)}: uscite ${eur(cs.out)}${cs.inc ? ' · risparmio ' + eur(cs.save) : ''}${tx.some(t => t.flag && !t.ok) ? ' · ⚠︎ ' + tx.filter(t => t.flag && !t.ok).length + ' da controllare' : ''}` : 'Carica l\'estratto conto: ti dico dove vanno i soldi e se c\'è qualcosa di strano.';
+  if (view !== 'soldi') return;
+  const last = m.imports[m.imports.length - 1];
+  $('mnyInfo').textContent = tx.length ? `${tx.length} movimenti · dal ${shortDate(tx[tx.length - 1].date)} al ${shortDate(tx[0].date)}${last ? ' · ultimo caricamento ' + shortDate(last.date) : ''}` : 'Scarica dalla banca l\'estratto conto in CSV o Excel e caricalo qui. I dati restano su questo telefono.';
+  $('mnyPrivacy').textContent = m.ai === false ? '🔒 Solo sul telefono' : '✦ Negozi con IA';
+  // da controllare
+  const chk = tx.filter(t => t.flag && !t.ok);
+  $('mnyCheck').style.display = chk.length ? '' : 'none'; $('mnyCheckN').textContent = chk.length;
+  $('mnyCheckList').innerHTML = chk.slice(0, 20).map(t => `<div class="item" style="flex-wrap:wrap"><div class="grow"><b>${esc(t.name || t.merchant)}</b> · ${eur(-t.amount)}<div class="sub">${shortDate(t.date)} · ${esc(t.flag)}</div><div class="sub" style="font-size:11.5px">${esc(t.desc.slice(0, 90))}</div></div><div style="display:flex;gap:6px;width:100%;margin-top:6px"><button class="btn small" data-msafe="${t.id}">✓ È sicura</button><button class="btn ghost small" data-mbad="${t.id}">Non la riconosco</button></div></div>`).join('');
+  // mese
+  const months = [...new Set(tx.map(t => monthOf(t.date)))].sort().reverse().slice(0, 12);
+  if (!months.includes(mnyMonth)) mnyMonth = months[0] || ck;
+  $('mnyMonths').innerHTML = months.map(k => `<button class="chip ${k === mnyMonth ? 'on' : ''}" data-mmonth="${k}">${monthLbl(k)}</button>`).join('');
+  const st = monthStats(mnyMonth), prev = months.filter(k => k < mnyMonth).slice(0, 3).map(monthStats);
+  const avgCat = c => prev.length ? prev.reduce((a, s) => a + (s.cats[c] || 0), 0) / prev.length : null;
+  $('mnyMonthTot').textContent = st.n ? `${st.n} movimenti` : '';
+  const cats = Object.entries(st.cats).sort((a, b) => b[1] - a[1]), max = cats[0] ? cats[0][1] : 1;
+  $('mnyMonth').innerHTML = st.n ? `<div class="kpi"><div><b>${eur0(st.inc)}</b><span>Entrate</span></div><div><b>${eur0(st.out)}</b><span>Spese</span></div><div><b>${eur0(st.invested)}</b><span>Messi da parte</span></div></div>`
+    + cats.map(([c, v]) => { const a = avgCat(c), d = a ? Math.round((v - a) / a * 100) : null; return `<div class="mbar"><div class="l">${esc(c)}</div><div class="b"><i style="width:${Math.max(3, v / max * 100)}%"></i></div><div class="v">${eur(v)}${d != null && Math.abs(d) >= 20 ? `<div class="${d > 0 ? 'up' : 'down'}" style="font-size:11px">${d > 0 ? '▲' : '▼'} ${Math.abs(d)}%</div>` : ''}</div></div>`; }).join('')
+    + (prev.length ? `<div class="sub" style="margin-top:6px">▲▼ rispetto ${prev.length === 1 ? 'al mese prima' : 'alla media dei ' + prev.length + ' mesi prima'}</div>` : '')
+    : '<div class="empty">Nessun movimento per questo mese.</div>';
+  // ricorrenti (mutuo, bonifici, abbonamenti, stipendio…)
+  const rec = recurring(), fixedOut = rec.filter(r => r.sign < 0 && r.kind !== 'risparmio' && r.kind !== 'trasferimento').reduce((a, s) => a + s.amount, 0);
+  $('mnySubsTot').textContent = rec.length ? `fisse ${eur(fixedOut)}/mese` : '';
+  $('mnySubs').innerHTML = rec.length ? rec.map(s => `<div class="item"><div class="grow">${esc(s.name)}<div class="sub">${MKINDS[s.kind].split(' ')[0]} ${esc(MKINDS[s.kind].split(' ').slice(1).join(' ').replace(/\s*\(.*\)/, ''))} · ultimo ${shortDate(s.last)}</div></div><div class="price ${s.sign > 0 ? 'down' : ''}">${s.sign > 0 ? '+' : ''}${eur(s.amount)}</div><button class="btn ${s.explained ? 'ghost' : ''} small" data-mrec="${esc(s.merchant)}">${s.explained ? '✎' : "Cos'è?"}</button></div>`).join('')
+    : '<div class="empty">Li trovo da soli dai movimenti che si ripetono ogni mese.</div>';
+  // in evidenza: quanto hai risparmiato
+  const months6 = [...new Set(tx.map(t => monthOf(t.date)))].sort().slice(-6), ser6 = months6.map(k => ({ k, ...monthStats(k) }));
+  const full = ser6.filter(s => s.inc > 0), avgSave = full.length ? full.reduce((a, s) => a + s.save, 0) / full.length : 0, goal = m.goal || 0;
+  $('mnyHero').style.display = st.n ? '' : 'none';
+  if (st.n) {
+    const pct = st.inc > 0 ? Math.round(st.save / st.inc * 100) : null;
+    $('mnyHero').innerHTML = `<div class="lbl2" style="font-weight:700">${MESI_L[+mnyMonth.slice(5) - 1].toUpperCase()} · ${st.inc > 0 ? 'HAI RISPARMIATO' : 'HAI SPESO'}</div>
+      <div class="big">${st.inc > 0 ? eur(st.save) : eur(st.out)}</div>
+      <div class="sub">${st.inc > 0 ? `${pct}% di quello che è entrato${avgSave ? ' · a questo ritmo sono ' + eur0(avgSave * 12) + ' in un anno' : ''}` : 'Le entrate di questo mese non sono ancora nel file'}</div>
+      ${goal ? `<div class="gbar"><i style="width:${Math.max(3, Math.min(100, st.save / goal * 100))}%"></i></div><div class="sub">Obiettivo ${eur(goal)} al mese · ${st.save >= goal ? 'raggiunto ✓' : 'mancano ' + eur(goal - st.save)}</div>` : ''}
+      <div class="row3"><div><b>${eur0(st.fixed)}</b><span>Spese fisse</span></div><div><b>${eur0(st.variable)}</b><span>Spese variabili</span></div><div><b>${eur0(st.invested)}</b><span>Messi da parte</span></div></div>`;
+  }
+  $('mnyGoalBtn').innerHTML = `<button class="btn ghost small" id="mnyGoal">🎯 ${goal ? eur(goal) : 'Obiettivo'}</button>`;
+  // dove puoi risparmiare
+  const tps = st.n ? saveTips(mnyMonth) : [], gainTot = tps.reduce((a, x) => a + x.gain, 0);
+  $('mnyTipsCard').style.display = tps.length ? '' : 'none';
+  $('mnyTipsTot').textContent = gainTot ? `fino a ${eur0(gainTot)}/anno` : '';
+  $('mnyTips').innerHTML = tps.map(x => `<div class="savetip"><div class="ic">${x.ic}</div><div class="grow"><b>${esc(x.t)}</b><div class="sub">${esc(x.d)}${x.gain ? ` <span class="gain">${eur0(x.gain)}/anno</span>` : ''}</div></div></div>`).join('');
+  // andamento risparmio (6 mesi)
+  if (full.length >= 1) { const mx = Math.max(...ser6.map(s => Math.abs(s.save)), 1);
+    $('mnyTrendTot').textContent = full.length >= 2 ? `media ${eur(avgSave)}/mese` : '';
+    $('mnyTrend').innerHTML = `<div class="chart">${ser6.map(s => `<div><span style="font-size:10px;color:var(--ink);font-weight:700">${s.inc > 0 ? Math.round(s.save) : ''}</span><i class="${s.save < 0 ? 'neg' : ''}" style="height:${s.inc > 0 ? Math.max(3, Math.abs(s.save) / mx * 85) : 0}%"></i>${MESI[+s.k.slice(5) - 1]}</div>`).join('')}</div><div class="sub" style="margin-top:6px">Entrate meno spese, mese per mese (i soldi spostati su deposito ed ETF contano come risparmio).</div>`; }
+  else { $('mnyTrendTot').textContent = ''; $('mnyTrend').innerHTML = '<div class="empty">Serve almeno un mese con lo stipendio dentro.</div>'; }
+  // patrimonio
+  if (!m.accounts.length) m.accounts = [{ id: uid(), name: 'Conto corrente', type: 'conto', snaps: [] }, { id: uid(), name: 'Conto deposito Poste', type: 'deposito', snaps: [] }, { id: uid(), name: 'ETF', type: 'etf', snaps: [] }];
+  const net = m.accounts.reduce((a, x) => a + (x.snaps.length ? x.snaps[x.snaps.length - 1].value : 0), 0);
+  $('mnyNet').textContent = m.accounts.some(a => a.snaps.length) ? eur(net) : '';
+  $('mnyAcc').innerHTML = m.accounts.map(a => { const s = a.snaps[a.snaps.length - 1], p = a.snaps[a.snaps.length - 2]; const d = s && p ? s.value - p.value : null;
+    return `<div class="item"><div class="grow"><b>${esc(a.name)}</b><div class="sub">${s ? 'aggiornato ' + shortDate(s.date) : 'da inserire'}${d != null ? ` · <span class="${d >= 0 ? 'down' : 'up'}">${d >= 0 ? '+' : ''}${eur(d)}</span>` : ''}</div></div><div class="price">${s ? eur(s.value) : '—'}</div><button class="btn ghost small" data-macc="${a.id}">Aggiorna</button></div>`; }).join('');
+  const ser = netSeries(), vals = ser.filter(x => x.tot != null);
+  if (vals.length >= 2) { const mx = Math.max(...vals.map(x => x.tot)), mn = Math.min(...vals.map(x => x.tot)) * 0.9;
+    $('mnyChart').innerHTML = `<div class="chart">${ser.map(x => `<div><i style="height:${x.tot == null ? 0 : Math.max(3, (x.tot - mn) / (mx - mn || 1) * 100)}%"></i>${MESI[+x.k.slice(5) - 1][0].toUpperCase()}</div>`).join('')}</div>`; }
+  else $('mnyChart').innerHTML = '';
+  // movimenti
+  const q = normKey($('mnySearch').value || '');
+  const found = q ? tx.filter(t => normKey([t.name, t.merchant, t.cat, t.desc, String(Math.abs(t.amount))].join(' ')).includes(q)) : tx, shown = found.slice(0, mnyAll ? 200 : 12);
+  $('mnyTx').innerHTML = shown.length ? shown.map(t => `<div class="item"><div class="grow">${esc(t.name || t.merchant)}<div class="sub">${shortDate(t.date)} · <button class="tag" data-mcat="${t.id}" style="border:0">${esc(t.cat)}</button>${t.flag && !t.ok ? ' · ⚠︎' : ''}</div></div><div class="price ${t.amount > 0 ? 'down' : ''}">${t.amount > 0 ? '+' : ''}${eur(t.amount)}</div></div>`).join('') + (found.length > shown.length ? `<button class="more" id="mnyMore">Mostra altri ${found.length - shown.length}</button>` : '') : '<div class="empty">Nessun movimento.</div>';
+}
+$('v-soldi').addEventListener('click', e => {
+  const m = M(), t = e.target;
+  const sf = t.closest('[data-msafe]'); if (sf) { const x = m.tx.find(y => y.id === sf.dataset.msafe); if (x) { m.safe[x.merchant] = true; m.tx.forEach(y => { if (y.merchant === x.merchant) y.ok = true; }); save(); renderSoldi(); toast(`${x.name || x.merchant}: segnato come sicuro, non te lo segnalo più`); } return; }
+  const bd = t.closest('[data-mbad]'); if (bd) { const x = m.tx.find(y => y.id === bd.dataset.mbad); if (x) { x.ok = true; x.suspect = true; save(); renderSoldi(); alert(`Spesa non riconosciuta: ${x.name || x.merchant}, ${eur(-x.amount)} del ${shortDate(x.date)}.\n\n1. Blocca subito la carta dall'app della banca.\n2. Chiama il numero di assistenza della banca (è sul retro della carta) e chiedi il disconoscimento.\n3. Tieni uno screenshot di questo movimento.`); } return; }
+  const mm = t.closest('[data-mmonth]'); if (mm) { mnyMonth = mm.dataset.mmonth; return renderSoldi(); }
+  const ac = t.closest('[data-macc]'); if (ac) { const a = m.accounts.find(x => x.id === ac.dataset.macc); const v = parseAmt(prompt(`${a.name}: valore di oggi in euro`, a.snaps.length ? String(a.snaps[a.snaps.length - 1].value).replace('.', ',') : '')); if (v == null) return; a.snaps = a.snaps.filter(s => s.date !== today()); a.snaps.push({ date: today(), value: v }); save(); return renderSoldi(); }
+  const mc = t.closest('[data-mcat]'); if (mc) { const x = m.tx.find(y => y.id === mc.dataset.mcat); const c = prompt('Categoria:\n' + MCATS.join(', '), x.cat); const cc = MCATS.find(k => normKey(k) === normKey(c || '')); if (!cc) return; m.merch[x.merchant] = { name: x.name || x.merchant, cat: cc }; m.tx.forEach(y => { if (y.merchant === x.merchant) y.cat = cc; }); save(); renderSoldi(); return toast(`${x.name || x.merchant} → ${cc} (anche in futuro)`); }
+});
+let rcCur = null, rcKind = 'spesa';
+function openRec(merchant) {
+  const r = recurring().find(x => x.merchant === merchant) || { merchant, name: merchant, amount: 0, sign: -1, kind: 'spesa' };
+  rcCur = r; rcKind = r.kind;
+  $('rcTitle').textContent = r.name; $('rcSub').textContent = `${r.sign > 0 ? '+' : '−'}${eur(r.amount)} circa ogni mese`;
+  $('rcName').value = r.explained ? r.name : '';
+  $('rcKinds').innerHTML = Object.entries(MKINDS).map(([k, v]) => `<button class="chip ${k === rcKind ? 'on' : ''}" data-rk="${k}">${v}</button>`).join('');
+  $('dlgRec').showModal();
+}
+$('rcKinds').onclick = e => { const b = e.target.closest('[data-rk]'); if (!b) return; rcKind = b.dataset.rk; document.querySelectorAll('#rcKinds .chip').forEach(c => c.classList.toggle('on', c.dataset.rk === rcKind)); };
+function setRule(merchant, kind, name) {
+  const m = M(); m.rules = (m.rules || []).filter(r => r.merchant !== merchant);
+  m.rules.push({ merchant, kind, name: name || '' });
+  const cat = kind === 'risparmio' ? 'Risparmi e investimenti' : kind === 'abbonamento' ? 'Abbonamenti' : null;
+  m.tx.forEach(t => { if (t.merchant === merchant) { if (name) t.name = name; if (cat) t.cat = cat; if (/mutuo|affitto/i.test(name || '') && kind === 'fisso') t.cat = 'Mutuo e affitto'; t.ok = true; } });
+  save();
+}
+$('rcOk').onclick = () => { if (!rcCur) return; setRule(rcCur.merchant, rcKind, $('rcName').value.trim()); $('dlgRec').close(); renderSoldi(); toast('Capito: lo conto così da ora in poi'); };
+$('rcChat').onclick = () => { if (!rcCur) return; $('dlgRec').close(); go('chat'); $('chatIn').value = `Il movimento ricorrente "${rcCur.name}" (${rcCur.sign > 0 ? '+' : '-'}${eur(rcCur.amount)} al mese) è `; setTimeout(() => { const i = $('chatIn'); i.focus(); i.setSelectionRange(i.value.length, i.value.length); }, 100); };
+$('v-soldi').addEventListener('click', e => {
+  const rb = e.target.closest('[data-mrec]'); if (rb) return openRec(rb.dataset.mrec);
+  if (e.target.closest('#mnyGoal')) { const v = parseAmt(prompt('Quanto vuoi mettere da parte ogni mese? (euro)', M().goal ? String(M().goal) : '')); if (v == null) return; M().goal = Math.max(0, v); save(); renderSoldi(); }
+});
+$('mnyAI').onclick = async () => {
+  if (!aiReady()) return toast('Serve la chiave della chat (⚙︎)');
+  const b = $('mnyAI'); b.disabled = true; b.textContent = 'Analizzo…';
+  try {
+    const months = [...new Set(M().tx.map(t => monthOf(t.date)))].sort().slice(-4);
+    const sum = months.map(k => { const s = monthStats(k); return `${k}: entrate ${Math.round(s.inc)}, spese ${Math.round(s.out)} (fisse ${Math.round(s.fixed)}), messi da parte ${Math.round(s.invested)}; categorie: ${Object.entries(s.cats).map(([c, v]) => c + ' ' + Math.round(v)).join(', ')}`; }).join('\n');
+    const rec = recurring().map(r => `${r.name}: ${r.sign > 0 ? '+' : '-'}${r.amount} (${r.kind})`).join('; ');
+    const txt = await aiAsk({ maxTokens: 900, system: "Sei un assistente per il risparmio personale di Otto (Italia). Con i numeri del mese dai 4 consigli CONCRETI per risparmiare, ognuno con la cifra stimata in euro all'anno, in italiano, tono neutro e pratico, frasi brevi in elenco. Non dare consigli su quali investimenti comprare o vendere: solo abitudini di spesa, abbonamenti, spese fisse da rinegoziare (es. luce, gas, telefono, assicurazioni). Chiudi con una riga sul ritmo di risparmio.", text: `Ultimi mesi (euro):\n${sum}\nRicorrenti: ${rec || '-'}\nObiettivo di risparmio: ${M().goal || 'non impostato'} al mese.` });
+    $('mnyAIout').innerHTML = `<div class="msg a" style="max-width:100%;margin-top:10px">${esc(txt)}</div>`;
+  } catch (err) { toast('Analisi: ' + err.message.slice(0, 80)); }
+  b.disabled = false; b.textContent = "✦ Analisi più approfondita con l'IA";
+};
+$('mnyAccAdd').onclick = () => { const n = (prompt('Nome del conto (es. Libretto Poste, Conto Fineco):') || '').trim(); if (!n) return; M().accounts.push({ id: uid(), name: n, type: /etf|fondo|titol/i.test(n) ? 'etf' : 'altro', snaps: [] }); save(); renderSoldi(); };
+$('mnySearch').addEventListener('input', () => renderSoldi());
+
+
 /* Outfit del mattino: scelto da solo all'apertura dell'app, una volta al giorno */
 let mornTried = '';
 async function ensureMorningOutfit() {
@@ -2712,7 +3921,7 @@ let packBusy = false;
 async function ensurePackOutfit(day) {
   if (packBusy || !S.clothes.length || S.packOutfit?.day === day) return;
   packBusy = true;
-  try { const r = await suggestOutfit({ date: day, silent: true, keep: true }); if (r) { S.packOutfit = { day, ids: r.ids || [], reason: r.reason || '' }; save(); renderOggi(); } }
+  try { const r = await suggestOutfit({ date: day, silent: true, keep: true }); if (r && (r.ids || []).length) { S.packOutfit = { day, ids: r.ids, reason: r.reason || '' }; save(); renderOggi(); } }
   catch (e) { console.warn('pack', e); }
   packBusy = false;
 }
@@ -2724,10 +3933,12 @@ $('qa').onclick = async e => {
       if (a) { S.chat.push({ role: 'tool', text: `✓ Appuntamento: ${a.title}, ${longDate(a.date)}${a.time ? ' alle ' + a.time : ''}${REC[a.rec] ? ' · ' + REC[a.rec] : ''} · ${ALERT[a.alert]}` }); save(); renderChat(); clearTimeout(syncT); syncServer(); } break; }
     case 'rem': openRem(); break;
     case 'outfit': S.clothes.length ? suggestOutfit() : (go('outfit'), toast('Aggiungi prima qualche capo')); break;
-    case 'spesa': go('liste'); setTimeout(() => { $('spFold').open = true; $('spCard').scrollIntoView({ behavior: 'smooth' }); }, 50); break;
+    case 'spesa': go('liste'); setTimeout(() => $('mnCard').scrollIntoView({ behavior: 'smooth' }), 50); break;
     case 'gym': if (!S.gym.log.includes(today())) toggleGym(); toast(`Palestra segnata · ${gymWeek()}/${S.gym.goal} questa settimana`); break;
     case 'night': openNights(); break;
     case 'week': openWeek('plan'); break;
+    case 'bday': { SUG_BD['bd-new'] = ''; openSug('bd-new'); $('sgHead').textContent = 'Nuovo compleanno'; $('sgTitle').placeholder = 'Es. Compleanno Marco'; setTimeout(() => $('sgTitle').focus(), 200); break; }
+    case 'trip': { const t = nextTrip(); t ? openTrip(t.id) : openTripNew(); break; }
   }
 };
 
@@ -2756,7 +3967,7 @@ $('diagTest').onclick = async () => {
   }
   $('diagTest').textContent = 'Prova la chat'; fillDiag();
 };
-function fillSettings() { fillDiag(); const s = S.settings; $('setCity').value = s.city || ''; $('setStores').value = (s.stores || []).join(', '); $('setVoice').checked = !!s.voice; $('setName').value = s.name; $('setProvider').value = s.provider; $('setGKey').value = s.geminiKey; $('setGModel').value = s.geminiModel; $('gemStatus').textContent = gemStatusText(); $('setQuiet').checked = s.quietOrg !== false; $('setKey').value = s.apiKey; $('setModel').value = s.model; provBoxes(); }
+function fillSettings() { fillDiag(); try { fillGuides(); renderMsgs(); } catch (e) { logErr('automazioni', e); } const s = S.settings; $('setCity').value = s.city || ''; $('setStores').value = (s.stores || []).join(', '); $('setVoice').checked = !!s.voice; $('setName').value = s.name; $('setProvider').value = s.provider; $('setGKey').value = s.geminiKey; $('setGModel').value = s.geminiModel; $('gemStatus').textContent = gemStatusText(); $('setQuiet').checked = s.quietOrg !== false; $('setKey').value = s.apiKey; $('setModel').value = s.model; provBoxes(); }
 $('btnSettings').onclick = () => go('settings');
 $('setSave').onclick = async () => {
   const s = S.settings, oldKey = s.geminiKey;
@@ -2782,6 +3993,7 @@ async function shareFile(file) {
   const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = file.name; document.body.appendChild(a); a.click(); a.remove(); return true;
 }
 async function exportAll() {
+  S.lastExport = today(); save();
   const btn = $('bkAll');
   if (exportReady) { const f = exportReady; exportReady = null; btn.textContent = '⬇︎ Esporta tutti i dati'; return shareFile(f); }
   if (LOAD_FAIL) return shareFile(new File([RAW], `gestiotto-dati-originali-${today()}.json`, { type: 'application/json' }));
@@ -2795,6 +4007,7 @@ async function exportAll() {
   if (!(await shareFile(file))) { exportReady = file; btn.textContent = '✓ File pronto: tocca per salvarlo'; toast('File pronto: tocca di nuovo per salvarlo'); }
 }
 $('bkAll').onclick = exportAll;
+$('bkNagGo').onclick = () => { go('settings'); setTimeout(exportAll, 250); };
 $('bkExport').onclick = () => { go('settings'); exportAll(); };
 $('bkImport').onclick = () => $('bkFile').click();
 $('bkFile').onchange = async e => {
@@ -2817,7 +4030,9 @@ if (navigator.storage?.persist) navigator.storage.persist();
 if (!LOAD_FAIL && S.settings.geminiKey && S.settings.geminiKey !== cleanKey(S.settings.geminiKey)) { S.settings.geminiKey = cleanKey(S.settings.geminiKey); save(); }
 if (LOAD_FAIL) setTimeout(() => { alert('Gestiotto non è riuscito a leggere i tuoi dati. Sono ancora intatti sul telefono e non verranno toccati: vai in ⚙︎ › Esporta tutti i dati e manda il file a Claude.'); go('settings'); }, 500);
 housekeeping(); render(); setTimeout(syncServer, 1500);
-setTimeout(() => { if (!LOAD_FAIL && aiReady() && S.settings.provider === 'gemini') geminiModels().catch(() => {}); }, 2500); setTimeout(pullInbox, 1200); getWeather().then(w => { if (w) render(); });
+setTimeout(() => { if (!LOAD_FAIL && aiReady() && S.settings.provider === 'gemini') geminiModels().catch(() => {}); }, 2500);
+setTimeout(() => autoFlyers().catch(() => {}), 6000);
+setTimeout(() => { if (!LOAD_FAIL && S.gym.notes && hashStr(S.gym.notes) !== S.gym.planOf) parseGymPlan().catch(() => {}); }, 4000); setTimeout(pullInbox, 1200); getWeather().then(w => { if (w) render(); });
 </script>
 </body>
 </html>
