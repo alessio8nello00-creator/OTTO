@@ -297,6 +297,7 @@ details.fold[open]>summary{margin-bottom:8px}
       <div id="mornRows"></div><div class="sub" id="mornWhy" style="margin-top:4px"></div>
       <div class="grid2" style="margin-top:10px"><button class="btn small" id="mornWear">✓ Lo indosso</button><button class="btn ghost small" id="mornMore">Cambia</button></div></div>
     <div class="card" id="tripToday" style="display:none"></div>
+    <div class="alert" id="pushNag" style="display:none"><div style="font-size:22px">🔔</div><div class="grow"><b>Notifiche</b><div class="muted" id="pushNagTxt"></div></div><button class="btn small" id="pushNagGo">Sistema</button></div>
     <div class="alert" id="bkNag" style="display:none"><div style="font-size:22px">💾</div><div class="grow"><b>Backup del mese</b><div class="muted">Un file con tutto, foto comprese. 10 secondi.</div></div><button class="btn small" id="bkNagGo">Salva</button></div>
     <div id="alerts"></div>
     <div class="card" id="planCard" style="display:none"><div class="addrow"><div style="font-size:24px">🗓</div><div class="grow"><b>Pianifica la settimana</b><div class="sub">Notti, palestra e impegni in un minuto.</div></div><button class="btn small" id="planGo">Inizia</button></div></div>
@@ -504,7 +505,9 @@ details.fold[open]>summary{margin-bottom:8px}
     </div>
     <div class="card"><h2>Promemoria su misura</h2>
       <p class="muted" style="margin-top:0">Creali dalla chat: “ogni primo del mese alle 9 ricordami l'affitto”.</p>
-      <div id="reminders"></div></div>
+      <div id="reminders"></div>
+      <button class="btn ghost full" id="icsPick" style="margin-top:10px">📥 Importa da calendario (.ics)</button>
+      <input type="file" id="icsFile" accept=".ics,text/calendar" hidden></div>
     <div class="card"><h2>Contatori</h2>
       <p class="muted" style="margin-top:0">Abitudini da contare a settimana: “crea un contatore Lettura, 5 volte a settimana”.</p>
       <div id="counters"></div></div>
@@ -869,7 +872,7 @@ function hydrate(raw) {
 /* PROTEZIONE DATI
    1) prima di usare una versione nuova dell'app, copia intatta dei dati com'erano (otto.v1.pre-<versione>)
    2) se i dati non si leggono, l'app NON salva nulla sopra: restano intatti e si possono esportare */
-const APP_VER = '3.4';
+const APP_VER = '3.5';
 let RAW = null, LOAD_FAIL = false;
 try { RAW = localStorage.getItem(KEY); } catch {}
 try {
@@ -1035,10 +1038,10 @@ function remOn(r, d) {
 /* avvisi in più: oltre a quello principale (appuntamenti 1 ora prima, promemoria all'ora esatta) */
 const MORE_OPTS = [[0, 'Ora esatta'], [5, '5 min'], [10, '10 min'], [15, '15 min'], [30, '30 min'], [60, '1 ora'], [120, '2 ore'], [1440, '1 giorno'], [2880, '2 giorni'], [10080, '1 settimana']];
 let apMoreSet = new Set(), rmMoreSet = new Set();
-function drawMore(el, set, main) { el.innerHTML = MORE_OPTS.filter(([v]) => v !== +main).map(([v, l]) => `<button type="button" class="chip ${set.has(v) ? 'on' : ''}" data-more="${v}">${l}</button>`).join(''); }
+function drawMore(el, set, main) { el.innerHTML = [...MORE_OPTS, ...[...set].filter(v => !MORE_OPTS.some(o => o[0] === v)).map(v => [v, fmtMin(v)])].filter(([v]) => v !== +main).map(([v, l]) => `<button type="button" class="chip ${set.has(v) ? 'on' : ''}" data-more="${v}">${l}</button>`).join(''); }
 const alertsOf = x => [...new Set([x.alert, ...(x.more || [])].filter(v => v != null && v >= 0))].sort((a, b) => b - a);
 const REM_ALERT = r => (r.alert || (r.more || []).length) ? ' · avvisi: ' + alertsTxt({ alert: r.alert || 0, more: r.more }) : '';
-const alertsTxt = x => alertsOf(x).map(v => v === 0 ? "all'ora" : (MORE_OPTS.find(o => o[0] === v) || [0, v + ' min'])[1] + ' prima').join(', ');
+const alertsTxt = x => alertsOf(x).map(v => v === 0 ? "all'ora" : fmtMin(v) + ' prima').join(', ');
 const REM_ALERT_OLD = r => r.alert ? ' · avviso ' + (r.alert >= 60 ? (r.alert / 60 === 24 ? '1 giorno' : r.alert / 60 + ' h') : r.alert + ' min') + ' prima' : '';
 const REP_TXT = r => ({ once: r.date ? 'il ' + shortDate(r.date) : 'una volta', daily: 'ogni giorno', weekly: daysText(r.days || []).replace('Ogni', 'ogni'), monthly: `ogni mese il ${r.dom}`, yearly: r.date ? `ogni anno il ${parse(r.date).getDate()} ${MON[parse(r.date).getMonth()]}` : 'ogni anno' }[r.rep] || '');
 const counterWeek = (c, d = today()) => { const ws = weekStart(d), we = shift(ws, 6); return c.log.filter(x => x >= ws && x <= we).length; };
@@ -1644,8 +1647,7 @@ function renderVita() {
     $('pushUrl').value = S.settings.push.url; $('pushPw').value = S.settings.push.password;
   }
   $('iphoneStatus').textContent = S.ext.calAt ? `Ultimo aggiornamento dall'iPhone: ${shortDate(S.ext.calAt.slice(0, 10))} ${new Date(S.ext.calAt).toTimeString().slice(0, 5)} · ${S.ext.cal.length} eventi` : "Nessun dato ancora ricevuto dall'iPhone (Comando Rapido “Otto iPhone”, facoltativo).";
-  const nx = S.settings.push.on ? buildSchedule()[0] : null;
-  $('pushStatus').textContent = S.settings.push.on ? `Notifiche attive${lastSync ? ' · ultimo invio al server ' + lastSync : ''}.${nx ? ` Prossima: “${nx.title}” ${shortDate(ymd(new Date(nx.at)))} alle ${new Date(nx.at).toTimeString().slice(0, 5)}.` : ''}` : 'Notifiche non attive.';
+  $('pushStatus').textContent = pushStatusText(); $('pushStatus').style.whiteSpace = 'pre-line';
 }
 $('sgOk').onclick = () => {
   const title = $('sgTitle').value.trim(), date = $('sgDate').value;
@@ -1814,17 +1816,20 @@ function buildSchedule() {
     add(`q-m-${d}-${R().morning}`, at(d, R().morning), `Oggi · ${shortDate(d)}`, recapMorning(d));
     add(`q-e-${d}-${R().evening}`, at(d, R().evening), `Domani · ${shortDate(shift(d, 1))}`, recapEvening(d));
     if (dow === 0) add(`q-w-${d}-${R().sunday}`, at(d, R().sunday), `Settimana · da ${shortDate(shift(d, 1))}`, recapSunday(d) + '\nTocca per pianificare la settimana.');
-    apptsOn(d).forEach(a => { const st = a.time ? at(d, a.time) : at(d, '09:00');
-      alertsOf(a).forEach(al => add(`a-${a.id}-${d}-${a.time || ''}-${al}`, st - al * 6e4, al ? a.title : '⏰ ' + a.title, `${al ? (d === t ? 'Oggi' : longDate(d)) + (a.time ? ' alle ' + a.time : '') : 'Adesso'}${a.place ? ' · ' + a.place : ''}`)); });
     S.rules.filter(r => r.on && r.days.includes(dow)).forEach(r => { const n = pending(r.list).length;
       if (!r.onlyPending || n) add(`${Q}r-${r.id}-${d}-${r.time}`, at(d, r.time), r.msg, n ? `${n} voci in ${r.list}` : r.list); });
   }
+  // appuntamenti e promemoria: 60 giorni in avanti (così arrivano anche se apri l'app di rado)
+  for (let i = 0; i < SCHED_DAYS; i++) { const d = shift(t, i);
+    apptsOn(d).forEach(a => { const st = a.time ? at(d, a.time) : at(d, '09:00');
+      alertsOf(a).forEach(al => add(`a-${a.id}-${d}-${a.time || ''}-${al}`, st - al * 6e4, al ? a.title : '⏰ ' + a.title, `${al ? (d === t ? 'Oggi' : longDate(d)) + (a.time ? ' alle ' + a.time : '') : 'Adesso'}${a.place ? ' · ' + a.place : ''}`)); }); }
   S.deadlines.forEach(dl => { const nd = nextDeadline(dl);
     [...dl.remind, 0].forEach(n => { const d = shift(nd, -n); if (daysBetween(t, d) < 60) add(`d-${dl.id}-${nd}-${n}`, at(d, '09:00'), `Scadenza: ${dl.title}`, n ? `Scade ${inDays(n)}, ${longDate(nd)}.` : 'Scade oggi.'); }); });
   S.birthdays.forEach(b => { const nb = nextBirthday(b);
     add(`b-${b.id}-${nb}`, at(nb, '09:00'), b.name, `Oggi, ${longDate(nb)}.`);
     if (b.gift) add(`bg-${b.id}-${nb}`, at(shift(nb, -b.gift), '09:00'), `${b.name} tra ${b.gift} giorni`, `Regalo aggiunto alla lista Regali.`); });
-  for (let i = 0; i < 14; i++) { const d = shift(t, i); S.reminders.forEach(r => { if (remOn(r, d)) alertsOf({ alert: r.alert || 0, more: r.more }).forEach(al => { const before = out.length; add(`p-${r.id}-${d}-${r.time}-${al}`, at(d, r.time) - al * 6e4, r.title, al ? `Alle ${r.time}${r.body ? ' · ' + r.body : ''}` : (r.body || '') + (r.wa ? (r.body ? ' · ' : '') + '📲 Tocca per mandare il WhatsApp' : ''));
+  for (let i = 0; i < SCHED_DAYS; i++) { const d = shift(t, i); S.reminders.forEach(r => { if (remOn(r, d)) alertsOf({ alert: r.alert || 0, more: r.more }).forEach(al => { const before = out.length, own = r.alTxt && r.alTxt[al];
+    add(`p-${r.id}-${d}-${r.time}-${al}`, at(d, r.time) - al * 6e4, r.title, own ? own : al ? `${alWhen(al, r.time)}${r.body ? ' · ' + r.body : ''}` : (r.body || '') + (r.wa ? (r.body ? ' · ' : '') + '📲 Tocca per mandare il WhatsApp' : ''));
     if (r.wa && !al && out.length > before) out[out.length - 1].url = waURL(r.wa); }); }); }
   // 💾 promemoria backup: prima domenica del mese alle 10, se l'ultimo backup ha più di 25 giorni
   for (let i = 0; i < 14; i++) { const d = shift(t, i), x = parse(d); if (x.getDay() === 0 && x.getDate() <= 7 && (!S.lastExport || daysBetween(S.lastExport, d) > 25)) add(`q-bk-${d}`, at(d, '10:00'), '💾 Backup del mese', 'Apri Gestiotto e tocca “Salva”: un file con tutto, foto comprese.'); }
@@ -1835,8 +1840,12 @@ function buildSchedule() {
     (S.msgRules || []).filter(m => m.on !== false && m.when === 'orario' && (m.date ? m.date === d : (m.days || []).includes(dow))).forEach(m => {
       const before = out.length; add(`msg-${m.id}-${d}-${m.time}`, at(d, m.time), `📲 Messaggio per ${m.toName || 'WhatsApp'}`, `“${m.text}” · tocca per inviare`);
       if (out.length > before) out[out.length - 1].url = waURL(m); }); }
-  return out.sort((a, b) => a.at - b.at).slice(0, 350);
+  return out.sort((a, b) => a.at - b.at).slice(0, 800);
 }
+const SCHED_DAYS = 60;
+/* "Alle 08:00" se è lo stesso giorno, altrimenti "Domani alle 08:00" / "Tra 3 giorni alle 08:00" */
+const alWhen = (al, time) => { const dd = Math.floor((toMin(time) - al) / 1440); return dd >= 0 ? `Alle ${time}` : dd === -1 ? `Domani alle ${time}` : `Tra ${-dd} giorni alle ${time}`; };
+const fmtMin = v => v % 10080 === 0 ? (v / 10080 === 1 ? '1 settimana' : v / 10080 + ' settimane') : v % 1440 === 0 ? (v / 1440 === 1 ? '1 giorno' : v / 1440 + ' giorni') : v % 60 === 0 ? (v / 60 === 1 ? '1 ora' : v / 60 + ' ore') : v + ' min';
 
 /* =====================================================================
    SERVER NOTIFICHE
@@ -1912,8 +1921,12 @@ function pushScheduleNow() {
   try {
     const { items, carry, hash } = schedPayload();
     const H = { authorization: 'Bearer ' + P().password, 'content-type': 'application/json' }, base = P().url.replace(/\/$/, '');
-    if (hash !== lastHash) fetch(base + '/schedule', { method: 'POST', keepalive: true, headers: H, body: JSON.stringify({ items, carry }) })
-      .then(r => { if (r.ok) { lastHash = hash; lastSchedAt = Date.now(); } }).catch(() => {});
+    if (hash !== lastHash) {
+      let body = JSON.stringify({ items, carry }), full = true;
+      if (body.length > 60000) { full = false; let n = items.length; do { n = Math.floor(n * 0.8); body = JSON.stringify({ items: items.slice(0, n), carry, until: n ? items[n - 1].at : 1 }); } while (body.length > 60000 && n > 1); }
+      fetch(base + '/schedule', { method: 'POST', keepalive: true, headers: H, body })
+        .then(r => { if (r.ok && full) { lastHash = hash; lastSchedAt = Date.now(); } }).catch(() => {});
+    }
     // backup all'uscita, solo se è cambiato e se sta nel limite delle richieste "keepalive" (64 KB)
     const bp = JSON.stringify(backupPayload()), bh = hashStr(bp);
     if (bh !== lastBackupHash && bp.length < 60000) fetch(base + '/backup', { method: 'POST', keepalive: true, headers: H, body: bp })
@@ -1950,10 +1963,80 @@ $('pushOn').onclick = async () => {
     let sub = await reg.pushManager.getSubscription();
     if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToU8(publicKey) });
     await api('/register', { subscription: sub.toJSON() });
-    P().on = true; lastHash = ''; save(); await syncServer(); render(); toast('Notifiche attive');
+    P().on = true; lastHash = ''; save(); await syncServer(); await ensurePush(true); render(); toast('Notifiche attive');
   } catch (e) { toast('Errore: ' + e.message); $('pushStatus').textContent = 'Errore: ' + e.message; }
 };
-$('pushTest').onclick = async () => { try { await api('/test', {}); toast('Notifica di prova inviata'); } catch (e) { toast('Errore: ' + e.message); } };
+$('pushTest').onclick = async () => {
+  try { await ensurePush(true, true); const r = await api('/test', {}); toast(r.ok ? 'Notifica di prova inviata' : 'Errore: ' + (r.error || r.status)); }
+  catch (e) { toast('Errore: ' + e.message); }
+  pushChk = 0; ensurePush(true);
+};
+/* V3.5 · Notifiche che si riparano da sole.
+   iOS a volte "scollega" il telefono dal server (aggiornamenti, reinstallazione, chiavi cambiate): Apple risponde 410 e il server
+   non può più mandare nulla. A ogni apertura l'app chiede al server lo stato e, se serve, ricollega il telefono da sola. */
+let pushChk = 0, pushInfo = null;
+const permNow = () => ('Notification' in window) ? Notification.permission : 'unsupported';
+async function ensurePush(force = false, gesture = false) {
+  if (!P().on || !P().url || LOAD_FAIL || !navigator.onLine) return pushInfo;
+  if (!force && Date.now() - pushChk < 20 * 60e3) return pushInfo;
+  pushChk = Date.now();
+  try {
+    let perm = permNow();
+    if (perm === 'default' && gesture) perm = await Notification.requestPermission();
+    let st = await api('/status');
+    pushInfo = { ...st, perm, checked: Date.now() };
+    if (perm === 'granted' && 'serviceWorker' in navigator && 'PushManager' in window) {
+      const reg = await navigator.serviceWorker.ready;
+      let sub = await reg.pushManager.getSubscription(), fix = !sub || !st.subscribed || (st.ep && !sub.endpoint.endsWith(st.ep));
+      const { publicKey } = await api('/vapid');
+      // chiave del server cambiata, o Apple rifiuta la firma: serve una nuova iscrizione
+      let keyOk = true; try { const k = sub && sub.options && sub.options.applicationServerKey; if (k) keyOk = btoa(String.fromCharCode(...new Uint8Array(k))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '') === publicKey; } catch {}
+      if (sub && (!keyOk || (st.last && !st.last.ok && st.last.status === 403))) { try { await sub.unsubscribe(); } catch {} sub = null; fix = true; }
+      if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToU8(publicKey) });
+      if (fix) {
+        await api('/register', { subscription: sub.toJSON() });
+        lastHash = ''; await syncServer();
+        st = await api('/status'); pushInfo = { ...st, perm, checked: Date.now(), fixedAt: Date.now() };
+        toast('🔔 Notifiche ricollegate');
+      }
+    }
+  } catch (e) { pushInfo = { ...(pushInfo || {}), err: e.message, checked: Date.now() }; }
+  renderPushNag(); if (view === 'settings') renderVita();
+  return pushInfo;
+}
+/* qualcosa non va con le notifiche? un avviso in Oggi con il tasto per sistemarlo */
+function pushProblem() {
+  const x = pushInfo; if (!P().on || !x) return '';
+  if (x.perm === 'denied') return 'Le notifiche sono bloccate: iPhone › Impostazioni › Notifiche › Gestiotto › Consenti.';
+  if (x.perm === 'default') return 'Gestiotto non ha ancora il permesso per le notifiche.';
+  if (x.err && /password/i.test(x.err)) return 'Il server non accetta la password: controllala in ⚙︎ › Notifiche.';
+  if (x.err) return '';   // senza rete o server lento: riprovo alla prossima apertura
+  if (!x.subscribed) return 'Il telefono non è collegato al server delle notifiche.';
+  if (x.last && !x.last.ok && !x.last.nosub && Date.now() - x.last.at < 3 * 864e5) return `L'ultima notifica non è partita (${x.last.status || ''} ${x.last.error || ''}).`.replace(/\s+\)/, ')');
+  return '';
+}
+function renderPushNag() { const m = pushProblem(), el = $('pushNag'); if (!el) return; el.style.display = m ? '' : 'none'; $('pushNagTxt').textContent = m; }
+$('pushNagGo').onclick = async () => {
+  if (pushInfo && pushInfo.perm === 'denied') { go('settings'); return toast('Apri Impostazioni › Notifiche › Gestiotto e attivale'); }
+  if (pushInfo && pushInfo.err && /password/i.test(pushInfo.err)) return go('settings');
+  $('pushNagGo').disabled = true; await ensurePush(true, true); $('pushNagGo').disabled = false;
+  toast(pushProblem() ? 'Non ci sono riuscito: guarda ⚙︎ › Notifiche' : '🔔 Notifiche a posto');
+};
+function pushStatusText() {
+  if (!P().on) return 'Notifiche non attive.';
+  const nx = buildSchedule()[0], x = pushInfo, hm = ms => new Date(ms).toTimeString().slice(0, 5), when = ms => `${shortDate(ymd(new Date(ms)))} ${hm(ms)}`;
+  const L = [];
+  if (!x) L.push('Controllo il server…');
+  else if (x.err) L.push('Server non raggiungibile ora: ' + x.err.slice(0, 80));
+  else {
+    L.push(x.subscribed ? '✓ Telefono collegato al server' : '✗ Telefono non collegato al server');
+    if (x.last && x.last.title) L.push(`${x.last.ok ? '✓' : '✗'} Ultima inviata: “${x.last.title}” ${when(x.last.at)}${x.last.ok ? '' : ' · ' + (x.last.status || '') + ' ' + (x.last.error || '')}`);
+    L.push(`${x.scheduled || 0} notifiche in programma sul server`);
+  }
+  if (lastSync) L.push('Ultimo aggiornamento del programma: ' + lastSync);
+  if (nx) L.push(`Prossima: “${nx.title}” ${when(nx.at)}`);
+  return L.join('\n');
+}
 $('bkServer').onclick = async () => {
   if (!P().url) return toast('Configura prima il server in ⚙︎ › Notifiche');
   if (!confirm('Sostituire i dati di questo telefono con il backup del server?')) return;
@@ -3319,6 +3402,67 @@ $('rmOk').onclick = () => {
   S.chat.push({ role: 'tool', text: `✓ Promemoria: ${title}, ${REP_TXT(r)} alle ${time} · avvisi: ${alertsTxt(r)}` }); save(); renderChat();
   toast('Promemoria salvato');
 };
+/* V3.5 · Importa un calendario .ics: ogni evento diventa un promemoria con i suoi avvisi (e i loro testi).
+   Reimportare lo stesso file aggiorna, non duplica (si riconoscono dall'UID). */
+function parseICS(txt) {
+  const lines = String(txt).replace(/\r\n/g, '\n').replace(/\n[ \t]/g, '').split('\n');
+  const un = v => v.replace(/\\n/gi, '\n').replace(/\\([,;\\])/g, '$1').trim();
+  const evs = []; let ev = null, al = null;
+  for (const l of lines) {
+    const i = l.indexOf(':'); if (i < 0) continue;
+    const [name, ...params] = l.slice(0, i).split(';'), val = l.slice(i + 1), key = name.toUpperCase();
+    const prm = Object.fromEntries(params.map(p => p.split('=')).map(([k, v]) => [k.toUpperCase(), v]));
+    if (key === 'BEGIN' && val === 'VEVENT') ev = { alarms: [] };
+    else if (key === 'END' && val === 'VEVENT') { if (ev) evs.push(ev); ev = null; }
+    else if (key === 'BEGIN' && val === 'VALARM') al = {};
+    else if (key === 'END' && val === 'VALARM') { if (ev && al) ev.alarms.push(al); al = null; }
+    else if (al) { if (key === 'TRIGGER') { al.trigger = val; al.abs = prm.VALUE === 'DATE-TIME'; } if (key === 'DESCRIPTION') al.text = un(val); }
+    else if (ev) { if (key === 'DTSTART') { ev.start = val; ev.allDay = prm.VALUE === 'DATE' || /^\d{8}$/.test(val); } else if (['SUMMARY', 'DESCRIPTION', 'LOCATION', 'UID', 'RRULE'].includes(key)) ev[key.toLowerCase()] = key === 'RRULE' ? val : un(val); }
+  }
+  return evs;
+}
+function icsDate(v) {   // → Date locale
+  const m = String(v).match(/^(\d{4})(\d{2})(\d{2})(?:T(\d{2})(\d{2})(\d{2})?(Z)?)?/); if (!m) return null;
+  const [, y, mo, d, h = '09', mi = '00', , z] = m;
+  return z ? new Date(Date.UTC(+y, +mo - 1, +d, +h, +mi)) : new Date(+y, +mo - 1, +d, +h, +mi);
+}
+function icsMinutes(tr, start) {   // TRIGGER → minuti prima dell'inizio (0 = all'ora)
+  if (!tr) return 0;
+  if (/^\d{8}T/.test(tr)) { const x = icsDate(tr); return x ? Math.max(0, Math.round((start - x) / 6e4)) : 0; }
+  const m = tr.match(/^([+-])?P(?:(\d+)W)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?$/); if (!m) return 0;
+  const min = (+m[2] || 0) * 10080 + (+m[3] || 0) * 1440 + (+m[4] || 0) * 60 + (+m[5] || 0);
+  return m[1] === '-' ? min : 0;
+}
+function importICS(txt) {
+  const evs = parseICS(txt), t = today(); let add = 0, upd = 0, old = 0;
+  const DOW = { SU: 0, MO: 1, TU: 2, WE: 3, TH: 4, FR: 5, SA: 6 };
+  evs.forEach(e => {
+    const st = icsDate(e.start); if (!st || !e.summary) return;
+    const date = ymd(st), time = e.allDay ? '09:00' : pad(st.getHours()) + ':' + pad(st.getMinutes());
+    const rr = Object.fromEntries(String(e.rrule || '').split(';').filter(Boolean).map(x => x.split('=')));
+    const rep = { YEARLY: 'yearly', WEEKLY: 'weekly', DAILY: 'daily', MONTHLY: 'monthly' }[rr.FREQ] || 'once';
+    if (rep === 'once' && date < t) { old++; return; }
+    const mins = [...new Set(e.alarms.map(a => icsMinutes(a.trigger, st)))].sort((a, b) => a - b);
+    const alTxt = {}; e.alarms.forEach(a => { const v = icsMinutes(a.trigger, st); if (a.text && a.text !== e.summary) alTxt[v] = a.text.slice(0, 300); });
+    const r = { title: e.summary.slice(0, 120), body: [e.description, e.location].filter(Boolean).join(' · ').replace(/\n+/g, ' · ').slice(0, 400), rep, days: rep === 'weekly' ? String(rr.BYDAY || '').split(',').map(x => DOW[x.slice(-2)]).filter(x => x != null) : [], dom: st.getDate(), date, time,
+      alert: mins.includes(0) || !mins.length ? 0 : mins[0], on: true, icsUid: e.uid || '' };
+    if (rep === 'weekly' && !r.days.length) r.days = [st.getDay()];
+    r.more = mins.filter(v => v !== r.alert); if (Object.keys(alTxt).length) r.alTxt = alTxt;
+    const ex = r.icsUid && S.reminders.find(x => x.icsUid === r.icsUid);
+    if (ex) { Object.assign(ex, r, { id: ex.id, on: ex.on }); upd++; } else { S.reminders.push({ id: uid(), ...r }); add++; }
+  });
+  return { add, upd, old, tot: evs.length };
+}
+$('icsPick').onclick = () => $('icsFile').click();
+$('icsFile').onchange = async ev => {
+  const f = ev.target.files[0]; ev.target.value = ''; if (!f) return;
+  try {
+    const res = importICS(await f.text());
+    if (!res.tot) return toast('Nel file non ho trovato eventi');
+    save(); render(); clearTimeout(syncT); lastHash = ''; syncServer();
+    toast(`Calendario: ${res.add} promemoria nuovi${res.upd ? ', ' + res.upd + ' aggiornati' : ''}${res.old ? ', ' + res.old + ' già passati saltati' : ''}`);
+  } catch (e) { toast('File non leggibile: ' + e.message.slice(0, 60)); }
+};
 /* Settimana: notti (dove + con Giada), palestra e impegni in una sola schermata */
 const isGymAppt = a => /palestra|gym/i.test(a.title || '');
 const gymOn = d => apptsOn(d).some(isGymAppt);
@@ -4021,7 +4165,7 @@ $('bkFile').onchange = async e => {
 /* =====================================================================
    AVVIO
    ===================================================================== */
-document.addEventListener('visibilitychange', () => { if (!document.hidden) { housekeeping(); render(); syncServer(); pullInbox(); getWeather().then(w => { if (w) render(); }); } else { clearTimeout(syncT); pushScheduleNow(); } });
+document.addEventListener('visibilitychange', () => { if (!document.hidden) { housekeeping(); render(); syncServer(); pullInbox(); ensurePush(); getWeather().then(w => { if (w) render(); }); } else { clearTimeout(syncT); pushScheduleNow(); } });
 window.addEventListener('pagehide', pushScheduleNow);
 setInterval(() => { if (!document.hidden && view === 'oggi') renderOggi(); }, 60000);
 if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js').catch(() => {}); navigator.serviceWorker.addEventListener('message', e => { if (e.data?.open === 'plan') openWeek('plan'); }); }
@@ -4032,7 +4176,7 @@ if (LOAD_FAIL) setTimeout(() => { alert('Gestiotto non è riuscito a leggere i t
 housekeeping(); render(); setTimeout(syncServer, 1500);
 setTimeout(() => { if (!LOAD_FAIL && aiReady() && S.settings.provider === 'gemini') geminiModels().catch(() => {}); }, 2500);
 setTimeout(() => autoFlyers().catch(() => {}), 6000);
-setTimeout(() => { if (!LOAD_FAIL && S.gym.notes && hashStr(S.gym.notes) !== S.gym.planOf) parseGymPlan().catch(() => {}); }, 4000); setTimeout(pullInbox, 1200); getWeather().then(w => { if (w) render(); });
+setTimeout(() => { if (!LOAD_FAIL && S.gym.notes && hashStr(S.gym.notes) !== S.gym.planOf) parseGymPlan().catch(() => {}); }, 4000); setTimeout(pullInbox, 1200); setTimeout(() => ensurePush(true), 2500); getWeather().then(w => { if (w) render(); });
 </script>
 </body>
 </html>
