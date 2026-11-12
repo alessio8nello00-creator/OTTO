@@ -12,7 +12,7 @@
 <link rel="icon" href="logo.svg" type="image/svg+xml">
 <link rel="manifest" href="manifest.webmanifest">
 <title>Gestiotto</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://generativelanguage.googleapis.com" crossorigin><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 /* ===== Palette autunnale: calma, calda, marrone ===== */
@@ -872,7 +872,7 @@ function hydrate(raw) {
 /* PROTEZIONE DATI
    1) prima di usare una versione nuova dell'app, copia intatta dei dati com'erano (otto.v1.pre-<versione>)
    2) se i dati non si leggono, l'app NON salva nulla sopra: restano intatti e si possono esportare */
-const APP_VER = '3.6';
+const APP_VER = '3.7';
 let RAW = null, LOAD_FAIL = false;
 try { RAW = localStorage.getItem(KEY); } catch {}
 try {
@@ -925,6 +925,7 @@ function normDate(d) {
 const toMin = t => { const n = normTime(t); if (!n) return null; const [h, m] = n.split(':').map(Number); return h * 60 + m; };
 const at = (dateStr, time) => parse(normDate(dateStr) || dateStr).getTime() + (toMin(time) ?? 9 * 60) * 6e4; // senza orario valido: 9:00
 const nowHM = () => { const d = new Date(); return pad(d.getHours()) + ':' + pad(d.getMinutes()); };
+const nowHMS = () => { const d = new Date(); return nowHM() + ':' + pad(d.getSeconds()); };
 const weekStart = s => { const d = parse(s); return shift(s, -((d.getDay() + 6) % 7)); };
 const REC = { none: '', daily: 'ogni giorno', weekly: 'ogni settimana', biweekly: 'ogni 2 settimane', monthly: 'ogni mese', yearly: 'ogni anno' };
 const ALERT = { '-1': 'nessun avviso', 0: "avviso all'ora esatta", 10: 'avviso 10 min prima', 30: 'avviso 30 min prima', 60: 'avviso 1 ora prima', 120: 'avviso 2 ore prima', 1440: 'avviso 1 giorno prima', 2880: 'avviso 2 giorni prima', 10080: 'avviso 1 settimana prima' };
@@ -1164,7 +1165,7 @@ function go(v) {
   view = v;
   document.querySelectorAll('.view').forEach(x => x.classList.toggle('on', x.id === 'v-' + v));
   document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
-  document.body.classList.toggle('chat', v === 'chat');
+  document.body.classList.toggle('chat', v === 'chat'); if (v === 'chat') warmAI();
   document.body.classList.toggle('settings', v === 'settings');
   document.body.classList.toggle('outfit', v === 'outfit');
   document.body.classList.toggle('liste', v === 'liste'); document.body.classList.toggle('soldi', v === 'soldi');
@@ -1829,7 +1830,7 @@ function buildSchedule() {
     add(`b-${b.id}-${nb}`, at(nb, '09:00'), b.name, `Oggi, ${longDate(nb)}.`);
     if (b.gift) add(`bg-${b.id}-${nb}`, at(shift(nb, -b.gift), '09:00'), `${b.name} tra ${b.gift} giorni`, `Regalo aggiunto alla lista Regali.`); });
   for (let i = 0; i < SCHED_DAYS; i++) { const d = shift(t, i); S.reminders.forEach(r => { if (remOn(r, d)) alertsOf({ alert: r.alert || 0, more: r.more }).forEach(al => { const before = out.length, own = r.alTxt && r.alTxt[al];
-    add(`p-${r.id}-${d}-${r.time}-${al}`, at(d, r.time) - al * 6e4, r.title, own ? own : al ? `${alWhen(al, r.time)}${r.body ? ' · ' + r.body : ''}` : (r.body || (r.wa ? '' : `⏰ Adesso · ${r.time}`)) + (r.wa ? (r.body ? ' · ' : '') + '📲 Tocca per mandare il WhatsApp' : ''));
+    add(`p-${r.id}-${d}-${r.time}-${al}`, (r.exact && r.rep === 'once' ? r.exact : at(d, r.time)) - al * 6e4, r.title, own ? own : al ? `${alWhen(al, r.time)}${r.body ? ' · ' + r.body : ''}` : (r.body || (r.wa ? '' : `⏰ Adesso · ${r.time}`)) + (r.wa ? (r.body ? ' · ' : '') + '📲 Tocca per mandare il WhatsApp' : ''));
     if (r.wa && !al && out.length > before) out[out.length - 1].url = waURL(r.wa); }); }); }
   // 💾 promemoria backup: prima domenica del mese alle 10, se l'ultimo backup ha più di 25 giorni
   for (let i = 0; i < 14; i++) { const d = shift(t, i), x = parse(d); if (x.getDay() === 0 && x.getDate() <= 7 && (!S.lastExport || daysBetween(S.lastExport, d) > 25)) add(`q-bk-${d}`, at(d, '10:00'), '💾 Backup del mese', 'Apri Gestiotto e tocca “Salva”: un file con tutto, foto comprese.'); }
@@ -1843,6 +1844,9 @@ function buildSchedule() {
   return out.sort((a, b) => a.at - b.at).slice(0, 800);
 }
 const SCHED_DAYS = 60;
+/* promemoria al secondo ("tra 10 minuti", o un orario appena passato che parte subito) */
+const setExact = (r, ms) => { const x = new Date(ms); r.exact = ms; r.date = ymd(x); r.time = pad(x.getHours()) + ':' + pad(x.getMinutes()); r.rep = 'once'; };
+const exactTxt = ms => { const x = new Date(ms); return pad(x.getHours()) + ':' + pad(x.getMinutes()) + ':' + pad(x.getSeconds()); };
 /* "Alle 08:00" se è lo stesso giorno, altrimenti "Domani alle 08:00" / "Tra 3 giorni alle 08:00" */
 const alWhen = (al, time) => { const dd = Math.floor((toMin(time) - al) / 1440); return dd >= 0 ? `Alle ${time}` : dd === -1 ? `Domani alle ${time}` : `Tra ${-dd} giorni alle ${time}`; };
 const fmtMin = v => v % 10080 === 0 ? (v / 10080 === 1 ? '1 settimana' : v / 10080 + ' settimane') : v % 1440 === 0 ? (v / 1440 === 1 ? '1 giorno' : v / 1440 + ' giorni') : v % 60 === 0 ? (v / 60 === 1 ? '1 ora' : v / 60 + ' ore') : v + ' min';
@@ -2159,6 +2163,13 @@ $('chatlog').addEventListener('click', e => {
   S.chat.push({ role: 'tool', text: '↶ Modifiche annullate' }); undoSnap = null; save(); render();
 });
 const dataSnap = () => JSON.stringify({ ...S, chat: [], settings: { name: S.settings.name, routine: S.settings.routine } });
+/* connessione a Google già aperta quando entri in chat o inizi a scrivere: la prima risposta parte senza attese */
+var warmAt = 0;
+function warmAI() {
+  if (!aiReady() || S.settings.provider !== 'gemini' || Date.now() - warmAt < 90e3 || !navigator.onLine) return;
+  warmAt = Date.now(); fetch(GEM + 'models?pageSize=1', { headers: { 'x-goog-api-key': gKey() } }).catch(() => {});
+}
+$('chatIn').addEventListener('focus', warmAI); $('chatIn').addEventListener('input', warmAI);
 $('chatIn').onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } };
 
 const TOOLS = [
@@ -2218,8 +2229,8 @@ const TOOLS = [
     input_schema: { type: 'object', properties: { cosa: { type: 'string' }, condizione: { type: 'string', enum: ['sempre', 'lavoro', 'palestra'] } }, required: ['cosa'] } },
   { name: 'imposta_routine', description: 'Cambia routine e impostazioni: giorni e orari ufficio, orari dei riepiloghi, nome con cui chiamarlo.',
     input_schema: { type: 'object', properties: { giorni_ufficio: { type: 'array', items: { type: 'integer', description: '0=dom … 6=sab' } }, entrata: { type: 'string' }, uscita: { type: 'string' }, recap_mattina: { type: 'string' }, recap_sera: { type: 'string' }, recap_domenica: { type: 'string' }, nome: { type: 'string' } } } },
-  { name: 'crea_promemoria', description: "Crea un promemoria su misura con notifica, per qualsiasi cosa (affitto, medicine, chiamare la nonna, buttare la plastica…). Di base avvisa all'ora esatta; altri_preavvisi (minuti prima) aggiunge avvisi in più. ripetizione: once (serve data) | daily | weekly (serve giorni) | monthly (serve giorno_mese) | yearly (serve data).",
-    input_schema: { type: 'object', properties: { altri_preavvisi: { type: 'array', items: { type: 'integer' } }, titolo: { type: 'string' }, testo: { type: 'string' }, ripetizione: { type: 'string', enum: ['once', 'daily', 'weekly', 'monthly', 'yearly'] }, giorni: { type: 'array', items: { type: 'integer' } }, giorno_mese: { type: 'integer' }, data: { type: 'string' }, ora: { type: 'string' }, preavviso_minuti: { type: 'integer', description: '0 = all\'ora esatta; es. 10, 30, 60, 1440' } }, required: ['titolo', 'ripetizione', 'ora'] } },
+  { name: 'crea_promemoria', description: "Crea un promemoria su misura con notifica, per qualsiasi cosa (affitto, medicine, chiamare la nonna, buttare la plastica…). Di base avvisa all'ora esatta; altri_preavvisi (minuti prima) aggiunge avvisi in più. ripetizione: once (serve data) | daily | weekly (serve giorni) | monthly (serve giorno_mese) | yearly (serve data). Per \"tra X minuti/ore\" usa SOLO tra_minuti (once, senza data né ora): l'app calcola l'orario al secondo.",
+    input_schema: { type: 'object', properties: { tra_minuti: { type: 'number', description: 'minuti da adesso, es. 1, 10, 90 (al posto di data e ora)' }, altri_preavvisi: { type: 'array', items: { type: 'integer' } }, titolo: { type: 'string' }, testo: { type: 'string' }, ripetizione: { type: 'string', enum: ['once', 'daily', 'weekly', 'monthly', 'yearly'] }, giorni: { type: 'array', items: { type: 'integer' } }, giorno_mese: { type: 'integer' }, data: { type: 'string' }, ora: { type: 'string' }, preavviso_minuti: { type: 'integer', description: '0 = all\'ora esatta; es. 10, 30, 60, 1440' } }, required: ['titolo', 'ripetizione'] } },
   { name: 'crea_contatore', description: "Crea un contatore settimanale per un'abitudine (es. Lettura 5 volte, Corsa 2 volte). Compare in Oggi con il tasto Fatto.",
     input_schema: { type: 'object', properties: { nome: { type: 'string' }, obiettivo: { type: 'integer' } }, required: ['nome', 'obiettivo'] } },
   { name: 'registra_contatore', description: 'Segna (o annulla) un contatore in un giorno.',
@@ -2403,12 +2414,15 @@ async function runTool(name, x) {
       return `Routine aggiornata: ufficio ${r.workDays.map(d => WD[d]).join(', ')} ${r.workStart}–${r.workEnd}; recap ${r.morning} / ${r.evening} / dom ${r.sunday}`;
     }
     case 'crea_promemoria': {
-      const r = { id: uid(), title: x.titolo, body: x.testo || '', rep: x.ripetizione, days: x.giorni || [], dom: x.giorno_mese || 1, date: x.data || '', time: x.ora, alert: Math.max(0, x.preavviso_minuti || 0), more: (x.altri_preavvisi || []).filter(v => v >= 0), on: true };
+      const r = { id: uid(), title: x.titolo, body: x.testo || '', rep: x.ripetizione || 'once', days: x.giorni || [], dom: x.giorno_mese || 1, date: x.data || '', time: normTime(x.ora || ''), alert: Math.max(0, x.preavviso_minuti || 0), more: (x.altri_preavvisi || []).filter(v => v >= 0), on: true };
+      if (+x.tra_minuti > 0) setExact(r, Date.now() + Math.round(+x.tra_minuti * 60e3));   // "tra X minuti": calcolato qui, al secondo
       if ((r.rep === 'once' || r.rep === 'yearly') && !r.date) throw new Error('serve la data');
       if (!r.time) throw new Error('serve l\'orario (HH:MM)');
-      if (r.rep === 'once' && at(r.date, r.time) <= Date.now()) throw new Error(`orario già passato: adesso sono le ${nowHM()} del ${today()}`);
+      if (r.rep === 'once' && !r.exact) { const late = Date.now() - at(r.date, r.time);
+        if (late > 0 && late <= 3 * 60e3) setExact(r, Date.now() + 2000);   // ora appena passata (la chat ci ha messo un attimo): parte subito, niente errore
+        else if (late > 0) throw new Error(`orario già passato: adesso sono le ${nowHMS()} del ${today()}. Se Otto intendeva "tra X minuti" usa tra_minuti.`); }
       if (r.rep === 'weekly' && !r.days.length) throw new Error('servono i giorni');
-      S.reminders.push(r); return `Promemoria creato: ${r.title}, ${REP_TXT(r)} alle ${r.time}${REM_ALERT(r)}`;
+      S.reminders.push(r); return `Promemoria creato: ${r.title}, ${REP_TXT(r)} alle ${r.exact ? exactTxt(r.exact) : r.time}${REM_ALERT(r)}`;
     }
     case 'crea_contatore': { S.counters.push({ id: uid(), name: x.nome, goal: x.obiettivo, log: [] }); return `Contatore creato: ${x.nome}, ${x.obiettivo} a settimana`; }
     case 'registra_contatore': {
@@ -2473,9 +2487,6 @@ function systemPrompt() {
   const bds = S.birthdays.map(b => `- [${b.id}] ${b.name}: ${nextBirthday(b)}${nt(b)}`).join('\n') || '(nessuno)';
   const pls = S.plants.map(p => `- [${p.id}] ${p.name}: ogni ${p.every} gg, prossima ${plantNext(p)}${nt(p)}`).join('\n') || '(nessuna)';
   return `Sei l'assistente dentro "Gestiotto", l'app personale di Otto. Chiamalo "Otto". Tono NEUTRO e PRECISO: frasi brevi, solo informazioni utili, niente battute né enfasi. Rispondi in italiano.
-ADESSO: ${longDate(t)} ${t}, ore ${nowHM()} (ora italiana, Europe/Rome).
-CALENDARIO PROSSIMI GIORNI: ${Array.from({ length: 15 }, (_, i) => { const d = shift(t, i); return `${i === 0 ? 'oggi' : i === 1 ? 'domani' : WDL[parse(d).getDay()]}=${d}`; }).join(', ')}.
-ORARI: usa SEMPRE date YYYY-MM-DD e orari HH:MM a 24 ore (es. 08:30, 21:00). "Tra X minuti/ore" si calcola dall'ora attuale (${nowHM()}). "Stamattina/stasera/domani pomeriggio" senza ora precisa: chiedi l'ora. Non creare mai promemoria o appuntamenti in un orario già passato.
 
 ROUTINE: ufficio ${R().workDays.map(d => WD[d]).join(', ')} ${R().workStart}–${R().workEnd}. Le notti (casa sua / da Giada, la sua ragazza / altro = trasferta o altrove) cambiano ogni settimana; di base dorme con Giada (90% delle volte), "da solo" è l'eccezione. Palestra: obiettivo ${S.gym.goal} volte a settimana (fatte ${gymWeek()}).
 SIRI: i messaggi che iniziano con "(da Siri)" sono stati dettati a Siri: eseguili direttamente e rispondi in una riga.
@@ -2540,7 +2551,11 @@ OUTFIT — armadio (usa gli id con suggerisci_outfit / aggiorna_capo; per "cosa 
 ${S.clothes.slice(0, 150).map(c => `- [${c.id}] ${CATS[c.cat]}: ${c.name}${c.brand ? ' · ' + c.brand : ''}${c.color ? ' · ' + c.color : ''} · voto ${c.rating || 0}/5${isWash(c) ? ' · A LAVARE' : ''}`).join('\n') || '(vuoto)'}
 
 GUSTI — Otto: piace ${S.tastes.otto.likes.join(', ') || '-'}; non piace ${S.tastes.otto.dislikes.join(', ') || '-'}. Giada: piace ${S.tastes.giada.likes.join(', ') || '-'}; non piace ${S.tastes.giada.dislikes.join(', ') || '-'}. Mangiano sempre insieme; se una cosa non piace a uno solo si può comunque comprare per l'altro.
-SPESA: negozi ${storesList().join(', ')}; ${validOffers().length} offerte valide, ${Object.keys(S.prices).length} prezzi noti. Per "fai la spesa", "cosa compro", "spesa economica" usa prepara_spesa. Se Otto dice gusti nuovi usa aggiorna_gusti.`;
+SPESA: negozi ${storesList().join(', ')}; ${validOffers().length} offerte valide, ${Object.keys(S.prices).length} prezzi noti. Per "fai la spesa", "cosa compro", "spesa economica" usa prepara_spesa. Se Otto dice gusti nuovi usa aggiorna_gusti.
+
+ORARI: usa SEMPRE date YYYY-MM-DD e orari HH:MM a 24 ore (es. 08:30, 21:00). Per "tra X minuti/ore" NON calcolare l'ora: usa crea_promemoria con tra_minuti (l'app calcola al secondo). "Stamattina/stasera/domani pomeriggio" senza ora precisa: chiedi l'ora.
+CALENDARIO PROSSIMI GIORNI: ${Array.from({ length: 15 }, (_, i) => { const d = shift(t, i); return `${i === 0 ? 'oggi' : i === 1 ? 'domani' : WDL[parse(d).getDay()]}=${d}`; }).join(', ')}.
+ADESSO: ${longDate(t)} ${t}, ore ${nowHMS()} (ora italiana, Europe/Rome).`;
 }
 
 /* =====================================================================
@@ -2606,7 +2621,7 @@ const AI = {
   },
   gemini: {
     init: hist => hist.map(m => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.text }] })),
-    async call(native, system, tools, maxTokens, json) {
+    async call(native, system, tools, maxTokens, json, onText) {
       const body = { systemInstruction: { parts: [{ text: system }] }, contents: native, generationConfig: { maxOutputTokens: Math.max(2048, maxTokens * 2) } };
       if (json && !tools) body.generationConfig.responseMimeType = 'application/json';
       if (tools) body.tools = [{ functionDeclarations: tools.map(t => ({ name: t.name, description: t.description, parameters: gSchema(t.input_schema) })) }];
@@ -2620,47 +2635,90 @@ const AI = {
       /* Patch 13: più modelli IN PARALLELO, vince il primo che risponde.
          Parte il preferito; se dopo 4 s tace parte anche il successivo, poi un terzo a 9 s.
          Un errore (sovraccarico, limite, modello sparito) fa partire subito il prossimo. Tetto: 35 s. */
-      const noThink = S.settings.noThink = S.settings.noThink || {};
-      const tryModel = async (model, signal) => {
+      const noThink = S.settings.noThink = S.settings.noThink || {}, speed = S.settings.gemSpeed = S.settings.gemSpeed || {};
+      /* V3.7 · CHAT VELOCE
+         - risposta in STREAMING: le parole compaiono mentre Google le scrive (onText);
+         - partono SUBITO due modelli in parallelo (l'ultimo che ha funzionato e il più rapido misurato): vince il primo che inizia a rispondere,
+           gli altri si fermano; se tacciono ne partono altri a 3, 7 e 12 secondi;
+         - la velocità di ogni modello viene misurata e ricordata. */
+      const fastest = Object.entries(speed).filter(([m]) => order.includes(m) && !busy[m]).sort((a, b) => a[1] - b[1]).map(([m]) => m)[0];
+      if (fastest) order = [...new Set([order[0], fastest, ...order])];
+      let winner = null;
+      const tryModel = async (model, signal, claim) => {
         for (let att = 0; att < 2; att++) {
           const gc = { ...body.generationConfig };
           if (/flash/.test(model) && !noThink[model]) gc.thinkingConfig = { thinkingBudget: 0 };
+          const t0 = performance.now();
           let res;
-          try { res = await fetch(GEM + 'models/' + model + ':generateContent', { method: 'POST', headers: { 'content-type': 'application/json', 'x-goog-api-key': gKey() }, body: JSON.stringify({ ...body, generationConfig: gc }), signal }); }
+          try { res = await fetch(GEM + 'models/' + model + ':streamGenerateContent?alt=sse', { method: 'POST', headers: { 'content-type': 'application/json', 'x-goog-api-key': gKey() }, body: JSON.stringify({ ...body, generationConfig: gc }), signal }); }
           catch (e) { if (e.name === 'AbortError') throw Object.assign(new Error('annullato'), { aborted: true }); throw Object.assign(new Error('Connessione assente o bloccata: ' + e.message), { net: true }); }
-          const d = await res.json().catch(() => ({}));
-          if (res.ok) return d;
-          const msg = d?.error?.message || ('Errore ' + res.status);
-          if (res.status === 400 && gc.thinkingConfig && /think/i.test(msg)) { noThink[model] = true; save(); continue; }
-          throw Object.assign(new Error(msg), { status: res.status });
+          if (!res.ok) {
+            const d = await res.json().catch(() => ({})), msg = d?.error?.message || ('Errore ' + res.status);
+            if (res.status === 400 && gc.thinkingConfig && /think/i.test(msg)) { noThink[model] = true; save(); continue; }
+            throw Object.assign(new Error(msg), { status: res.status });
+          }
+          const parts = [];
+          const take = d => {
+            const ps = d?.candidates?.[0]?.content?.parts || [];
+            if (ps.length && !claim(model)) throw Object.assign(new Error('annullato'), { aborted: true });
+            parts.push(...ps);
+            if (ps.some(p => p.text && !p.thought) && onText && winner === model) onText(parts.filter(p => p.text && !p.thought).map(p => p.text).join(''));
+          };
+          try {
+            if (!/event-stream/i.test(res.headers.get('content-type') || '') || !res.body || !res.body.getReader) {
+              take(await res.json());   // risposta intera (senza streaming)
+            } else {
+              const rd = res.body.getReader(), dec = new TextDecoder(); let buf = '';
+              for (;;) {
+                const { value, done } = await rd.read(); if (done) break;
+                buf += dec.decode(value, { stream: true });
+                let k; while ((k = buf.indexOf('\n')) >= 0) { const line = buf.slice(0, k).trim(); buf = buf.slice(k + 1); if (line.startsWith('data:')) { const j = line.slice(5).trim(); if (j && j !== '[DONE]') take(JSON.parse(j)); } }
+              }
+              const rest = buf.trim(); if (rest.startsWith('data:')) take(JSON.parse(rest.slice(5).trim()));
+            }
+          } catch (e) { if (e.aborted || e.name === 'AbortError') throw Object.assign(new Error('annullato'), { aborted: true }); throw Object.assign(new Error('Risposta interrotta: ' + e.message), { status: 503 }); }
+          if (!parts.length) throw Object.assign(new Error('risposta vuota'), { status: 503 });
+          // pezzi di testo uniti in uno (le "firme" del modello restano), chiamate agli strumenti così come sono
+          const merged = [];
+          for (const p of parts) {
+            const prev = merged[merged.length - 1];
+            if (p.text != null && !p.functionCall && !p.thought && prev && prev.text != null && !prev.functionCall && !prev.thought) { prev.text += p.text; if (p.thoughtSignature && !prev.thoughtSignature) prev.thoughtSignature = p.thoughtSignature; }
+            else merged.push({ ...p });
+          }
+          const ms = performance.now() - t0; speed[model] = Math.round(speed[model] ? speed[model] * 0.6 + ms * 0.4 : ms);
+          return { candidates: [{ content: { role: 'model', parts: merged } }] };
         }
         throw new Error('modello non adatto');
       };
       const data = await new Promise((resolve, reject) => {
-        const ctrls = [], timers = []; let idx = 0, running = 0, finished = false, lastErr = null, netErr = null;
-        const finish = (fn, v) => { if (finished) return; finished = true; timers.forEach(clearTimeout); ctrls.forEach(c => { try { c.abort(); } catch {} }); fn(v); };
+        const ctrls = {}, timers = []; let idx = 0, running = 0, finished = false, lastErr = null, netErr = null;
+        const finish = (fn, v) => { if (finished) return; finished = true; timers.forEach(clearTimeout); Object.values(ctrls).forEach(c => { try { c.abort(); } catch {} }); fn(v); };
+        // il primo modello che inizia a rispondere vince: gli altri si fermano subito
+        const claim = model => { if (finished) return false; if (!winner) { winner = model; timers.forEach(clearTimeout); for (const [m, c] of Object.entries(ctrls)) if (m !== model) try { c.abort(); } catch {} } return winner === model; };
         const failAll = () => {
           if (lastErr) return finish(reject, new Error(lastErr.status === 429 ? 'Limite gratuito raggiunto su tutti i modelli: riprova tra qualche minuto' : [500, 503, 504].includes(lastErr.status) ? 'Google è sovraccarico in questo momento: riprova tra qualche minuto' : lastErr.message));
           finish(reject, netErr || new Error('Nessun modello disponibile'));
         };
         const launch = () => {
-          if (finished) return;
+          if (finished || winner) return;
           if (idx >= order.length) { if (!running) failAll(); return; }
-          const model = order[idx++], ac = new AbortController(); ctrls.push(ac); running++;
+          const model = order[idx++], ac = new AbortController(); ctrls[model] = ac; running++;
           aiProgress(model);
-          tryModel(model, ac.signal).then(d => {
+          tryModel(model, ac.signal, claim).then(d => {
             S.settings.geminiLast = model; delete busy[model]; save(); finish(resolve, d);
           }).catch(e => {
-            running--; if (e.aborted || finished) return;
+            running--; if (finished) return;
+            if (winner === model) winner = null;   // si è interrotto a metà: riparto con gli altri
+            else if (e.aborted) { if (!running && !winner) launch(); return; }
             if (/api key|api_key/i.test(e.message)) return finish(reject, new Error('Chiave Gemini non valida: ricontrollala in ⚙︎'));
             if (e.net) netErr = e;
             else { lastErr = e; const ov = [429, 500, 503, 504].includes(e.status) || /overload|high demand|unavailable|exhausted/i.test(e.message); busy[model] = Date.now() + (ov ? 10 * 60e3 : 24 * 3600e3); save(); }
             launch();
           });
         };
-        launch();
-        timers.push(setTimeout(launch, 4000), setTimeout(launch, 9000), setTimeout(launch, 15000));
-        timers.push(setTimeout(() => finish(reject, new Error('Google non risponde in questo momento: riprova tra poco')), 35000));
+        launch(); if (onText && order.length > 1) launch();   // in chat due modelli subito; per foto e volantini uno alla volta (risparmia il limite gratuito)
+        timers.push(setTimeout(launch, 3000), setTimeout(launch, 7000), setTimeout(launch, 12000));
+        setTimeout(() => finish(reject, new Error('Google non risponde in questo momento: riprova tra poco')), 45000);
       });
       const content = data.candidates?.[0]?.content || { role: 'model', parts: [{ text: '' }] };
       const parts = content.parts || [];
@@ -2692,10 +2750,11 @@ async function send(override) {
   const A = ai(), native = A.init(hist);
   try {
     for (let round = 0; round < 8; round++) {
-      const r = await A.call(native, systemPrompt(), TOOLS, 1024);
+      const r = await A.call(native, systemPrompt(), TOOLS, 1024, false, txt => { thinking.className = 'msg a'; thinking.textContent = txt; window.scrollTo(0, document.body.scrollHeight); });
       native.push(r.assistant);
       if (!r.uses.length) { S.chat.push({ role: 'assistant', text: r.said || '✓' }); break; }
       if (r.said) { S.chat.push({ role: 'assistant', text: r.said }); renderChat(); }
+      thinking.className = 'msg t thinking'; thinking.textContent = '… eseguo'; $('chatlog').appendChild(thinking);
       const outs = [];
       for (const u of r.uses) {
         try { const res = await runTool(u.name, u.input); S.chat.push({ role: 'tool', text: (res.startsWith('ANNULLATO') ? '✕ ' : '✓ ') + res }); outs.push({ id: u.id, name: u.name, content: res }); }
@@ -3385,8 +3444,8 @@ function rmUpdate() {
   const al = +$('rmAlert').value, t = normTime(r.time);
   let txt = t ? `${REP_TXT(r) || ''} alle ${t}` : 'Scegli l\'ora';
   if (t && al) { const m = toMin(t) - al; txt += m >= 0 ? ` · notifica alle ${pad(Math.floor(m / 60))}:${pad(m % 60)}` : ` · notifica ${ALERT[al] || al + ' min prima'}`; }
-  const past = rep === 'once' && r.date && t && at(r.date, t) - al * 6e4 <= Date.now();
-  $('rmCheck').innerHTML = `<div><b>${esc(txt)}</b></div>${past ? '<div class="bad">⚠︎ Questo orario è già passato</div>' : ''}`;
+  const late = rep === 'once' && r.date && t ? Date.now() - (at(r.date, t) - al * 6e4) : -1;
+  $('rmCheck').innerHTML = `<div><b>${esc(txt)}</b></div>${late > 3 * 60e3 ? `<div class="bad">⚠︎ Questo orario è già passato (adesso sono le ${nowHM()})</div>` : late > 0 ? '<div class="sub">È adesso: la notifica parte appena salvi.</div>' : ''}`;
 }
 function openRem() {
   $('rmTitle').value = ''; $('rmRep').value = 'once'; $('rmDate').value = today();
@@ -3410,7 +3469,9 @@ $('rmOk').onclick = () => {
   if ($('rmWaText').value.trim()) r.wa = { toName: $('rmWaName').value.trim(), phone: $('rmWaPhone').value.trim(), text: $('rmWaText').value.trim() };
   if ((rep === 'once' || rep === 'yearly') && !r.date) return toast('Scegli il giorno');
   if (rep === 'weekly' && !r.days.length) return toast('Scegli almeno un giorno');
-  if (rep === 'once' && at(r.date, time) - alert * 6e4 <= Date.now()) return toast('Orario già passato');
+  if (rep === 'once') { const late = Date.now() - (at(r.date, time) - alert * 6e4);
+    if (late > 3 * 60e3) return toast(`Orario già passato: adesso sono le ${nowHM()}`);
+    if (late > 0) setExact(r, Date.now() + 2000 + alert * 6e4); }   // ora attuale o appena passata: parte subito
   S.reminders.push(r); save(); render(); $('dlgRem').close(); syncNow('Promemoria');
   S.chat.push({ role: 'tool', text: `✓ Promemoria: ${title}, ${REP_TXT(r)} alle ${time} · avvisi: ${alertsTxt(r)}` }); save(); renderChat();
   toast('Promemoria salvato');
