@@ -872,7 +872,7 @@ function hydrate(raw) {
 /* PROTEZIONE DATI
    1) prima di usare una versione nuova dell'app, copia intatta dei dati com'erano (otto.v1.pre-<versione>)
    2) se i dati non si leggono, l'app NON salva nulla sopra: restano intatti e si possono esportare */
-const APP_VER = '3.5';
+const APP_VER = '3.6';
 let RAW = null, LOAD_FAIL = false;
 try { RAW = localStorage.getItem(KEY); } catch {}
 try {
@@ -1457,7 +1457,7 @@ $('apOk').onclick = () => {
   else { a.id = uid(); S.appts.push(a); }
   save();
   if ($('apCal').checked) addToCalendar(a);
-  $('dlgAppt').close(); render(); apResolve?.(a); apResolve = null;
+  $('dlgAppt').close(); render(); apResolve?.(a); apResolve = null; syncNow('Appuntamento');
 };
 function addToCalendar(a) {
   const d = a.date.replace(/-/g, ''), stamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
@@ -1829,7 +1829,7 @@ function buildSchedule() {
     add(`b-${b.id}-${nb}`, at(nb, '09:00'), b.name, `Oggi, ${longDate(nb)}.`);
     if (b.gift) add(`bg-${b.id}-${nb}`, at(shift(nb, -b.gift), '09:00'), `${b.name} tra ${b.gift} giorni`, `Regalo aggiunto alla lista Regali.`); });
   for (let i = 0; i < SCHED_DAYS; i++) { const d = shift(t, i); S.reminders.forEach(r => { if (remOn(r, d)) alertsOf({ alert: r.alert || 0, more: r.more }).forEach(al => { const before = out.length, own = r.alTxt && r.alTxt[al];
-    add(`p-${r.id}-${d}-${r.time}-${al}`, at(d, r.time) - al * 6e4, r.title, own ? own : al ? `${alWhen(al, r.time)}${r.body ? ' · ' + r.body : ''}` : (r.body || '') + (r.wa ? (r.body ? ' · ' : '') + '📲 Tocca per mandare il WhatsApp' : ''));
+    add(`p-${r.id}-${d}-${r.time}-${al}`, at(d, r.time) - al * 6e4, r.title, own ? own : al ? `${alWhen(al, r.time)}${r.body ? ' · ' + r.body : ''}` : (r.body || (r.wa ? '' : `⏰ Adesso · ${r.time}`)) + (r.wa ? (r.body ? ' · ' : '') + '📲 Tocca per mandare il WhatsApp' : ''));
     if (r.wa && !al && out.length > before) out[out.length - 1].url = waURL(r.wa); }); }); }
   // 💾 promemoria backup: prima domenica del mese alle 10, se l'ultimo backup ha più di 25 giorni
   for (let i = 0; i < 14; i++) { const d = shift(t, i), x = parse(d); if (x.getDay() === 0 && x.getDate() <= 7 && (!S.lastExport || daysBetween(S.lastExport, d) > 25)) add(`q-bk-${d}`, at(d, '10:00'), '💾 Backup del mese', 'Apri Gestiotto e tocca “Salva”: un file con tutto, foto comprese.'); }
@@ -1933,22 +1933,35 @@ function pushScheduleNow() {
       .then(r => { if (r.ok) { lastBackupHash = bh; lastBackupAt = Date.now(); } }).catch(() => {});
   } catch {}
 }
-async function syncServer() {
+let lastKey = '';
+async function syncServer(force = false) {
   if (!P().on || !P().url || !navigator.onLine) return;
+  let sent = true;
   try {
     const { items, carry, hash } = schedPayload();
     nextNotif = items[0] || null;
     if (hash !== lastHash) {
-      // al massimo un invio ogni 20 secondi (le modifiche a raffica, es. spunte al supermercato, si raggruppano)
-      const wait = 20e3 - (Date.now() - lastSchedAt);
+      // V3.6: se cambia QUANDO arriva qualcosa (promemoria, appuntamenti nuovi o spostati) invio SUBITO:
+      // su iPhone, se chiudi l'app entro pochi secondi, l'invio "rimandato" non partiva mai e la notifica non arrivava.
+      // Solo i cambi di testo (riepiloghi, spunte al supermercato) si raggruppano, al massimo uno ogni 20 secondi.
+      const key = items.map(i => i.id + '@' + i.at).join('|');
+      const wait = force || key !== lastKey ? 0 : 20e3 - (Date.now() - lastSchedAt);
       if (wait > 0) { clearTimeout(schedTimer); schedTimer = setTimeout(syncServer, wait); }
-      else { await api('/schedule', { items, carry }); lastHash = hash; lastSchedAt = Date.now(); lastSync = new Date().toTimeString().slice(0, 5); }
+      else { clearTimeout(schedTimer); sent = false; await api('/schedule', { items, carry }); sent = true; lastHash = hash; lastKey = key; lastSchedAt = Date.now(); lastSync = new Date().toTimeString().slice(0, 5); }
     }
     // backup: solo se cambiato e al massimo ogni 15 minuti (più quello all'uscita dall'app)
     const bp = backupPayload(), bh = hashStr(JSON.stringify(bp));
     if (bh !== lastBackupHash && Date.now() - lastBackupAt > 15 * 60e3) { await api('/backup', bp); lastBackupHash = bh; lastBackupAt = Date.now(); }
     if (view === 'settings') renderVita();
   } catch (e) { console.warn('sync', e); }
+  return sent;
+}
+/* dopo aver salvato un promemoria o un appuntamento: lo mando subito al server e ti dico se è arrivato */
+async function syncNow(what) {
+  if (!P().on || !P().url) return;
+  clearTimeout(syncT);
+  const ok = navigator.onLine && await syncServer(true);
+  if (!ok) toast(`⚠︎ ${what} salvato, ma il server non risponde: la notifica partirà quando riapri l'app con la rete`);
 }
 const b64ToU8 = s => { s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; return Uint8Array.from(atob(s), c => c.charCodeAt(0)); };
 $('pushOn').onclick = async () => {
@@ -3398,7 +3411,7 @@ $('rmOk').onclick = () => {
   if ((rep === 'once' || rep === 'yearly') && !r.date) return toast('Scegli il giorno');
   if (rep === 'weekly' && !r.days.length) return toast('Scegli almeno un giorno');
   if (rep === 'once' && at(r.date, time) - alert * 6e4 <= Date.now()) return toast('Orario già passato');
-  S.reminders.push(r); save(); render(); $('dlgRem').close(); clearTimeout(syncT); syncServer();
+  S.reminders.push(r); save(); render(); $('dlgRem').close(); syncNow('Promemoria');
   S.chat.push({ role: 'tool', text: `✓ Promemoria: ${title}, ${REP_TXT(r)} alle ${time} · avvisi: ${alertsTxt(r)}` }); save(); renderChat();
   toast('Promemoria salvato');
 };
@@ -4176,7 +4189,8 @@ if (LOAD_FAIL) setTimeout(() => { alert('Gestiotto non è riuscito a leggere i t
 housekeeping(); render(); setTimeout(syncServer, 1500);
 setTimeout(() => { if (!LOAD_FAIL && aiReady() && S.settings.provider === 'gemini') geminiModels().catch(() => {}); }, 2500);
 setTimeout(() => autoFlyers().catch(() => {}), 6000);
-setTimeout(() => { if (!LOAD_FAIL && S.gym.notes && hashStr(S.gym.notes) !== S.gym.planOf) parseGymPlan().catch(() => {}); }, 4000); setTimeout(pullInbox, 1200); setTimeout(() => ensurePush(true), 2500); getWeather().then(w => { if (w) render(); });
+setTimeout(() => { if (!LOAD_FAIL && S.gym.notes && hashStr(S.gym.notes) !== S.gym.planOf) parseGymPlan().catch(() => {}); }, 4000); setTimeout(pullInbox, 1200); setTimeout(() => ensurePush(true), 2500);
+window.addEventListener('pagehide', () => { clearTimeout(syncT); pushScheduleNow(); }); getWeather().then(w => { if (w) render(); });
 </script>
 </body>
 </html>
